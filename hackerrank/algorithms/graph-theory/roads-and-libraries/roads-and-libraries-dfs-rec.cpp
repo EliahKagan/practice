@@ -2,6 +2,7 @@
 // In C++14. Using recursive depth-first search.
 
 #include <cassert>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
@@ -67,23 +68,28 @@ namespace {
     }
 
     // Computes the cost of an optimal road- and library-building strategy.
-    int compute_minimum_cost(const int city_count, const int road_count,
-                             const int lib_cost, const int road_cost)
+    std::int_fast64_t
+    compute_minimum_cost(const int city_count, const int road_count,
+                         const int lib_cost, const int road_cost)
     {
         ensure(city_count >= 0 && road_count >= 0);
         ensure(lib_cost >= 0 && road_cost >= 0);
 
         if (lib_cost <= road_cost) {
             consume_graph_vertices(road_count);
-            return city_count * lib_cost;
+            return city_count * std::int_fast64_t{lib_cost};
         }
 
         const auto adj = read_graph(city_count, road_count);
         const auto component_count = count_components(adj);
         assert(component_count <= city_count);
 
-        const auto total_lib_cost = component_count * lib_cost;
-        const auto total_road_cost = (city_count - component_count) * road_cost;
+        const auto total_lib_cost =
+            component_count * std::int_fast64_t{lib_cost};
+
+        const auto total_road_cost =
+            (city_count - component_count) * std::int_fast64_t{road_cost};
+
         return total_lib_cost + total_road_cost;
     }
 }
