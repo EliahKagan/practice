@@ -1,0 +1,8 @@
+# build files
+*.class
+*.exe
+*.obj
+
+# large test-cases (that might be copyright-encumbered)
+input*.txt
+output*.txt
