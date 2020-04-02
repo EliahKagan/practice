@@ -40,7 +40,7 @@ namespace {
     }
 
     // Reads and discards the edges of a graph.
-    void consume_graph_vertices(int edge_count)
+    void consume_graph(int edge_count)
     {
         auto discard = 0;
         for (; edge_count != 0; --edge_count) std::cin >> discard >> discard;
@@ -76,7 +76,7 @@ namespace {
         ensure(lib_cost >= 0 && road_cost >= 0);
 
         if (lib_cost <= road_cost) {
-            consume_graph_vertices(road_count);
+            consume_graph(road_count);
             return city_count * std::int_fast64_t{lib_cost};
         }
 
