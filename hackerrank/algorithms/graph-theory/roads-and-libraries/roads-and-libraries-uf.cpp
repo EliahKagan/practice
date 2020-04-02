@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <numeric>
 #include <utility>
 #include <vector>
 
@@ -97,17 +98,16 @@ namespace {
         for (; edge_count != 0; --edge_count) std::cin >> discard >> discard;
     }
 
-    // Computes the number of components in the specified graph.
-    int count_components(const int vertex_count,
-                         const std::vector<Edge>& edges)
+    // Computes the number of edges in a spanning forest.
+    int count_forest_edges(const int vertex_count,
+                           const std::vector<Edge>& edges)
     {
         auto sets = DisjointSets{vertex_count + 1}; // +1 for 1-based indexing
 
-        auto component_count = vertex_count;
-        for (const auto edge : edges)
-            if (sets.unite(edge.first, edge.second)) --component_count;
-
-        return component_count;
+        return std::accumulate(cbegin(edges), cend(edges), 0,
+                [&sets](const int acc, const Edge edge) noexcept {
+            return acc + sets.unite(edge.first, edge.second);
+        });
     }
 
     // Computes the cost of an optimal road- and library-building strategy.
@@ -123,17 +123,14 @@ namespace {
             return city_count * std::int_fast64_t{lib_cost};
         }
 
-        const auto edges = read_edges(city_count, road_count);
-        const auto component_count = count_components(city_count, edges);
-        assert(component_count <= city_count);
+        const auto roads = read_edges(city_count, road_count);
+        const auto repair_count = count_forest_edges(city_count, roads);
+        assert(repair_count <= road_count);
+        assert(repair_count <= city_count);
+        const auto build_count = city_count - repair_count;
 
-        const auto total_lib_cost =
-            component_count * std::int_fast64_t{lib_cost};
-
-        const auto total_road_cost =
-            (city_count - component_count) * std::int_fast64_t{road_cost};
-
-        return total_lib_cost + total_road_cost;
+        return build_count * std::int_fast64_t{lib_cost}
+                + repair_count * std::int_fast64_t{road_cost};
     }
 }
 
