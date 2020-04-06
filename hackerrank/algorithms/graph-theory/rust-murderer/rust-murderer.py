@@ -7,7 +7,6 @@ of forward *non*-neighbors.
 """
 
 import collections
-import itertools
 import sys
 
 
