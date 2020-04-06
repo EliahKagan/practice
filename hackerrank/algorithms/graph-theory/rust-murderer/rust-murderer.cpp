@@ -88,6 +88,7 @@ namespace {
             }
         }
 
+        std::cerr << "warning: some vertices were not reached\n";
         return costs;
     }
 
