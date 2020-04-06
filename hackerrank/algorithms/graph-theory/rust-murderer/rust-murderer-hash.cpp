@@ -107,7 +107,6 @@ namespace {
                 if (row.count(*destp)) {
                     // Can't go directly to *destp: it's a non-neighbor.
                     ++destp;
-                    continue;
                 } else {
                     costs[*destp] = cost;
                     queue.push({*destp, cost});
