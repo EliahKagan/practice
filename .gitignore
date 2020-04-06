@@ -1,10 +1,10 @@
-# build files
+# Build files.
 *.class
 *.exe
 *.obj
 *.plist
 
-# large test-cases (some of which *might* be copyright-encumbered)
+# Large test cases (some of which *might* be copyright-encumbered).
 input*.txt
 output*.txt
 out.txt

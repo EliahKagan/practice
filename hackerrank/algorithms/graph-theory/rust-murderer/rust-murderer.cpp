@@ -46,14 +46,16 @@ namespace {
         int cost;
     };
 
+    // Given as the minimum cost to reach an unreachable vertex. Conceptually,
+    // this value represents positive infinity.
+    constexpr auto not_reached = -1;
+
     // Computes minimum cost paths from the specified start vertex to all
     // other vertices, in the "complement" graph that has the same vertices
     // as those in the specified graph, and all the edges the specified graph
     // does *not* have. Takes every edge weight to be 1.
     std::vector<int> bfs_complement(const Graph& adj, const int start)
     {
-        static constexpr auto not_reached = -1;
-
         assert(!adj.empty()); // adj[0] exists and is unused (1-based indexing)
         const auto vertex_count = static_cast<int>(adj.size() - 1);
 
