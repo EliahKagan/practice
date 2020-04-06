@@ -62,6 +62,12 @@ namespace {
         auto dests = std::vector<int>(vertex_count - 1);
         std::iota(begin(dests), begin(dests) + (start - 1), 1);
         std::iota(begin(dests) + start, end(dests), start + 1);
+
+        // FIXME: Remove after debugging.
+        std::cerr << "DEBUG:";
+        for (const auto dest : dests) std::cerr << ' ' << dest;
+        std::cerr << '\n';
+
         return dests;
     }
 
