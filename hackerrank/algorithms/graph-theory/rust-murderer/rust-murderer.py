@@ -91,7 +91,6 @@ def bfs_complement(adj, start):
             if nei_index != leader:
                 nei_index = leader
             elif costs[dest] is None and visit(dest, cost + 1):
-                print(costs, file=sys.stderr)
                 return costs
 
     print('warning: some vertices were not reached', file=sys.stderr)
