@@ -2,7 +2,9 @@
 *.class
 *.exe
 *.obj
+*.plist
 
-# large test-cases (that might be copyright-encumbered)
+# large test-cases (some of which *might* be copyright-encumbered)
 input*.txt
 output*.txt
+out.txt

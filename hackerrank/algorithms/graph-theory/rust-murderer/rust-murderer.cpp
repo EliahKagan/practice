@@ -84,7 +84,7 @@ namespace {
                     while (++first != last && *first == dest) { }
                 }
                 else if (costs[dest] == not_reached && visit(dest, cost + 1))
-                    break;
+                    return costs;
             }
         }
 
