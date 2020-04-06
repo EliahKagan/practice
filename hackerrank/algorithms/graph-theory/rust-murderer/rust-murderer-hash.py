@@ -79,10 +79,10 @@ def bfs_complement(adj, start):
             costs[dest] = cost + 1
             queue.append(VertexCostPair(dest, cost + 1))
 
-            next_dest = dests.pop()
+            dests[index] = dests[-1]
+            del dests[-1]
             if not dests:
                 return costs
-            dests[index] = next_dest
 
     print('warning: some vertices were not reached', file=sys.stderr)
     return costs
