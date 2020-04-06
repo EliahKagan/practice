@@ -59,7 +59,7 @@ def bfs_complement(adj, start):
     the specified graph, and all the edges the specified graph does *not* have.
     Takes every edge weight to be 1.
     """
-    assert 0 < start < len(adj) # have unused adj[0] (1-based indexing)
+    assert 0 < start < len(adj)  # It has an unused adj[0] (1-based indexing).
 
     dests = list(range(1, start)) + list(range(start + 1, len(adj)))
     costs = [None] * len(adj)
