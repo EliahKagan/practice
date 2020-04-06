@@ -60,14 +60,9 @@ namespace {
     std::vector<int> get_all_dets(const int vertex_count, const int start)
     {
         auto dests = std::vector<int>(vertex_count - 1);
-        std::iota(begin(dests), begin(dests) + (start - 1), 1);
-        std::iota(begin(dests) + (start - 1), end(dests), start + 1);
-
-        // FIXME: Remove after debugging.
-        std::cerr << "DEBUG:";
-        for (const auto dest : dests) std::cerr << ' ' << dest;
-        std::cerr << '\n';
-
+        const auto mid = begin(dests) + (start - 1);
+        std::iota(begin(dests), mid, 1);
+        std::iota(mid, end(dests), start + 1);
         return dests;
     }
 
