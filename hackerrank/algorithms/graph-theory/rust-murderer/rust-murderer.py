@@ -102,7 +102,8 @@ def report(costs, start):
     """
     Reports the costs of all minimum-cost paths from start, except to itself.
     """
-    print(*itertools.chain(range(1, start), range(start + 1, len(costs))))
+    costs_to_report = costs[1:start] + costs[(start + 1):]
+    print(*costs_to_report)
 
 
 def run():
