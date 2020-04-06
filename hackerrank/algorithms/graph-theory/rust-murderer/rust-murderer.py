@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+https://www.hackerrank.com/challenges/rust-murderer
+In Python 3. Using BFS and an adjacency list in which each row is a sorted list
+of forward *non*-neighbors.
+"""
 
 import collections
 import itertools
