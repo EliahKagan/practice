@@ -31,7 +31,7 @@ namespace {
 
             ensure(0 < u && u <= vertex_count);
             ensure(0 < v && v <= vertex_count);
-            
+
             adj[u].push_back(v);
             adj[v].push_back(u);
         }
@@ -40,15 +40,20 @@ namespace {
         return adj;
     }
 
+    // A vertex in a graph, and the minimum cost to get there.
     struct VertexCostPair {
         int vertex;
         int cost;
     };
 
+    // Computes minimum cost paths from the specified start vertex to all
+    // other vertices, in the "complement" graph that has the same vertices
+    // as those in the specified graph, and all the edges the specified graph
+    // does *not* have. Takes every edge weight to be 1.
     std::vector<int> bfs_complement(const Graph& adj, const int start)
     {
         static constexpr auto not_reached = -1;
-        
+
         assert(!adj.empty()); // adj[0] exists and is unused (1-based indexing)
         const auto vertex_count = static_cast<int>(adj.size() - 1);
 
@@ -86,6 +91,7 @@ namespace {
         return costs;
     }
 
+    // Reports the cost of all minimum-cost paths from start, except to itself.
     void report(const std::vector<int>& costs, const int start)
     {
         auto sep = "";
