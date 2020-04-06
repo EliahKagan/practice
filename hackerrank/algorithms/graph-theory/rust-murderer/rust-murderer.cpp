@@ -1,3 +1,8 @@
+// https://www.hackerrank.com/challenges/rust-murderer
+//
+// In C++14. Using BFS and an adjacency list in which each row is a sorted
+// vector of forward *non*-neighbors.
+
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
