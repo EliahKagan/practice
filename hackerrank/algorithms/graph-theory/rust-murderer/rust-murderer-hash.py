@@ -60,9 +60,14 @@ def bfs_complement(adj, start):
     Takes every edge weight to be 1.
     """
     assert 0 < start < len(adj) # have unused adj[0] (1-based indexing)
+
     dests = list(range(1, start)) + list(range(start + 1, len(adj)))
     costs = [None] * len(adj)
     costs[start] = 0
+
+    if not dests:
+        return costs
+
     queue = collections.deque((VertexCostPair(start, 0),))
 
     while queue:
