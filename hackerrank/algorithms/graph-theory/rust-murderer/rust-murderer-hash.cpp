@@ -53,8 +53,36 @@ namespace {
     };
 
     // Given as the minimum cost to reach an unreachable vertex. Conceptually,
-    // this value represents positive infinity. Helper for bfs_complement().
+    // this value represents positive infinity.
     constexpr auto not_reached = -1;
+
+    // Gets all the destination vertices. Helper for bfs_complement().
+    std::vector<int> get_all_dets(const int vertex_count, const int start)
+    {
+        auto dests = std::vector<int>(vertex_count - 1);
+        std::iota(begin(dests), begin(dests) + (start - 1), 1);
+        std::iota(begin(dests) + start, end(dests), start + 1);
+        return dests;
+    }
+
+    // Gets the initial costs, not_reached everywhere but the start vertex.
+    // Helper for bfs_complement().
+    std::vector<int> get_unpopulated_costs(const int vertex_count,
+                                           const int start)
+    {
+        auto costs = std::vector<int>(vertex_count + 1, not_reached);
+        costs[start] = 0;
+        return costs;
+    }
+
+    // Gets the initial queue, with only an entry for the start vertex.
+    // Helper for bfs_complement().
+    std::queue<VertexCostPair> get_start_queue(const int start)
+    {
+        auto queue = std::queue<VertexCostPair>{};
+        queue.push({start, 0});
+        return queue;
+    }
 
     // Computes minimum cost paths from the specified start vertex to all
     // other vertices, in the "complement" graph that has the same vertices
@@ -65,66 +93,35 @@ namespace {
         // adj has an unused first row, due to 1-based indexing.
         assert(0 < start && start < adj.size());
 
-        auto dests = std::vector<int>(adj.size() - 1);
-        std::iota(begin(dests), end(dests), 1);
-        auto costs = std::vector<int>(adj.size(), not_reached);
-        auto queue = std::queue<VertexCostPair>{};
+        auto dests = get_all_dets(adj.size() - 1, start);
+        auto costs = get_unpopulated_costs(adj.size() - 1, start);
+        if (dests.empty()) return costs;
 
-        const auto visit = [&](const std::vector<int>::iterator destp,
-                               const int cost) noexcept {
-            costs[*destp] = cost;
-            queue.push({*destp, cost});
-
-            // Iterators remain valid: https://stackoverflow.com/q/62340
-            *destp = dests.back();
-            dests.pop_back();
-        };
-
-
-
-    }
-
-    /*
-    std::vector<int> bfs_complement(const Graph& adj, const int start)
-    {
-        assert(!adj.empty()); // adj[0] exists and is unused (1-based indexing)
-        const auto vertex_count = static_cast<int>(adj.size() - 1);
-
-        auto remaining = vertex_count;
-        auto costs = std::vector<int>(adj.size(), not_reached);
-        auto queue = std::queue<VertexCostPair>{};
-
-        // Returns true iff BFS is finished.
-        const auto visit = [&](const int vertex, const int cost) {
-            costs[vertex] = cost;
-            if (--remaining == 0) return true;
-            queue.push({vertex, cost});
-            return false;
-        };
-
-        if (visit(start, 0)) return costs;
-
-        while (!queue.empty()) {
-            const auto src = queue.front().vertex;
-            const auto cost = queue.front().cost;
+        for (auto queue = get_start_queue(start); !queue.empty(); ) {
+            const auto& row = adj[queue.front().vertex];
+            const auto cost = queue.front().cost + 1; // edge weight of 1
             queue.pop();
 
-            auto first = cbegin(adj[src]);
-            const auto last = cend(adj[src]);
+            for (auto destp = begin(dests); destp != end(dests); ) {
+                if (row.count(*destp)) {
+                    // Can't go directly to *destp: it's a non-neighbor.
+                    ++destp;
+                    continue;
+                } else {
+                    costs[*destp] = cost;
+                    queue.push({*destp, cost});
 
-            for (auto dest = 1; dest <= vertex_count; ++dest) {
-                if (first != last && *first == dest) {
-                    while (++first != last && *first == dest) { }
+                    *destp = dests.back();
+                    dests.pop_back();
+                    if (dests.empty()) return costs;
+                    // *destp remains valid: https://stackoverflow.com/q/62340
                 }
-                else if (costs[dest] == not_reached && visit(dest, cost + 1))
-                    return costs;
             }
         }
 
         std::cerr << "warning: some vertices were not reached\n";
         return costs;
     }
-    */
 
     // Reports the cost of all minimum-cost paths from start, except to itself.
     void report(const std::vector<int>& costs, const int start)
