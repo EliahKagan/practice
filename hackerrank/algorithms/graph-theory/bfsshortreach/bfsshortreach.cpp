@@ -18,9 +18,6 @@ namespace {
     // Adjacency-list representation of a graph.
     using Graph = std::vector<std::vector<int>>;
 
-    // Visitaton states. (Since std::vector<bool> is a bitset, and weird.)
-    enum class Color : bool { white, black };
-
     // Reads a graph as an adjacency list.
     Graph read_graph()
     {
