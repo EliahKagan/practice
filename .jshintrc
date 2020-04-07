@@ -7,9 +7,6 @@
     "forin": true,
     "freeze": true,
     "futurehostile": true,
-    "globals": {
-        "console": true
-    },
     "latedef": true,
     "leanswitch": true,
     // TODO: Enable "maxcomplexity".
@@ -51,5 +48,8 @@
     "scripturl": false,
     "supernew": false,
     "validthis": false, // Should I really set this explicitly?
-    "withstmt": false
+    "withstmt": false,
+
+    // Environments
+    "node": true
 }
