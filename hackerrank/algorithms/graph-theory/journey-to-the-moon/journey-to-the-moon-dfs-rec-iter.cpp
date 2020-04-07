@@ -54,7 +54,7 @@ namespace {
         return adj;
     }
 
-    // Peforms an action for each component size in the graph.
+    // Performs an action for each component size in the graph.
     template<typename UnaryFunction>
     void for_each_component_size(const Graph& adj, UnaryFunction f)
     {
