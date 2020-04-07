@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace {
-    // Terminates the progam abnormally if the given condition fails.
+    // Terminates the program abnormally if the given condition fails.
     inline void ensure(const bool condition) noexcept
     {
         if (!condition) std::abort();
