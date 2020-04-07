@@ -77,7 +77,7 @@ namespace {
     // An undirected edge.
     using Edge = std::pair<int, int>;
 
-    // Reads the edges of a graph as an adjacency list.
+    // Reads the edges of a graph (as an edge list).
     std::vector<Edge> read_edges(const int vertex_count, const int edge_count)
     {
         auto edges = std::vector<Edge>(edge_count);
