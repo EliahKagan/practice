@@ -30,7 +30,7 @@ namespace {
         int index;
     };
 
-    // Reads the edges of a graph as an adjacency list.
+    // Reads a graph as an adjacency list.
     Graph read_graph()
     {
         auto vertex_count = -1, edge_count = -1;

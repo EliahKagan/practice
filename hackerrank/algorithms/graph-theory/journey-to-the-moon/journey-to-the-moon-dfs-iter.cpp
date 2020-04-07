@@ -21,7 +21,7 @@ namespace {
     // Visitaton states. (Since std::vector<bool> is a bitset, and weird.)
     enum class Color : bool { white, black };
 
-    // Reads the edges of a graph as an adjacency list.
+    // Reads a graph as an adjacency list.
     Graph read_graph()
     {
         auto vertex_count = -1, edge_count = -1;
