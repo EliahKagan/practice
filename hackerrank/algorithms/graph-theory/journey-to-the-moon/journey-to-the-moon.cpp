@@ -22,19 +22,19 @@ namespace {
     // Reads the edges of a graph as an adjacency list.
     Graph read_graph()
     {
-        auto vertex_count = 0, edge_count = 0;
+        auto vertex_count = -1, edge_count = -1;
         std::cin >> vertex_count >> edge_count;
         ensure(vertex_count >= 0);
         ensure(edge_count >= 0);
 
-        auto adj = Graph(vertex_count + 1); // +1 for 1-based indexing
+        auto adj = Graph(vertex_count);
 
         for (; edge_count != 0; --edge_count) {
-            auto u = 0, v = 0;
+            auto u = -1, v = -1;
             std::cin >> u >> v;
 
-            ensure(0 < u && u <= vertex_count);
-            ensure(0 < v && v <= vertex_count);
+            ensure(0 <= u && u < vertex_count);
+            ensure(0 <= v && v < vertex_count);
 
             adj[u].push_back(v);
             adj[v].push_back(u);
@@ -58,7 +58,7 @@ namespace {
             return size;
         };
 
-        for (auto start = 1; start != adj.size(); ++start) {
+        for (auto start = 0; start != adj.size(); ++start) {
             const auto size = dfs(dfs, start);
             if (size != 0) f(size);
         }
