@@ -52,7 +52,7 @@ namespace {
         auto vis = std::vector<Color>(adj.size(), Color::white);
         auto queue = std::queue<int>{};
 
-        const auto dfs = [&adj, &vis, &queue](int src) {
+        const auto bfs = [&adj, &vis, &queue](int src) {
             if (vis[src] != Color::white) return 0;
             vis[src] = Color::black;
 
@@ -76,7 +76,7 @@ namespace {
         };
 
         for (auto start = 0; start != adj.size(); ++start) {
-            const auto size = dfs(start);
+            const auto size = bfs(start);
             if (size != 0) f(size);
         }
     }
