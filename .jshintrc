@@ -1,0 +1,55 @@
+{
+    // Enforcing options
+    "bitwise": true,
+    "curly": false, // But I'd like to prohbit *most* instances with JSCS.
+    "eqeqeq": true,
+    "esversion": 6,
+    "forin": true,
+    "freeze": true,
+    "futurehostile": true,
+    "globals": {
+        "console": true
+    },
+    "latedef": true,
+    "leanswitch": true,
+    // TODO: Enable "maxcomplexity".
+    "maxdepth": 5,
+    // Probably no need to change "maxerr".
+    "maxparams": 4,
+    //"maxstatements": 20,
+    "noarg": true,
+    "nonbsp": true,
+    "nonew": true,
+    "noreturnawait": true,
+    // No global "predef".
+    "regexpu": true,
+    "shadow": "outer",
+    "singleGroups": true,
+    "strict": true,
+    "trailingcomma": false,
+    "undef": true,
+    "unused": "strict",
+    "varstmt": true,
+
+    // Relaxing options
+    "asi": false,
+    "boss": false,
+    "debug": false,
+    "elision": false,
+    "eqnull": false,
+    "evil": false,
+    "expr": false,
+    "funcscope": false,
+    "iterator": false,
+    "lastsemic": false,
+    "loopfunc": false, // TODO: Check that this allows OK cases with let/const.
+    "moz": false,
+    "notypeof": false,
+    "noyield": false,
+    "plusplus": false, // Should be considered an enforcing option.
+    "proto": false,
+    "scripturl": false,
+    "supernew": false,
+    "validthis": false, // Should I really set this explicitly?
+    "withstmt": false
+}
