@@ -2,7 +2,10 @@
 *.class
 *.exe
 *.obj
+
+# Static analysis output.
 *.plist
+infer-out/
 
 # Large test cases (some of which *might* be copyright-encumbered).
 input*.txt
