@@ -44,7 +44,7 @@ sub bfs($adj, $src) {
         ++$cost;
 
         for (0..$#queue) {
-            $src = pop @queue;
+            $src = shift @queue;
 
             for my $dest (@{$adj->[$src]}) {
                 next if defined $costs[$dest];
