@@ -52,7 +52,7 @@ final class Solution {
     }
 
     /**
-     * Given as the minimum cost to reach an unreachable vetex. Conceptually,
+     * Given as the minimum cost to reach an unreachable vertex. Conceptually,
      * this value represents positive infinity.
      */
     private static final int NOT_REACHED = -1;
