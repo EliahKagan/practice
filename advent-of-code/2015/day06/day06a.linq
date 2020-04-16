@@ -12,7 +12,7 @@ internal static class Program {
                 + @" (?<minRow>\d+),(?<minCol>\d+) through"
                 + @" (?<maxRow>\d+),(?<maxCol>\d+)$");
     
-    private enum Action : byte {
+    private enum Act : byte {
         TurnOn,
         TurnOff,
         Toggle
@@ -29,10 +29,10 @@ internal static class Program {
             
             var groups = match.Groups;
             
-            Action = groups["action"].Value switch {
-                "turn on"  => Action.TurnOn,
-                "turn off" => Action.TurnOff,
-                "toggle"   => Action.Toggle,
+            Act = groups["action"].Value switch {
+                "turn on"  => Act.TurnOn,
+                "turn off" => Act.TurnOff,
+                "toggle"   => Act.Toggle,
                 
                 _ => throw new NotSupportedException(
                         "internal error (parsing)")
@@ -55,7 +55,7 @@ internal static class Program {
             => (MinRow <= row && row <= MaxRow)
             && (MinCol <= col && col <= MaxCol);
         
-        internal Action Action { get; }
+        internal Act Act { get; }
         
         private short MinRow { get; }
         private short MinCol { get; }
@@ -63,21 +63,21 @@ internal static class Program {
         private short MaxCol { get; }
     }
     
-    private static IEnumerable<Action> ActionsAffecting(
+    private static IEnumerable<Act> ActsAffecting(
             this IEnumerable<Instruction> instructions, int row, int col)
         => from instruction in instructions
            where instruction.Affects(row, col)
-           select instruction.Action;
+           select instruction.Act;
     
-    private static bool Run(this IEnumerable<Action> actions)
+    private static bool Run(this IEnumerable<Act> acts)
     {
         var state = false; // not initially illuminated
         
-        foreach (var action in actions) {
-            state = action switch {
-                Action.TurnOn  => true,
-                Action.TurnOff => false,
-                Action.Toggle  => !state,
+        foreach (var act in acts) {
+            state = act switch {
+                Act.TurnOn  => true,
+                Act.TurnOff => false,
+                Act.Toggle  => !state,
                
                 _ => throw new NotSupportedException(
                         "internal error (running)")
@@ -99,7 +99,7 @@ internal static class Program {
         var endStates =
             from row in Enumerable.Range(0, GridSize)
             from col in Enumerable.Range(0, GridSize)
-            select instructions.ActionsAffecting(row, col).Run();
+            select instructions.ActsAffecting(row, col).Run();
         
         endStates.Count(state => state).Dump();
     }
