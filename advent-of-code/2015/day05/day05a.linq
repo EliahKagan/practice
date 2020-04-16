@@ -22,7 +22,5 @@ new[] { // Examples from problem statement.
 
 File.ReadLines("input")
     .Select(line => line.Trim())
-    .Where(IsNice)
-  //.Dump("nice words (for debugging)")
-    .Count()
+    .Count(IsNice)
     .Dump("NICE COUNT");
