@@ -21,7 +21,16 @@ internal static class Program {
     private static IDictionary<string, Func<ushort>>
     GetVariables(this IEnumerable<string> lines)
     {
-        var variables = new Dictionary<string, Func<ushort>>();
+        var variables = default(Dictionary<string, Func<ushort>>)!; // ugly :(
+    
+        variables =
+            lines.Select(line => line.Trim())
+                 .Where(line => line.Length != 0)
+                 .Select(line => line.Split(" -> "))
+                 .Select(tokens => (variable: tokens[1],
+                                    expression: tokens[0]))
+                 .ToDictionary(binding => binding.variable,
+                               binding => GetEvaluator(binding.expression));
         
         Func<ushort> GetNullaryEvaluator(string simpleExpression)
         {
@@ -63,19 +72,10 @@ internal static class Program {
             };
         }
         
-        variables =
-            lines.Select(line => line.Trim())
-                 .Where(line => line.Length != 0)
-                 .Select(line => line.Split(" -> "))
-                 .Select(tokens => (variable: tokens[1],
-                                    expression: tokens[0]))
-                 .ToDictionary(binding => binding.variable,
-                               binding => GetEvaluator(binding.expression));
-        
         return variables;
     }
     
-    private static void SolveExample()
+    private static void SolveTinyExample()
     {
         var example = @"
             123 -> x
@@ -95,17 +95,18 @@ internal static class Program {
                     Variable,
                     Value = variables[Variable]()
                 })
-            .Dump("tiny example", noTotals: true);
+            .Dump("tiny example, showing all variables", noTotals: true);
     }
     
-    private static void SolveProblem()
+    private static void SolveFullProblem()
     {
-        throw new NotImplementedException();
+        var variables = File.ReadLines("input").GetVariables();
+        variables["a"]().Dump("full problem, showing the specified variable");
     }
     
     private static void Main()
     {
-        SolveExample();
-        //SolveProblem();
+        SolveTinyExample();
+        SolveFullProblem();
     }
 }
