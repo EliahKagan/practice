@@ -6,11 +6,10 @@
 //
 // This way is unnecessarily slow because it involves extra string processing
 // and performs numerous memory allocations that could be avoided. But it's
-// clear and avoids opportunities for bit-twiddling mistakes. Maybe it'll be
-// fast enough.
+// clear and avoids opportunities for bit-twiddling mistakes.
 
-const string inputPrefix = "abcdef"; // Example string.
-const string outputPrefix = "00000";
+const string inPrefix = "abcdef"; // Example string.
+const string outPrefix = "00000";
 
 static IEnumerable<int> UnboundedRange(int start)
 {
@@ -21,14 +20,13 @@ static IEnumerable<int> UnboundedRange(int start)
 
 var md5 = MD5.Create();
 
-bool HasDesirableHash(string input)
+bool HasMD5Prefix(string message, string digestPrefix)
 {
-    var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+    var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(message));
     var output = string.Concat(hash.Select(octet => octet.ToString("x2")));
-    return output.StartsWith(outputPrefix);
+    return output.StartsWith(digestPrefix);
 }
 
 UnboundedRange(1)
-    .Select(inputSuffix => $"{inputPrefix}{inputSuffix}")
-    .First(HasDesirableHash)
+    .First(inSuffix => HasMD5Prefix($"{inPrefix}{inSuffix}", outPrefix))
     .Dump();
