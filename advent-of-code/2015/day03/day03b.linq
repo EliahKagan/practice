@@ -33,7 +33,6 @@ void TakeTrip(IEnumerable<(int, int)> moves, int i = 0, int j = 0)
     }
 }
 
-
 TakeTrip(evenMoves);
 TakeTrip(oddMoves);
 
