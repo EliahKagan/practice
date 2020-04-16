@@ -8,7 +8,7 @@
 // and performs numerous memory allocations that could be avoided. But it's
 // clear and avoids opportunities for bit-twiddling mistakes.
 
-const string inPrefix = "abcdef"; // Example string.
+const string inPrefix = "yzbqklnj"; // Puzzle input.
 const string outPrefix = "00000";
 
 static IEnumerable<int> UnboundedRange(int start)
