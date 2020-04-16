@@ -37,7 +37,11 @@ internal static class Program {
             if (ushort.TryParse(simpleExpression, out var value))
                 return () => value;
             
-            return () => variables[simpleExpression](); // no memoization
+            return () => {
+                var value = variables[simpleExpression]();
+                variables[simpleExpression] = () => value;
+                return value;
+            };
         }
         
         Func<ushort> GetUnaryEvaluator(string unaryFunctionName,
