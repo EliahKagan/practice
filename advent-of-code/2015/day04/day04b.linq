@@ -2,14 +2,14 @@
   <Namespace>System.Security.Cryptography</Namespace>
 </Query>
 
-// Advent of Code 2015, day 4 (part A).
+// Advent of Code 2015, day 4 (part B, six zeros instead of five).
 //
 // This way is unnecessarily slow because it involves extra string processing
 // and performs numerous memory allocations that could be avoided. But it's
 // clear and avoids opportunities for bit-twiddling mistakes.
 
 const string inPrefix = "yzbqklnj"; // Puzzle input.
-const string outPrefix = "00000";   // FIVE zeros.
+const string outPrefix = "000000";  // SIX zeros.
 
 static IEnumerable<int> UnboundedRange(int start)
 {
