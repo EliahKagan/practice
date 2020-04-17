@@ -1,5 +1,7 @@
 <Query Kind="Program" />
 
+// Advent of code 2015, day 7, part A
+
 internal static class Program {
     private static IReadOnlyDictionary<string, Func<ushort, ushort>>
     UnaryFunctions = new Dictionary<string, Func<ushort, ushort>> {
