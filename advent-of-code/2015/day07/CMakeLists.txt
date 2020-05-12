@@ -27,7 +27,7 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
     add_compile_options(
         -Weverything
         -Wno-c++98-compat
-        -Wno-c++98-compat-bind-to-temporary-copy
+        -Wno-padded
     )
 elseif(MSVC)
     # cl but not clang-cl accepts /Za to reject Microsoft extensions.

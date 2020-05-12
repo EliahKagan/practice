@@ -1,9 +1,12 @@
 #include <algorithm>
+#include <cassert>
+#include <fstream>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <optional>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -27,6 +30,9 @@ namespace {
         virtual ~Expression() = default;
 
         virtual unsigned evaluate(const Rules& rules, Memo& memo) const = 0;
+
+    protected:
+        constexpr Expression() noexcept = default;
     };
 
     class Constant final : public Expression {
@@ -146,6 +152,98 @@ namespace {
         }
     };
 
+    class MalformedRule : public std::runtime_error {
+    public:
+        using runtime_error::runtime_error;
+    };
+
+    class MalformedTerm : public MalformedRule {
+    public:
+        using MalformedRule::MalformedRule;
+    };
+
+    class UnrecognizedOperation : public MalformedRule {
+        using MalformedRule::MalformedRule;
+    };
+
+    // Converts text to a variable or constant.
+    [[nodiscard]] Expr make_nullary(std::string term)
+    {
+        auto in_term = std::istringstream{term};
+        auto value = unsigned{};
+
+        if (!(in_term >> value))
+            return std::make_unique<const Variable>(std::move(term));
+
+        if ((in_term >> std::ws).eof())
+            return std::make_unique<const Constant>(value);
+
+        throw MalformedTerm{"term is neither a variable nor a constant"};
+    }
+
+    [[nodiscard]] Expr make_unary(std::string operation, std::string term)
+    {
+        auto arg = make_nullary(term);
+
+        if (operation == "NOT")
+            return std::make_unique<const Negation>(std::move(arg));
+
+        throw UnrecognizedOperation{"unrecognized unary operation"};
+    }
+
+    [[nodiscard]] Expr make_binary(std::string operation,
+                                   std::string term1, std::string term2)
+    {
+        auto arg1 = make_nullary(term1);
+        auto arg2 = make_nullary(term2);
+
+        if (operation == "AND") {
+            return std::make_unique<const Conjunction>(std::move(arg1),
+                                                       std::move(arg2));
+        }
+
+        if (operation == "OR") {
+            return std::make_unique<const Alternation>(std::move(arg1),
+                                                       std::move(arg2));
+        }
+
+        if (operation == "LSHIFT") {
+            return std::make_unique<const LeftShift>(std::move(arg1),
+                                                     std::move(arg2));
+        }
+
+        if (operation == "RSHIFT") {
+            return std::make_unique<const RightShift>(std::move(arg1),
+                                                      std::move(arg2));
+        }
+
+        throw UnrecognizedOperation{"unrecognized binary operation"};
+    }
+
+    [[nodiscard]]
+    Expr extract_expression(const std::vector<std::string>& tokens)
+    {
+        if (size(tokens) < 3)
+            throw MalformedRule{"record too small to specify rule"};
+
+        if (tokens[size(tokens) - 2] != "->")
+            throw MalformedRule{"rule does not have the expected \"->\""};
+
+        switch (size(tokens) - 2) {
+        case 1:
+            return make_nullary(tokens[0]);
+
+        case 2:
+            return make_unary(tokens[0], tokens[1]);
+
+        case 3:
+            return make_binary(tokens[1], tokens[0], tokens[2]); // infix
+
+        default:
+            throw MalformedRule{"record too big to specify rule"};
+        }
+    }
+
     [[nodiscard]] std::optional<std::vector<std::string>>
     read_line_as_tokens(std::istream& in)
     {
@@ -163,21 +261,57 @@ namespace {
         return std::make_optional(std::move(tokens));
     }
 
-    Rules read_rules(std::istream& in)
+    void add_rule(Rules& rules, const std::vector<std::string>& tokens)
+    {
+        auto expr = extract_expression(tokens);
+        assert(!empty(tokens)); // Or extract_expression() would have thrown.
+        rules.emplace(tokens.back(), std::move(expr));
+    }
+
+    [[nodiscard]] Rules read_rules(std::istream& in)
     {
         auto rules = Rules{};
 
-        while (const auto tokens = read_line_as_tokens(in)) {
-            switch (size(*tokens)) {
-                // FIXME: implement this
-            }
+        while (const auto maybe_tokens = read_line_as_tokens(in)) {
+            if (!empty(*maybe_tokens))
+                add_rule(rules, *maybe_tokens);
         }
 
         return rules;
     }
+
+    void solve_test()
+    {
+        auto in = std::istringstream{R"(
+            123 -> x
+            456 -> y
+            x AND y -> d
+            x OR y -> e
+            x LSHIFT 2 -> f
+            y RSHIFT 2 -> g
+            NOT x -> h
+            NOT y -> i
+        )"};
+
+        const auto rules = read_rules(in);
+        auto memo = Memo{};
+
+        for (auto name : {"d", "e", "f", "g", "h", "i", "x", "y"}) {
+            std::cout << name << ": " << Variable{name}.evaluate(rules, memo)
+                      << '\n';
+        }
+    }
 }
 
-int main()
+int main(int argc, char **argv)
 {
     std::ios_base::sync_with_stdio(false);
+
+    if (argc == 1) {
+        std::cout << "No filenames given, solving test case.\n";
+        solve_test();
+    } else {
+        // FIXME: Implement this!
+        std::cout << "Reading from file not yet supported.\n";
+    }
 }
