@@ -321,12 +321,15 @@ namespace {
     void solve_from_file(const std::string path,
                          const std::string variable_name)
     {
-        std::ifstream in;
-        in.exceptions(std::ios_base::badbit | std::ios_base::failbit);
-        in.open(path);
-        in.exceptions(std::ios_base::badbit);
+        auto solver = [&path]() {
+            std::ifstream in;
+            in.exceptions(std::ios_base::badbit | std::ios_base::failbit);
+            in.open(path);
+            in.exceptions(std::ios_base::badbit);
 
-        auto solver = Solver{in};
+            return Solver{in};
+        }();
+
         std::cout << solver(variable_name) << '\n';
     }
 
