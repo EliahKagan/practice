@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cassert>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -8,6 +9,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -279,7 +281,23 @@ namespace {
         return rules;
     }
 
-    void solve_test()
+    class Solver {
+    public:
+        explicit Solver(Rules rules) noexcept : rules_(std::move(rules)) { }
+
+        explicit Solver(std::istream& in) : Solver{read_rules(in)} { }
+
+        [[nodiscard]] unsigned operator()(std::string name)
+        {
+            return Variable{std::move(name)}.evaluate(rules_, memo_);
+        }
+
+    private:
+        Rules rules_;
+        Memo memo_ {};
+    };
+
+    void solve_example()
     {
         auto in = std::istringstream{R"(
             123 -> x
@@ -289,28 +307,60 @@ namespace {
             x LSHIFT 2 -> f
             y RSHIFT 2 -> g
             NOT x -> h
-            NOT y -> i
+            NOT y - i
         )"};
 
-        const auto rules = read_rules(in);
-        auto memo = Memo{};
+        auto solver = Solver{in};
 
-        for (auto name : {"d", "e", "f", "g", "h", "i", "x", "y"}) {
-            std::cout << name << ": " << Variable{name}.evaluate(rules, memo)
-                      << '\n';
-        }
+        for (auto name : {"d", "e", "f", "g", "h", "i", "x", "y"})
+            std::cout << name << ": " << solver(name) << '\n';
+    }
+
+    void solve_from_file(const std::string path,
+                         const std::string variable_name)
+    {
+        std::ifstream in;
+        in.exceptions(std::ios_base::badbit | std::ios_base::failbit);
+        in.open(path);
+        in.exceptions(std::ios_base::badbit);
+
+        auto solver = Solver{in};
+        std::cout << solver(variable_name) << '\n';
+    }
+
+    std::string_view program_name;
+
+    [[noreturn]] void die(const std::string_view message) noexcept
+    {
+        std::cerr << program_name << ": error: " << message << '\n';
+        std::exit(EXIT_FAILURE);
     }
 }
 
 int main(int argc, char **argv)
 {
     std::ios_base::sync_with_stdio(false);
+    assert(argc > 0);
+    program_name = argv[0];
 
-    if (argc == 1) {
-        std::cout << "No filenames given, solving test case.\n";
-        solve_test();
-    } else {
-        // FIXME: Implement this!
-        std::cout << "Reading from file not yet supported.\n";
+    try {
+        switch (argc) {
+        case 1:
+            std::cout << "No filenames given, solving test case.\n";
+            solve_example();
+            break;
+
+        case 2:
+            solve_from_file(argv[1], "a");
+            break;
+
+        default:
+            die("too many arguments");
+        }
+    } catch (const MalformedRule& e) {
+        die(e.what());
+    } catch (const std::ios_base::failure& e) {
+        // TODO: Does this actually give enough information about an IO error?
+        die(e.what());
     }
 }
