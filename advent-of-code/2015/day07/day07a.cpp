@@ -22,6 +22,8 @@ namespace {
 
     class Expression {
     public:
+        Expression(const Expression&) = delete;
+        Expression& operator=(const Expression&) = delete;
         virtual ~Expression() = default;
 
         virtual unsigned evaluate(const Rules& rules, Memo& memo) const = 0;
@@ -163,11 +165,15 @@ namespace {
 
     Rules read_rules(std::istream& in)
     {
+        auto rules = Rules{};
+
         while (const auto tokens = read_line_as_tokens(in)) {
             switch (size(*tokens)) {
-                //
+                // FIXME: implement this
             }
         }
+
+        return rules;
     }
 }
 
