@@ -101,16 +101,6 @@ namespace {
 
     using Memo = std::unordered_map<std::string, unsigned>;
 
-    // FIXME: This seems overly complicated for what it is doing.
-    template<typename>
-    constexpr auto evaluator_unpacks_v = false;
-
-    template<>
-    constexpr auto evaluator_unpacks_v<Expression> = true;
-
-    template<>
-    constexpr auto evaluator_unpacks_v<Term> = true;
-
     class Evaluator {
     public:
         constexpr Evaluator(const Rules &rules, Memo &memo) noexcept
@@ -118,18 +108,25 @@ namespace {
         {
         }
 
-        template<typename Unpackable>
-        std::enable_if_t<evaluator_unpacks_v<Unpackable>, unsigned>
-        operator()(const Expression& unpackable) noexcept
+        [[nodiscard]] unsigned
+        operator()(const Expression& expression) noexcept
         {
-            return std::visit(*this, unpackable)
+            return std::visit(*this, expression);
         }
 
-        constexpr unsigned operator()(const Constant constant) const noexcept
+        [[nodiscard]] unsigned
+        operator()(const Term& constant_or_variable) noexcept
+        {
+            return std::visit(*this, constant_or_variable);
+        }
+
+        [[nodiscard]] constexpr unsigned
+        operator()(const Constant& constant) const noexcept
         {
             return constant.value;
         }
 
+        // Not nodiscard, since it might be called just to trigger memoization.
         unsigned operator()(const Variable& variable) noexcept
         {
             if (auto p = memo_.find(variable.name); p != end(memo_))
@@ -138,6 +135,21 @@ namespace {
             const auto value = (*this)(rules_.at(variable.name));
             memo_.emplace(variable.name, value);
             return value;
+        }
+
+        template<typename UnaryFunction>
+        [[nodiscard]] unsigned
+        operator()(const UnaryExpression<UnaryFunction>& unary) noexcept
+        {
+            return unary.operation((*this)(unary.arg));
+        }
+
+        template<typename BinaryFunction>
+        [[nodiscard]] unsigned
+        operator()(const BinaryExpression<BinaryFunction>& binary) noexcept
+        {
+            return binary.operation((*this)(binary.arg1),
+                                    (*this)(binary.arg2));
         }
 
     private:
