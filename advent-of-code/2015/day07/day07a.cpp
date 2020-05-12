@@ -1,6 +1,12 @@
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <algorithm>
 #include <cassert>
+#include <cerrno>
 #include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -359,8 +365,7 @@ int main(int argc, char **argv)
         }
     } catch (const MalformedRule& e) {
         die(e.what());
-    } catch (const std::ios_base::failure& e) {
-        // TODO: Does this actually give enough information about an IO error?
-        die(e.what());
+    } catch (const std::ios_base::failure&) {
+        die(std::strerror(errno));
     }
 }
