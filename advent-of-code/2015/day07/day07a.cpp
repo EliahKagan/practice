@@ -248,8 +248,7 @@ namespace {
     read_line_as_tokens(std::istream& in)
     {
         auto line = std::string{};
-        in >> line;
-        if (!in) return std::nullopt;
+        if (!getline(in, line)) return std::nullopt;
 
         auto in_tokens = std::istringstream{line};
         auto tokens = std::vector<std::string>{};
