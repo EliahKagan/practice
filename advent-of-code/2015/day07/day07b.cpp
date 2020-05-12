@@ -1,4 +1,4 @@
-// Advent of code 2015, day 7, part A
+// Advent of code 2015, day 7, part B
 // Via recursion with memoization, with no cycle checking.
 // Implemented using object-oriented polymorphism.
 
@@ -300,6 +300,12 @@ namespace {
             return Variable{std::move(name)}.evaluate(rules_, memo_);
         }
 
+        void override_rule(const std::string name, const unsigned value)
+        {
+            assert(empty(memo_)); // Rule changes must precede any evaluations.
+            rules_.at(name) = std::make_unique<const Constant>(value);
+        }
+
     private:
         Rules rules_;
         Memo memo_ {};
@@ -324,8 +330,10 @@ namespace {
             std::cout << name << ": " << solver(name) << '\n';
     }
 
-    void solve_from_file(const std::string path,
-                         const std::string variable_name)
+    void solve_from_file_with_rewire(const std::string path,
+                                     const std::string target_variable,
+                                     const std::string rewrite_variable,
+                                     const unsigned rewrite_value)
     {
         auto solver = [&path]() {
             std::ifstream in;
@@ -336,7 +344,8 @@ namespace {
             return Solver{in};
         }();
 
-        std::cout << solver(variable_name) << '\n';
+        solver.override_rule(rewrite_variable, rewrite_value);
+        std::cout << solver(target_variable) << '\n';
     }
 
     std::string_view program_name;
@@ -362,7 +371,8 @@ int main(int argc, char **argv)
             break;
 
         case 2:
-            solve_from_file(argv[1], "a");
+            static constexpr auto b_value = 16'076u; // Output from day07a.
+            solve_from_file_with_rewire(argv[1], "a", "b", b_value);
             break;
 
         default:
