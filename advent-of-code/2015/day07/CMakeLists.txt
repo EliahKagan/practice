@@ -46,6 +46,7 @@ endif()
 add_executable(day07a day07a.cpp)
 add_executable(day07b day07b.cpp)
 add_executable(day07a-variant day07a-variant.cpp)
+add_executable(day07b-variant day07b-variant.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
