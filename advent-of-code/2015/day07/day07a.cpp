@@ -307,7 +307,7 @@ namespace {
             x LSHIFT 2 -> f
             y RSHIFT 2 -> g
             NOT x -> h
-            NOT y - i
+            NOT y -> i
         )"};
 
         auto solver = Solver{in};
