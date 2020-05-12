@@ -41,7 +41,7 @@ namespace {
 
     class Constant final : public Expression {
     public:
-        explicit constexpr Constant(unsigned value) noexcept
+        explicit constexpr Constant(const unsigned value) noexcept
             : value_{value}
         {
         }
@@ -185,7 +185,8 @@ namespace {
         throw MalformedTerm{"term is neither a variable nor a constant"};
     }
 
-    [[nodiscard]] Expr make_unary(std::string operation, std::string term)
+    [[nodiscard]] Expr
+    make_unary(const std::string operation, const std::string term)
     {
         auto arg = make_nullary(term);
 
@@ -195,8 +196,9 @@ namespace {
         throw UnrecognizedOperation{"unrecognized unary operation"};
     }
 
-    [[nodiscard]] Expr make_binary(std::string operation,
-                                   std::string term1, std::string term2)
+    [[nodiscard]] Expr
+    make_binary(const std::string operation,
+                const std::string term1, const std::string term2)
     {
         auto arg1 = make_nullary(term1);
         auto arg2 = make_nullary(term2);
@@ -224,8 +226,8 @@ namespace {
         throw UnrecognizedOperation{"unrecognized binary operation"};
     }
 
-    [[nodiscard]]
-    Expr extract_expression(const std::vector<std::string>& tokens)
+    [[nodiscard]] Expr
+    extract_expression(const std::vector<std::string>& tokens)
     {
         if (size(tokens) < 3)
             throw MalformedRule{"record too small to specify rule"};
