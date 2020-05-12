@@ -4,7 +4,10 @@
 
 #include <functional>
 #include <iostream>
+#include <iterator>
 #include <string>
+#include <type_traits>
+#include <unordered_map>
 #include <variant>
 
 namespace {
@@ -93,9 +96,56 @@ namespace {
                                     Alternation,
                                     LeftShift,
                                     RightShift>;
+
+    using Rules = std::unordered_map<std::string, Expression>;
+
+    using Memo = std::unordered_map<std::string, unsigned>;
+
+    // FIXME: This seems overly complicated for what it is doing.
+    template<typename>
+    constexpr auto evaluator_unpacks_v = false;
+
+    template<>
+    constexpr auto evaluator_unpacks_v<Expression> = true;
+
+    template<>
+    constexpr auto evaluator_unpacks_v<Term> = true;
+
+    class Evaluator {
+    public:
+        constexpr Evaluator(const Rules &rules, Memo &memo) noexcept
+            : rules_{rules}, memo_{memo}
+        {
+        }
+
+        template<typename Unpackable>
+        std::enable_if_t<evaluator_unpacks_v<Unpackable>, unsigned>
+        operator()(const Expression& unpackable) noexcept
+        {
+            return std::visit(*this, unpackable)
+        }
+
+        constexpr unsigned operator()(const Constant constant) const noexcept
+        {
+            return constant.value;
+        }
+
+        unsigned operator()(const Variable& variable) noexcept
+        {
+            if (auto p = memo_.find(variable.name); p != end(memo_))
+                return p->second;
+
+            const auto value = (*this)(rules_.at(variable.name));
+            memo_.emplace(variable.name, value);
+            return value;
+        }
+
+    private:
+        const Rules& rules_;
+        Memo& memo_;
+    };
 }
 
 int main()
 {
-    //
 }
