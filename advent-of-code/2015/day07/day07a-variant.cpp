@@ -120,13 +120,14 @@ namespace {
             return std::visit(*this, constant_or_variable);
         }
 
+        // FIXME: Figure out why this can't be declared const.
         [[nodiscard]] constexpr unsigned
-        operator()(const Constant& constant) const noexcept
+        operator()(const Constant constant) noexcept
         {
             return constant.value;
         }
 
-        // Not nodiscard, since it might be called just to trigger memoization.
+        // Not [[nodiscard]] as it might be called just to trigger memoization.
         unsigned operator()(const Variable& variable) noexcept
         {
             if (auto p = memo_.find(variable.name); p != end(memo_))
