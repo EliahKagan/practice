@@ -352,7 +352,7 @@ int main(int argc, char **argv)
     try {
         switch (argc) {
         case 1:
-            std::cout << "No filenames given, solving test case.\n";
+            std::cout << "No filenames given. Solving example.\n";
             solve_example();
             break;
 
