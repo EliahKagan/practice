@@ -93,20 +93,9 @@ namespace {
                                     Alternation,
                                     LeftShift,
                                     RightShift>;
-
-    using FlatExpression = std::variant<Constant,
-                                        Variable,
-                                        Negation,
-                                        Conjunction,
-                                        Alternation,
-                                        LeftShift,
-                                        RightShift>;
-
 }
 
 int main()
 {
-    std::cout << sizeof(Expression) << '\n';
-    std::cout << sizeof(FlatExpression) << '\n';
-    std::cout << sizeof(std::string) << '\n';
+    //
 }
