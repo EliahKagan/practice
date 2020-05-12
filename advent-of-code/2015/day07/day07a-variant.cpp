@@ -144,15 +144,7 @@ namespace {
         }
 
         // Not [[nodiscard]] as it might be called just to trigger memoization.
-        unsigned operator()(const Variable& variable) const noexcept
-        {
-            if (auto p = memo_.find(variable.name); p != end(memo_))
-                return p->second;
-
-            const auto value = (*this)(rules_.at(variable.name));
-            memo_.emplace(variable.name, value);
-            return value;
-        }
+        unsigned operator()(const Variable& variable) const noexcept;
 
         template<typename UnaryFunction>
         [[nodiscard]] unsigned
@@ -174,6 +166,16 @@ namespace {
         const Rules& rules_;
         Memo& memo_;
     };
+
+    unsigned Evaluator::operator()(const Variable &variable) const noexcept
+    {
+        if (auto p = memo_.find(variable.name); p != end(memo_))
+            return p->second;
+
+        const auto value = (*this)(rules_.at(variable.name));
+        memo_.emplace(variable.name, value);
+        return value;
+    }
 
     // Like Evaluator, but owning instead of non-owning.
     class Solver {

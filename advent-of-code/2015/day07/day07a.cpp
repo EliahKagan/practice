@@ -37,7 +37,10 @@ namespace {
         Expression& operator=(const Expression&) = delete;
         virtual ~Expression() = default;
 
-        virtual unsigned evaluate(const Rules& rules, Memo& memo) const = 0;
+        // Not [[nodiscard]] as, in the case of Variable, it might be called
+        // just to trigger memoization.
+        virtual unsigned
+        evaluate(const Rules& rules, Memo& memo) const noexcept = 0;
 
     protected:
         constexpr Expression() noexcept = default;
@@ -50,7 +53,8 @@ namespace {
         {
         }
 
-        unsigned evaluate(const Rules&, Memo&) const noexcept override
+        [[nodiscard]] unsigned
+        evaluate(const Rules&, Memo&) const noexcept override
         {
             return value_;
         }
@@ -66,6 +70,7 @@ namespace {
         {
         }
 
+        // Not [[nodiscard]] as it might be called just to trigger memoization.
         unsigned
         evaluate(const Rules& rules, Memo& memo) const noexcept override;
 
@@ -98,7 +103,7 @@ namespace {
     public:
         using UnaryExpression::UnaryExpression;
 
-        unsigned
+        [[nodiscard]] unsigned
         evaluate(const Rules& rules, Memo& memo) const noexcept override
         {
             return ~arg_->evaluate(rules, memo) & mask;
@@ -121,7 +126,7 @@ namespace {
     public:
         using BinaryExpression::BinaryExpression;
 
-        unsigned
+        [[nodiscard]] unsigned
         evaluate(const Rules &rules, Memo &memo) const noexcept override
         {
             return arg1_->evaluate(rules, memo) & arg2_->evaluate(rules, memo);
@@ -131,7 +136,7 @@ namespace {
     class Alternation : public BinaryExpression { // a.k.a. disjunction
         using BinaryExpression::BinaryExpression;
 
-        unsigned
+        [[nodiscard]] unsigned
         evaluate(const Rules &rules, Memo &memo) const noexcept override
         {
             return arg1_->evaluate(rules, memo) | arg2_->evaluate(rules, memo);
@@ -141,7 +146,7 @@ namespace {
     class LeftShift : public BinaryExpression {
         using BinaryExpression::BinaryExpression;
 
-        unsigned
+        [[nodiscard]] unsigned
         evaluate(const Rules &rules, Memo &memo) const noexcept override
         {
             return (arg1_->evaluate(rules, memo)
@@ -152,7 +157,7 @@ namespace {
     class RightShift : public BinaryExpression {
         using BinaryExpression::BinaryExpression;
 
-        unsigned
+        [[nodiscard]] unsigned
         evaluate(const Rules &rules, Memo &memo) const noexcept override
         {
             return arg1_->evaluate(rules, memo)
