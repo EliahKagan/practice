@@ -14,6 +14,9 @@ if(MSVC)
 
     # cl and clang-cl accept /permissive- for stricter conformance.
     add_compile_options(/permissive-)
+
+    # cl and clang-cl warn about strerror (but strerror_s is nonportable).
+    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 else()
     # gcc/g++ and clang/clang++ require comparably strict conformance to
     # /permissive- unless -fpermissive is passed. But they accept -pedantic
