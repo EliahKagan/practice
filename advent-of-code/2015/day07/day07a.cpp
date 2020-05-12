@@ -144,24 +144,31 @@ namespace {
         }
     };
 
+    [[nodiscard]] std::optional<std::vector<std::string>>
+    read_line_as_tokens(std::istream& in)
+    {
+        auto line = std::string{};
+        in >> line;
+        if (!in) return std::nullopt;
 
+        auto in_tokens = std::istringstream{line};
+        auto tokens = std::vector<std::string>{};
 
-    // [[nodiscard]] std::optional<std::vector<std::string>>
-    // read_line_as_tokens(std::istream& in)
-    // {
-    //     auto line = std::string{};
-    //     in >> line;
-    //     if (!in) return std::nullopt;
+        std::copy(std::istream_iterator<std::string>(in_tokens),
+                  std::istream_iterator<std::string>{},
+                  std::back_inserter(tokens));
 
-    //     auto in_tokens = std::istringstream{line};
-    //     auto tokens = std::vector<std::string>{};
+        return std::make_optional(std::move(tokens));
+    }
 
-    //     std::copy(std::istream_iterator<std::string>(in_tokens),
-    //               std::istream_iterator<std::string>{},
-    //               std::back_inserter(tokens));
-
-    //     return std::move(tokens);
-    // }
+    Rules read_rules(std::istream& in)
+    {
+        while (const auto tokens = read_line_as_tokens(in)) {
+            switch (size(*tokens)) {
+                //
+            }
+        }
+    }
 }
 
 int main()
