@@ -371,8 +371,10 @@ int main(int argc, char **argv)
             break;
 
         case 2:
-            static constexpr auto b_value = 16'076u; // Output from day07a.
-            solve_from_file_with_rewire(argv[1], "a", "b", b_value);
+            {
+                static constexpr auto b_value = 16'076u; // Output from day07a.
+                solve_from_file_with_rewire(argv[1], "a", "b", b_value);
+            }
             break;
 
         default:
