@@ -2,13 +2,24 @@
 // Via recursion with memoization, with no cycle checking.
 // Implemented using bounded (discriminated-union) polymorphism (std::variant).
 
+#include <cassert>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <optional>
+#include <sstream>
+#include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <variant>
+#include <vector>
 
 namespace {
     constexpr auto mask = 65'535u;
@@ -58,8 +69,14 @@ namespace {
     using Negation = UnaryExpression<Not>;
 
     template<typename BinaryFunction>
-    struct BinaryExpression {
-        BinaryFunction operation;
+    class BinaryExpression {
+    public:
+        explicit BinaryExpression(Term given_arg1, Term given_arg2)
+            : arg1{std::move(given_arg1)}, arg2{std::move(given_arg2)}
+        {
+        }
+
+        BinaryFunction operation {};
         Term arg1;
         Term arg2;
     };
@@ -109,26 +126,25 @@ namespace {
         }
 
         [[nodiscard]] unsigned
-        operator()(const Expression& expression) noexcept
+        operator()(const Expression& expression) const noexcept
         {
             return std::visit(*this, expression);
         }
 
         [[nodiscard]] unsigned
-        operator()(const Term& constant_or_variable) noexcept
+        operator()(const Term& constant_or_variable) const noexcept
         {
             return std::visit(*this, constant_or_variable);
         }
 
-        // FIXME: Figure out why this can't be declared const.
         [[nodiscard]] constexpr unsigned
-        operator()(const Constant constant) noexcept
+        operator()(const Constant constant) const noexcept
         {
             return constant.value;
         }
 
         // Not [[nodiscard]] as it might be called just to trigger memoization.
-        unsigned operator()(const Variable& variable) noexcept
+        unsigned operator()(const Variable& variable) const noexcept
         {
             if (auto p = memo_.find(variable.name); p != end(memo_))
                 return p->second;
@@ -140,14 +156,15 @@ namespace {
 
         template<typename UnaryFunction>
         [[nodiscard]] unsigned
-        operator()(const UnaryExpression<UnaryFunction>& unary) noexcept
+        operator()(const UnaryExpression<UnaryFunction>& unary) const noexcept
         {
             return unary.operation((*this)(unary.arg));
         }
 
         template<typename BinaryFunction>
         [[nodiscard]] unsigned
-        operator()(const BinaryExpression<BinaryFunction>& binary) noexcept
+        operator()(const BinaryExpression<BinaryFunction>& binary)
+                const noexcept
         {
             return binary.operation((*this)(binary.arg1),
                                     (*this)(binary.arg2));
@@ -157,8 +174,211 @@ namespace {
         const Rules& rules_;
         Memo& memo_;
     };
+
+    // Like Evaluator, but owning instead of non-owning.
+    class Solver {
+    public:
+        explicit Solver(Rules rules) noexcept
+            : rules_(std::move(rules)), evaluator_{rules_, memo_} { }
+
+        [[nodiscard]] unsigned operator()(std::string name) noexcept
+        {
+            return evaluator_(Variable{std::move(name)});
+        }
+
+    private:
+        Rules rules_;
+        Memo memo_ {};
+        Evaluator evaluator_;
+    };
+
+    class MalformedRule : public std::runtime_error {
+    public:
+        using runtime_error::runtime_error;
+    };
+
+    class MalformedTerm : public MalformedRule {
+    public:
+        using MalformedRule::MalformedRule;
+    };
+
+    class UnrecognizedOperation : public MalformedRule {
+        using MalformedRule::MalformedRule;
+    };
+
+    // Converts text to a variable or constant.
+    [[nodiscard]] Term make_term(std::string term)
+    {
+        auto in_term = std::istringstream{term};
+        auto value = unsigned{};
+
+        if (!(in_term >> value))
+            return Variable{std::move(term)};
+
+        if ((in_term >> std::ws).eof())
+            return Constant{value};
+
+        throw MalformedTerm{"term is neither a variable nor a constant"};
+    }
+
+    [[nodiscard]] Expression
+    make_unary(const std::string operation, const std::string term)
+    {
+        auto arg = make_term(term);
+
+        if (operation == "NOT")
+            return Negation{std::move(arg)};
+
+        throw UnrecognizedOperation{"unrecognized unary operation"};
+    }
+
+    [[nodiscard]] Expression
+    make_binary(const std::string operation,
+                const std::string term1, const std::string term2)
+    {
+        auto arg1 = make_term(term1);
+        auto arg2 = make_term(term2);
+
+        if (operation == "AND")
+            return Conjunction{std::move(arg1), std::move(arg2)};
+
+        if (operation == "OR")
+            return Alternation{std::move(arg1), std::move(arg2)};
+
+        if (operation == "LSHIFT")
+            return LeftShift{std::move(arg1), std::move(arg2)};
+
+        if (operation == "RSHIFT")
+            return RightShift{std::move(arg1), std::move(arg2)};
+
+        throw UnrecognizedOperation{"unrecognized binary operation"};
+    }
+
+    [[nodiscard]] Expression
+    extract_expression(const std::vector<std::string>& tokens)
+    {
+        if (size(tokens) < 3)
+            throw MalformedRule{"record too small to specify rule"};
+
+        if (tokens[size(tokens) - 2] != "->")
+            throw MalformedRule{"rule does not have the expected \"->\""};
+
+        switch (size(tokens) - 2) {
+        case 1:
+            return make_term(tokens[0]);
+
+        case 2:
+            return make_unary(tokens[0], tokens[1]);
+
+        case 3:
+            return make_binary(tokens[1], tokens[0], tokens[2]); // infix
+
+        default:
+            throw MalformedRule{"record too big to specify rule"};
+        }
+    }
+
+    [[nodiscard]] std::optional<std::vector<std::string>>
+    read_line_as_tokens(std::istream& in)
+    {
+        auto line = std::string{};
+        if (!getline(in, line)) return std::nullopt;
+
+        auto in_tokens = std::istringstream{line};
+        auto tokens = std::vector<std::string>{};
+
+        std::copy(std::istream_iterator<std::string>(in_tokens),
+                  std::istream_iterator<std::string>{},
+                  std::back_inserter(tokens));
+
+        return std::make_optional(std::move(tokens));
+    }
+
+    void add_rule(Rules& rules, const std::vector<std::string>& tokens)
+    {
+        auto expr = extract_expression(tokens);
+        assert(!empty(tokens)); // Or extract_expression() would have thrown.
+        rules.emplace(tokens.back(), std::move(expr));
+    }
+
+    [[nodiscard]] Rules read_rules(std::istream& in)
+    {
+        auto rules = Rules{};
+
+        while (const auto maybe_tokens = read_line_as_tokens(in)) {
+            if (!empty(*maybe_tokens))
+                add_rule(rules, *maybe_tokens);
+        }
+
+        return rules;
+    }
+
+    void solve_example()
+    {
+        auto in = std::istringstream{R"(
+            123 -> x
+            456 -> y
+            x AND y -> d
+            x OR y -> e
+            x LSHIFT 2 -> f
+            y RSHIFT 2 -> g
+            NOT x -> h
+            NOT y -> i
+        )"};
+
+        auto solver = Solver{read_rules(in)};
+
+        for (auto name : {"d", "e", "f", "g", "h", "i", "x", "y"})
+            std::cout << name << ": " << solver(name) << '\n';
+    }
+
+    void solve_from_file(const std::string path,
+                         const std::string variable_name)
+    {
+        auto solver = [&path]() {
+            std::ifstream in;
+            in.exceptions(std::ios_base::badbit | std::ios_base::failbit);
+            in.open(path);
+            in.exceptions(std::ios_base::badbit);
+
+            return Solver{read_rules(in)};
+        }();
+
+        std::cout << solver(variable_name) << '\n';
+    }
+
+    std::string_view program_name;
+
+    [[noreturn]] void die(const std::string_view message) noexcept
+    {
+        std::cerr << program_name << ": error: " << message << '\n';
+        std::exit(EXIT_FAILURE);
+    }
 }
 
-int main()
+int main(int argc, char **argv)
 {
+    std::ios_base::sync_with_stdio(false);
+    assert(argc > 0);
+    program_name = argv[0];
+
+    try {
+        switch (argc) {
+        case 1:
+            std::cout << "No filenames given. Solving example.\n";
+            solve_example();
+            break;
+
+        case 2:
+            solve_from_file(argv[1], "a");
+            break;
+
+        default:
+            die("too many arguments");
+        }
+    } catch (const MalformedRule& e) {
+        die(e.what());
+    } catch (const std::ios_base::failure&) {
+        die(std::strerror(errno));
+    }
 }
