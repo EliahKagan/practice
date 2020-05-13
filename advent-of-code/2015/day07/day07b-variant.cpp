@@ -330,7 +330,7 @@ namespace {
 
         auto solver = Solver{read_rules(in)};
 
-        for (auto name : {"d", "e", "f", "g", "h", "i", "x", "y"})
+        for (const auto name : {"d", "e", "f", "g", "h", "i", "x", "y"})
             std::cout << name << ": " << solver(name) << '\n';
     }
 

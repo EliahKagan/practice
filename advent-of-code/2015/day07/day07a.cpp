@@ -325,7 +325,7 @@ namespace {
 
         auto solver = Solver{in};
 
-        for (auto name : {"d", "e", "f", "g", "h", "i", "x", "y"})
+        for (const auto name : {"d", "e", "f", "g", "h", "i", "x", "y"})
             std::cout << name << ": " << solver(name) << '\n';
     }
 

@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <functional>
+#include <iostream>
 #include <iterator>
 #include <regex>
 #include <sstream>
@@ -247,11 +248,14 @@ namespace {
             NOT y -> i
         )"};
 
+        auto scope = build_scope_from_bindings(in);
 
+        for (const auto name : {"d", "e", "f", "g", "h", "i", "x", "y"})
+            std::cout << name << ": " << scope.evaluate(name) << '\n';
     }
 }
 
 int main()
 {
-    //
+    solve_example();
 }
