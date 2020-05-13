@@ -10,6 +10,7 @@
 #include <cstring>
 #include <functional>
 #include <iterator>
+#include <regex>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -46,6 +47,11 @@ namespace {
         { "RSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
                         { return arg1 >> arg2; } }
     };
+
+    // FIXME: When an unrecognized operation (not one of the keys in the above
+    // maps) is supplied, throw a custom exception type that wraps its name and
+    // arity. Have the calling code catch it and generate a useful message.
+    // Also "backport" this change to the other day07 implementations.
 
     class MalformedBinding : public std::runtime_error {
     public:
@@ -195,7 +201,11 @@ namespace {
 
     Scope build_scope_from_bindings(std::istream& in)
     {
+        static constexpr auto pattern = std::regex{R"()"};
+
         auto scope = Scope{};
+
+
 
         // for (auto line = std::string{}; std::getline(in >> std::ws, line); ) {
         //     //
