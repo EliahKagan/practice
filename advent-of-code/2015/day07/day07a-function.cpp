@@ -19,6 +19,8 @@
 #include <vector>
 
 namespace {
+    using namespace std::string_view_literals;
+
     constexpr auto mask = 65'535u;
 
     // Function objects that take no arguments and may hold state.
@@ -30,19 +32,19 @@ namespace {
 
     const auto unary_functions
             = std::unordered_map<std::string_view, UnaryFunction>{
-        { "NOT", [](const unsigned arg) noexcept { return ~arg & mask; } }
+        { "NOT"sv, [](const unsigned arg) noexcept { return ~arg & mask; } }
     };
 
     const auto binary_functions
             = std::unordered_map<std::string_view, BinaryFunction>{
-        { "AND", [](const unsigned arg1, const unsigned arg2) noexcept
-                    { return arg1 & arg2; } },
-        { "OR", [](const unsigned arg1, const unsigned arg2) noexcept
-                    { return arg1 | arg2; } },
-        { "LSHIFT", [](const unsigned arg1, const unsigned arg2) noexcept
-                    { return (arg1 << arg2) & mask; } },
-        { "RSHIFT", [](const unsigned arg1, const unsigned arg2) noexcept
-                    { return arg1 >> arg2; } }
+        { "AND"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                        { return arg1 & arg2; } },
+        { "OR"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                        { return arg1 | arg2; } },
+        { "LSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                        { return (arg1 << arg2) & mask; } },
+        { "RSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                        { return arg1 >> arg2; } }
     };
 
     class MalformedBinding : public std::runtime_error {
@@ -75,20 +77,20 @@ namespace {
     class Scope {
     public:
         Scope() noexcept = default;
-        Scope(const Scope& other) noexcept = delete;
-        Scope(Scope&& other) noexcept = default;
-        Scope& operator=(const Scope& other) = delete;
-        Scope& operator=(Scope&& other) & noexcept = default;
+        Scope(const Scope&) = delete;
+        Scope(Scope&&) noexcept = default;
+        Scope& operator=(const Scope&) = delete;
+        Scope& operator=(Scope&&) & noexcept = default;
         ~Scope() = default;
 
-        void add_binding(std::string_view binding) noexcept;
+        void add_binding(std::string name, const std::string& expression);
 
     private:
         [[nodiscard]] NullaryFunction
-        make_evaluator(const std::string& expression) noexcept;
+        make_evaluator(const std::string& expression);
 
         [[nodiscard]] NullaryFunction
-        make_nullary_evaluator(std::string simple_expression) noexcept;
+        make_nullary_evaluator(std::string simple_expression);
 
         [[nodiscard]] NullaryFunction
         make_variable_evaluator(std::string name) noexcept;
@@ -101,18 +103,23 @@ namespace {
 
         [[nodiscard]] NullaryFunction
         make_unary_evaluator(std::string_view unary_function_name,
-                             NullaryFunction arg_supplier) noexcept;
+                             NullaryFunction arg_supplier);
 
         [[nodiscard]] NullaryFunction
         make_binary_evaluator(std::string_view binary_function_name,
                               NullaryFunction arg1_supplier,
-                              NullaryFunction arg2_supplier) noexcept;
+                              NullaryFunction arg2_supplier);
 
         std::unordered_map<std::string, NullaryFunction> variables_ {};
     };
 
+    void Scope::add_binding(std::string name, const std::string &expression)
+    {
+        variables_.emplace(std::move(name), make_evaluator(expression));
+    }
+
     NullaryFunction
-    Scope::make_evaluator(const std::string& expression) noexcept
+    Scope::make_evaluator(const std::string& expression)
     {
         const auto tokens = lex(expression);
         assert(!empty(tokens));
@@ -136,7 +143,7 @@ namespace {
     }
 
     NullaryFunction
-    Scope::make_nullary_evaluator(std::string simple_expression) noexcept
+    Scope::make_nullary_evaluator(std::string simple_expression)
     {
         assert(!empty(simple_expression));
 
@@ -166,7 +173,7 @@ namespace {
 
     inline NullaryFunction
     Scope::make_unary_evaluator(const std::string_view unary_function_name,
-                                NullaryFunction arg_supplier) noexcept
+                                NullaryFunction arg_supplier)
     {
         return [operation = unary_functions.at(unary_function_name),
                 arg_supplier = std::move(arg_supplier)]() noexcept {
@@ -177,13 +184,24 @@ namespace {
     inline NullaryFunction
     Scope::make_binary_evaluator(const std::string_view binary_function_name,
                                  NullaryFunction arg1_supplier,
-                                 NullaryFunction arg2_supplier) noexcept
+                                 NullaryFunction arg2_supplier)
     {
         return [operation = binary_functions.at(binary_function_name),
                 arg1_supplier = std::move(arg1_supplier),
                 arg2_supplier = std::move(arg2_supplier)]() noexcept {
             return operation(arg1_supplier(), arg2_supplier());
         };
+    }
+
+    Scope build_scope_from_bindings(std::istream& in)
+    {
+        auto scope = Scope{};
+
+        // for (auto line = std::string{}; std::getline(in >> std::ws, line); ) {
+        //     //
+        // }
+
+        return scope;
     }
 }
 
