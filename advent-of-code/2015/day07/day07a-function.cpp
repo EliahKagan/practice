@@ -24,35 +24,6 @@ namespace {
 
     constexpr auto mask = 65'535u;
 
-    // Function objects that take no arguments and may hold state.
-    using NullaryFunction = std::function<unsigned()>;
-
-    // Function objects that take one or two arguments and hold no state.
-    using UnaryFunction = unsigned (*)(unsigned) noexcept;
-    using BinaryFunction = unsigned (*)(unsigned, unsigned) noexcept;
-
-    const auto unary_functions
-            = std::unordered_map<std::string_view, UnaryFunction>{
-        { "NOT"sv, [](const unsigned arg) noexcept { return ~arg & mask; } }
-    };
-
-    const auto binary_functions
-            = std::unordered_map<std::string_view, BinaryFunction>{
-        { "AND"sv, [](const unsigned arg1, const unsigned arg2) noexcept
-                        { return arg1 & arg2; } },
-        { "OR"sv, [](const unsigned arg1, const unsigned arg2) noexcept
-                        { return arg1 | arg2; } },
-        { "LSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
-                        { return (arg1 << arg2) & mask; } },
-        { "RSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
-                        { return arg1 >> arg2; } }
-    };
-
-    // FIXME: When an unrecognized operation (not one of the keys in the above
-    // maps) is supplied, throw a custom exception type that wraps its name and
-    // arity. Have the calling code catch it and generate a useful message.
-    // Also "backport" this change to the other day07 implementations.
-
     class MalformedBinding : public std::runtime_error {
     public:
         using runtime_error::runtime_error;
@@ -63,9 +34,51 @@ namespace {
         using MalformedBinding::MalformedBinding;
     };
 
+    template<typename Function>
     class UnrecognizedOperation : public MalformedBinding {
-        using MalformedBinding::MalformedBinding;
+    public:
+        using MalformedBinding::MalformedBinding; // Pass unrecognized name.
     };
+
+    // Function objects that take no arguments and may hold state.
+    using Thunk = std::function<unsigned()>;
+
+    // Function objects that take one or two arguments and hold no state.
+    using UnaryOperation = unsigned (*)(unsigned) noexcept;
+    using BinaryOperation = unsigned (*)(unsigned, unsigned) noexcept;
+
+    template<typename Function>
+    using Operations = std::unordered_map<std::string_view, Function>;
+
+    template<typename Function>
+    constexpr auto operations = 0;
+
+    template<>
+    const auto operations<UnaryOperation> = Operations<UnaryOperation> {
+        { "NOT"sv, [](const unsigned arg) noexcept { return ~arg & mask; } }
+    };
+
+    template<>
+    const auto operations<BinaryOperation> = Operations<BinaryOperation> {
+        { "AND"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                        { return arg1 & arg2; } },
+        { "OR"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                        { return arg1 | arg2; } },
+        { "LSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                        { return (arg1 << arg2) & mask; } },
+        { "RSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                        { return arg1 >> arg2; } }
+    };
+
+    template<typename Function>
+    Function get_operation(const std::string_view operation_name)
+    {
+        try {
+            return operations<Function>.at(operation_name);
+        } catch (const std::out_of_range&) {
+            throw UnrecognizedOperation<Function>{std::string{operation_name}};
+        }
+    }
 
     [[nodiscard]] std::vector<std::string>
     lex(const std::string& expression) noexcept
@@ -102,35 +115,32 @@ namespace {
         }
 
     private:
-        [[nodiscard]] NullaryFunction
-        make_evaluator(const std::string& expression);
+        [[nodiscard]] Thunk make_evaluator(const std::string& expression);
 
-        [[nodiscard]] NullaryFunction
+        [[nodiscard]] Thunk
         make_nullary_evaluator(std::string simple_expression);
 
-        [[nodiscard]] NullaryFunction
-        make_variable_evaluator(std::string name) noexcept;
+        [[nodiscard]] Thunk make_variable_evaluator(std::string name) noexcept;
 
-        [[nodiscard]] NullaryFunction
+        [[nodiscard]] Thunk
         static make_literal_evaluator(const unsigned value) noexcept
         {
             return [value]() noexcept { return value; };
         }
 
-        [[nodiscard]] NullaryFunction
-        make_unary_evaluator(std::string_view unary_function_name,
-                             NullaryFunction arg_supplier);
+        [[nodiscard]] Thunk
+        make_unary_evaluator(std::string_view unary_operation_name,
+                             Thunk arg_supplier);
 
-        [[nodiscard]] NullaryFunction
-        make_binary_evaluator(std::string_view binary_function_name,
-                              NullaryFunction arg1_supplier,
-                              NullaryFunction arg2_supplier);
+        [[nodiscard]] Thunk
+        make_binary_evaluator(std::string_view binary_operation_name,
+                              Thunk arg1_supplier,
+                              Thunk arg2_supplier);
 
-        std::unordered_map<std::string, NullaryFunction> variables_ {};
+        std::unordered_map<std::string, Thunk> variables_ {};
     };
 
-    NullaryFunction
-    Scope::make_evaluator(const std::string& expression)
+    Thunk Scope::make_evaluator(const std::string& expression)
     {
         const auto tokens = lex(expression);
         assert(!empty(tokens));
@@ -153,8 +163,7 @@ namespace {
         }
     }
 
-    NullaryFunction
-    Scope::make_nullary_evaluator(std::string simple_expression)
+    Thunk Scope::make_nullary_evaluator(std::string simple_expression)
     {
         assert(!empty(simple_expression));
 
@@ -170,8 +179,7 @@ namespace {
         throw MalformedTerm{"term is neither a variable nor a constant"};
     }
 
-    inline NullaryFunction
-    Scope::make_variable_evaluator(std::string name) noexcept
+    inline Thunk Scope::make_variable_evaluator(std::string name) noexcept
     {
         return [name = std::move(name),
                 &variables = variables_]() noexcept {
@@ -182,22 +190,24 @@ namespace {
         };
     }
 
-    inline NullaryFunction
-    Scope::make_unary_evaluator(const std::string_view unary_function_name,
-                                NullaryFunction arg_supplier)
+    inline Thunk
+    Scope::make_unary_evaluator(const std::string_view unary_operation_name,
+                                Thunk arg_supplier)
     {
-        return [operation = unary_functions.at(unary_function_name),
+        return [operation =
+                    get_operation<UnaryOperation>(unary_operation_name),
                 arg_supplier = std::move(arg_supplier)]() noexcept {
             return operation(arg_supplier());
         };
     }
 
-    inline NullaryFunction
-    Scope::make_binary_evaluator(const std::string_view binary_function_name,
-                                 NullaryFunction arg1_supplier,
-                                 NullaryFunction arg2_supplier)
+    inline Thunk
+    Scope::make_binary_evaluator(const std::string_view binary_operation_name,
+                                 Thunk arg1_supplier,
+                                 Thunk arg2_supplier)
     {
-        return [operation = binary_functions.at(binary_function_name),
+        return [operation =
+                    get_operation<BinaryOperation>(binary_operation_name),
                 arg1_supplier = std::move(arg1_supplier),
                 arg2_supplier = std::move(arg2_supplier)]() noexcept {
             return operation(arg1_supplier(), arg2_supplier());
