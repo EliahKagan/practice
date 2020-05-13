@@ -80,6 +80,8 @@ namespace {
         return tokens;
     }
 
+    // FIXME: Is it really worth the confusion of taking some std::string
+    //        parameters by value and others by reference?
     class Scope {
     public:
         Scope() = default;
@@ -201,14 +203,19 @@ namespace {
 
     Scope build_scope_from_bindings(std::istream& in)
     {
-        static const auto pattern = std::regex{R"((.+)\s->\s(.+))"};
+        static const auto pattern = std::regex{R"((.+)\s->\s+(.*\S)\s*)"};
 
         auto scope = Scope{};
 
         for (auto line = std::string{}; std::getline(in >> std::ws, line); ) {
             if (empty(line)) continue;
 
+            auto match = std::smatch{};
 
+            if (!std::regex_match(line, match, pattern))
+                throw MalformedBinding{"binding not in expected format"};
+
+            scope.add_binding(match.str(2), match.str(1));
         }
 
         return scope;

@@ -49,6 +49,7 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "variant": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "regex": "cpp"
     }
 }
