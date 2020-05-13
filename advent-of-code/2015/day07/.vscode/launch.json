@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "(gdb) Launch - day07a",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/day07a",
@@ -24,7 +24,7 @@
             ]
         },
         {
-            "name": "(gdb) Launch [on C:]",
+            "name": "(gdb) Launch [on C:] - day07a",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/day07a.exe",
@@ -44,7 +44,7 @@
             ]
         },
         {
-            "name": "(gdb) Launch [on D:]",
+            "name": "(gdb) Launch [on D:] - day07a",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/day07a.exe",
@@ -64,7 +64,7 @@
             ]
         },
         {
-            "name": "(Windows) Launch",
+            "name": "(Windows) Launch - day07a",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/day07a.exe",
@@ -75,13 +75,173 @@
             "externalConsole": true
         },
         {
-            "name": "(lldb) Launch",
+            "name": "(lldb) Launch - day07a",
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/build/day07a",
             "args": [],
             "cwd": "${workspaceFolder}",
             "terminal": "external"
-        }
+        },
+
+        {
+            "name": "(gdb) Launch - day07a-variant",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/day07a-variant",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Launch [on C:] - day07a-variant",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/day07a-variant.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\msys64\\mingw64\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Launch [on D:] - day07a-variant",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/day07a-variant.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "D:\\msys64\\mingw64\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(Windows) Launch - day07a-variant",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/day07a-variant.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "(lldb) Launch - day07a-variant",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/day07a-variant",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "terminal": "external"
+        },
+
+        {
+            "name": "(gdb) Launch - day07a-function",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/day07a-function",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Launch [on C:] - day07a-function",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/day07a-function.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\msys64\\mingw64\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Launch [on D:] - day07a-function",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/day07a-function.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "D:\\msys64\\mingw64\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(Windows) Launch - day07a-function",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/day07a-function.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "(lldb) Launch - day07a-function",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/day07a-function",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "terminal": "external"
+        },
     ]
 }

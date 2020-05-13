@@ -187,6 +187,8 @@ namespace {
             auto &entry = variables.at(name);
             const auto value = entry();
             entry = make_literal_evaluator(value);
+            // const auto value = variables.at(name)();
+            // variables.at(name) = make_literal_evaluator(value);
             return value;
         };
     }
@@ -204,8 +206,7 @@ namespace {
 
     inline Thunk
     Scope::make_binary_evaluator(const std::string_view binary_operation_name,
-                                 Thunk arg1_supplier,
-                                 Thunk arg2_supplier)
+                                 Thunk arg1_supplier, Thunk arg2_supplier)
     {
         return [operation =
                     get_operation<BinaryOperation>(binary_operation_name),
