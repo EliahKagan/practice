@@ -21,11 +21,12 @@
 namespace {
     constexpr auto mask = 65'535u;
 
+    // Function objects that take no arguments and may hold state.
     using NullaryFunction = std::function<unsigned()>;
 
-    using UnaryFunction = std::function<unsigned(unsigned)>;
-
-    using BinaryFunction = std::function<unsigned(unsigned, unsigned)>;
+    // Function objects that take one or two arguments and hold no state.
+    using UnaryFunction = unsigned (*)(unsigned) noexcept;
+    using BinaryFunction = unsigned (*)(unsigned, unsigned) noexcept;
 
     const auto unary_functions
             = std::unordered_map<std::string_view, UnaryFunction>{
@@ -99,11 +100,11 @@ namespace {
         }
 
         [[nodiscard]] NullaryFunction
-        make_unary_evaluator(const std::string& unary_function_name,
+        make_unary_evaluator(std::string_view unary_function_name,
                              NullaryFunction arg_supplier) noexcept;
 
         [[nodiscard]] NullaryFunction
-        make_binary_evaluator(const std::string& binary_function_name,
+        make_binary_evaluator(std::string_view binary_function_name,
                               NullaryFunction arg1_supplier,
                               NullaryFunction arg2_supplier) noexcept;
 
@@ -160,6 +161,28 @@ namespace {
             const auto value = entry();
             entry = make_literal_evaluator(value);
             return value;
+        };
+    }
+
+    inline NullaryFunction
+    Scope::make_unary_evaluator(const std::string_view unary_function_name,
+                                NullaryFunction arg_supplier) noexcept
+    {
+        return [operation = unary_functions.at(unary_function_name),
+                arg_supplier = std::move(arg_supplier)]() noexcept {
+            return operation(arg_supplier());
+        };
+    }
+
+    inline NullaryFunction
+    Scope::make_binary_evaluator(const std::string_view binary_function_name,
+                                 NullaryFunction arg1_supplier,
+                                 NullaryFunction arg2_supplier) noexcept
+    {
+        return [operation = binary_functions.at(binary_function_name),
+                arg1_supplier = std::move(arg1_supplier),
+                arg2_supplier = std::move(arg2_supplier)]() noexcept {
+            return operation(arg1_supplier(), arg2_supplier());
         };
     }
 }
