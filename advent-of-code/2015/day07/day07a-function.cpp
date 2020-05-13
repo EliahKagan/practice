@@ -201,15 +201,15 @@ namespace {
 
     Scope build_scope_from_bindings(std::istream& in)
     {
-        static constexpr auto pattern = std::regex{R"()"};
+        static const auto pattern = std::regex{R"((.+)\s->\s(.+))"};
 
         auto scope = Scope{};
 
+        for (auto line = std::string{}; std::getline(in >> std::ws, line); ) {
+            if (empty(line)) continue;
 
 
-        // for (auto line = std::string{}; std::getline(in >> std::ws, line); ) {
-        //     //
-        // }
+        }
 
         return scope;
     }
