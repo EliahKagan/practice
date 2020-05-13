@@ -73,6 +73,13 @@ namespace {
 
     class Scope {
     public:
+        Scope() noexcept = default;
+        Scope(const Scope& other) noexcept = delete;
+        Scope(Scope&& other) noexcept = default;
+        Scope& operator=(const Scope& other) = delete;
+        Scope& operator=(Scope&& other) & noexcept = default;
+        ~Scope() = default;
+
         void add_binding(std::string_view binding) noexcept;
 
     private:
@@ -142,6 +149,18 @@ namespace {
             return make_literal_evaluator(literal_value);
 
         throw MalformedTerm{"term is neither a variable nor a constant"};
+    }
+
+    inline NullaryFunction
+    Scope::make_variable_evaluator(std::string name) noexcept
+    {
+        return [name = std::move(name),
+                &variables = variables_]() noexcept {
+            auto &entry = variables.at(name);
+            const auto value = entry();
+            entry = make_literal_evaluator(value);
+            return value;
+        };
     }
 }
 
