@@ -76,11 +76,11 @@ namespace {
 
     class Scope {
     public:
-        Scope() noexcept = default;
+        Scope() = default;
         Scope(const Scope&) = delete;
-        Scope(Scope&&) noexcept = default;
+        Scope(Scope&&) = default;
         Scope& operator=(const Scope&) = delete;
-        Scope& operator=(Scope&&) & noexcept = default;
+        Scope& operator=(Scope&&) & = default;
         ~Scope() = default;
 
         void add_binding(std::string name, const std::string& expression);
