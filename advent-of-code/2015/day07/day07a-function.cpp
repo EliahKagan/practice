@@ -91,7 +91,15 @@ namespace {
         Scope& operator=(Scope&&) & = default;
         ~Scope() = default;
 
-        void add_binding(std::string name, const std::string& expression);
+        void add_binding(std::string name, const std::string& expression)
+        {
+            variables_.emplace(std::move(name), make_evaluator(expression));
+        }
+
+        unsigned evaluate(const std::string& variable_name) noexcept
+        {
+            return variables_.at(variable_name)();
+        }
 
     private:
         [[nodiscard]] NullaryFunction
@@ -120,11 +128,6 @@ namespace {
 
         std::unordered_map<std::string, NullaryFunction> variables_ {};
     };
-
-    void Scope::add_binding(std::string name, const std::string &expression)
-    {
-        variables_.emplace(std::move(name), make_evaluator(expression));
-    }
 
     NullaryFunction
     Scope::make_evaluator(const std::string& expression)
@@ -219,6 +222,22 @@ namespace {
         }
 
         return scope;
+    }
+
+    void solve_example()
+    {
+        auto in = std::istringstream{R"(
+            123 -> x
+            456 -> y
+            x AND y -> d
+            x OR y -> e
+            x LSHIFT 2 -> f
+            y RSHIFT 2 -> g
+            NOT x -> h
+            NOT y -> i
+        )"};
+
+
     }
 }
 
