@@ -11,6 +11,7 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <regex>
 #include <sstream>
 #include <stdexcept>
@@ -107,16 +108,16 @@ namespace {
 
         void add_binding(std::string name, const std::string& expression)
         {
-            variables_.emplace(std::move(name), make_evaluator(expression));
+            variables_->emplace(std::move(name), make_evaluator(expression));
         }
 
         unsigned evaluate(const std::string& variable_name) noexcept
         {
-            return variables_.at(variable_name)();
+            return variables_->at(variable_name)();
         }
 
     private:
-        [[nodiscard]] Thunk make_evaluator(const std::string& expression);
+        [[nodiscard]] Thunk make_evaluator(const std::string &expression);
 
         [[nodiscard]] Thunk
         make_nullary_evaluator(std::string simple_expression);
@@ -138,22 +139,9 @@ namespace {
                               Thunk arg1_supplier,
                               Thunk arg2_supplier);
 
-        // FIXME: Moving a Scope moves its unordered_map member, which doesn't
-        // invalidate any references *into* the map, but *does* invalidate
-        // references to the map itself. This bug often doesn't show, because
-        // make_unary_evaluator() is very likely to be compiled with NRVO.
-        // Variable evaluator lambdas capture variables_ by reference, so they
-        // hold dangling references across a move; thus the current move
-        // constructor implementation is broken. Having them capture a
-        // reference or pointer to the Scope itself would be no better. Since I
-        // want a Scope to be movable, I think the best solution is for a Scope
-        // to hold its unordered_map member through a unique_ptr. [N.B. Even if
-        // NRVO is used so the Scope has the same address after being returned,
-        // I *think* pointers and references to it whose lifetime began before
-        // it was returned are invalidated, such that compilers are permitted
-        // to perform optimizations that assume the object won't be accessed
-        // through them. I *think*.]
-        std::unordered_map<std::string, Thunk> variables_ {};
+        using Variables = std::unordered_map<std::string, Thunk>;
+
+        std::unique_ptr<Variables> variables_ = std::make_unique<Variables>();
     };
 
     Thunk Scope::make_evaluator(const std::string& expression)
@@ -198,15 +186,10 @@ namespace {
     inline Thunk Scope::make_variable_evaluator(std::string name) noexcept
     {
         return [name = std::move(name),
-                &variables = variables_]() noexcept {
-            std::cerr << "DEBUG: size(variables) == " << size(variables)
-                      << '\n'; // FIXME: remove after debugging
-
+                &variables = *variables_]() noexcept {
             auto &entry = variables.at(name);
             const auto value = entry();
             entry = make_literal_evaluator(value);
-            // const auto value = variables.at(name)();
-            // variables.at(name) = make_literal_evaluator(value);
             return value;
         };
     }
