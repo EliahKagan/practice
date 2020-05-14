@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <iterator>
@@ -22,7 +23,7 @@
 #include <vector>
 
 namespace {
-    using namespace std::string_view_literals;
+    using namespace std::literals;
 
     constexpr auto mask = 65'535u;
 
@@ -56,12 +57,12 @@ namespace {
     constexpr auto operations = 0;
 
     template<>
-    const auto operations<UnaryOperation> = Operations<UnaryOperation> {
+    const auto operations<UnaryOperation> = Operations<UnaryOperation>{
         { "NOT"sv, [](const unsigned arg) noexcept { return ~arg & mask; } }
     };
 
     template<>
-    const auto operations<BinaryOperation> = Operations<BinaryOperation> {
+    const auto operations<BinaryOperation> = Operations<BinaryOperation>{
         { "AND"sv, [](const unsigned arg1, const unsigned arg2) noexcept
                         { return arg1 & arg2; } },
         { "OR"sv, [](const unsigned arg1, const unsigned arg2) noexcept
@@ -103,7 +104,7 @@ namespace {
         Scope(const Scope&) = delete;
         Scope(Scope&&) = default;
         Scope& operator=(const Scope&) = delete;
-        Scope& operator=(Scope&&) & = default;
+        [[maybe_unused]] Scope& operator=(Scope&&) & = default;
         ~Scope() = default;
 
         void add_binding(std::string name, const std::string& expression)
@@ -255,9 +256,59 @@ namespace {
         for (const auto name : {"d", "e", "f", "g", "h", "i", "x", "y"})
             std::cout << name << ": " << scope.evaluate(name) << '\n';
     }
+
+    void solve_from_file(const std::string path,
+                         const std::string variable_name)
+    {
+        auto scope = [&path]() {
+            std::ifstream in;
+            in.exceptions(std::ios_base::badbit | std::ios_base::failbit);
+            in.open(path);
+            in.exceptions(std::ios_base::badbit);
+
+            return build_scope_from_bindings(in);
+        }();
+
+        std::cout << scope.evaluate(variable_name) << '\n';
+    }
+
+    std::string_view program_name;
+
+    // FIXME: Make this a C-style variadic, or use {fmt}, or something.
+    [[noreturn]] void die(const std::string_view message) noexcept
+    {
+        std::cerr << program_name << ": error: " << message << '\n';
+        std::exit(EXIT_FAILURE);
+    }
 }
 
-int main()
+int main(int argc, char **argv)
 {
-    solve_example();
+    std::ios_base::sync_with_stdio(false);
+    assert(argc > 0);
+    program_name = argv[0];
+
+    try {
+        switch (argc) {
+        case 1:
+            std::cout << "No filenames given. Solving example.\n";
+            solve_example();
+            break;
+
+        case 2:
+            solve_from_file(argv[1], "a");
+            break;
+
+        default:
+            die("too many arguments");
+        }
+    } catch (const UnrecognizedOperation<UnaryOperation>& e) {
+        die("unrecognized unary operation \""s + e.what() + '"');
+    } catch (const UnrecognizedOperation<BinaryOperation>& e) {
+        die("unrecognized binary operation\""s + e.what() + '"');
+    } catch (const MalformedBinding& e) {
+        die(e.what());
+    } catch (const std::ios_base::failure&) {
+        die(std::strerror(errno));
+    }
 }
