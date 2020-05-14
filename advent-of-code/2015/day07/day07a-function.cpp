@@ -218,7 +218,7 @@ namespace {
         };
     }
 
-    Scope build_scope_from_bindings(std::istream& in)
+    [[nodiscard]] Scope build_scope_from_bindings(std::istream& in)
     {
         static const auto pattern = std::regex{R"((.+)\s->\s+(.*\S)\s*)"};
 
