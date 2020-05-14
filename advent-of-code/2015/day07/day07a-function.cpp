@@ -53,35 +53,37 @@ namespace {
     template<typename Function>
     using Operations = std::unordered_map<std::string_view, Function>;
 
-    template<typename Function>
-    constexpr auto operations = 0;
-
-    template<>
-    const auto operations<UnaryOperation> = Operations<UnaryOperation>{
-        { "NOT"sv, [](const unsigned arg) noexcept { return ~arg & mask; } }
-    };
-
-    template<>
-    const auto operations<BinaryOperation> = Operations<BinaryOperation>{
-        { "AND"sv, [](const unsigned arg1, const unsigned arg2) noexcept
-                        { return arg1 & arg2; } },
-        { "OR"sv, [](const unsigned arg1, const unsigned arg2) noexcept
-                        { return arg1 | arg2; } },
-        { "LSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
-                        { return (arg1 << arg2) & mask; } },
-        { "RSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
-                        { return arg1 >> arg2; } }
-    };
-
-    template<typename Function>
-    Function get_operation(const std::string_view operation_name)
+    Operations<UnaryOperation> get_unary_operations() noexcept
     {
-        try {
-            return operations<Function>.at(operation_name);
-        } catch (const std::out_of_range&) {
-            throw UnrecognizedOperation<Function>{std::string{operation_name}};
-        }
+        return {
+            { "NOT"sv, [](const unsigned arg) noexcept
+                        { return ~arg & mask; } }
+        };
     }
+
+    Operations<BinaryOperation> get_binary_operations() noexcept
+    {
+        return {
+            { "AND"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                            { return arg1 & arg2; } },
+            { "OR"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                            { return arg1 | arg2; } },
+            { "LSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                            { return (arg1 << arg2) & mask; } },
+            { "RSHIFT"sv, [](const unsigned arg1, const unsigned arg2) noexcept
+                            { return arg1 >> arg2; } }
+        };
+    }
+
+    // template<typename Function>
+    // Function get_operation(const std::string_view operation_name)
+    // {
+    //     try {
+    //         return operations<Function>.at(operation_name);
+    //     } catch (const std::out_of_range&) {
+    //         throw UnrecognizedOperation<Function>{std::string{operation_name}};
+    //     }
+    // }
 
     [[nodiscard]] std::vector<std::string>
     lex(const std::string& expression) noexcept
@@ -100,7 +102,14 @@ namespace {
     //        parameters by value and others by reference?
     class Scope {
     public:
-        Scope() = default;
+        Scope() noexcept
+            : Scope{get_unary_operations(), get_binary_operations()} { }
+
+        Scope(Operations<UnaryOperation> unary_operations,
+              Operations<BinaryOperation> binary_operations) noexcept
+            : unary_operations_(std::move(unary_operations)),
+              binary_operations_(std::move(binary_operations)) { }
+
         Scope(const Scope&) = delete;
         Scope(Scope&&) = default;
         Scope& operator=(const Scope&) = delete;
@@ -118,6 +127,8 @@ namespace {
         }
 
     private:
+        using Variables = std::unordered_map<std::string, Thunk>;
+
         [[nodiscard]] Thunk make_evaluator(const std::string &expression);
 
         [[nodiscard]] Thunk
@@ -140,8 +151,8 @@ namespace {
                               Thunk arg1_supplier,
                               Thunk arg2_supplier);
 
-        using Variables = std::unordered_map<std::string, Thunk>;
-
+        Operations<UnaryOperation> unary_operations_;
+        Operations<BinaryOperation> binary_operations_;
         std::unique_ptr<Variables> variables_ = std::make_unique<Variables>();
     };
 
@@ -199,8 +210,7 @@ namespace {
     Scope::make_unary_evaluator(const std::string_view unary_operation_name,
                                 Thunk arg_supplier)
     {
-        return [operation =
-                    get_operation<UnaryOperation>(unary_operation_name),
+        return [operation = unary_operations_.at(unary_operation_name),
                 arg_supplier = std::move(arg_supplier)]() noexcept {
             return operation(arg_supplier());
         };
@@ -210,8 +220,7 @@ namespace {
     Scope::make_binary_evaluator(const std::string_view binary_operation_name,
                                  Thunk arg1_supplier, Thunk arg2_supplier)
     {
-        return [operation =
-                    get_operation<BinaryOperation>(binary_operation_name),
+        return [operation = binary_operations_.at(binary_operation_name),
                 arg1_supplier = std::move(arg1_supplier),
                 arg2_supplier = std::move(arg2_supplier)]() noexcept {
             return operation(arg1_supplier(), arg2_supplier());
@@ -220,7 +229,7 @@ namespace {
 
     [[nodiscard]] Scope build_scope_from_bindings(std::istream& in)
     {
-        static const auto pattern = std::regex{R"((.+)\s->\s+(.*\S)\s*)"};
+        const auto pattern = std::regex{R"((.+)\s->\s+(.*\S)\s*)"};
 
         auto scope = Scope{};
 
