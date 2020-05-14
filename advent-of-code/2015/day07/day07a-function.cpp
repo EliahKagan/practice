@@ -27,6 +27,13 @@ namespace {
 
     constexpr auto mask = 65'535u;
 
+    // Function objects that take no arguments and may hold state.
+    using Thunk = std::function<unsigned()>;
+
+    // Function objects that take one or two arguments and hold no state.
+    using UnaryOperation = unsigned (*)(unsigned) noexcept;
+    using BinaryOperation = unsigned (*)(unsigned, unsigned) noexcept;
+
     class MalformedBinding : public std::runtime_error {
     public:
         using runtime_error::runtime_error;
@@ -40,18 +47,65 @@ namespace {
     template<typename Function>
     class UnrecognizedOperation : public MalformedBinding {
     public:
-        using MalformedBinding::MalformedBinding; // Pass unrecognized name.
+        explicit
+        UnrecognizedOperation(const std::string_view operation_name) noexcept
+            : MalformedBinding{build_message(operation_name)} { }
+
+    private:
+        [[nodiscard]] static std::string
+        build_message(std::string_view operation_name) noexcept;
+
+        [[nodiscard]] static constexpr std::string_view
+        arity_adjective() noexcept;
     };
 
-    // Function objects that take no arguments and may hold state.
-    using Thunk = std::function<unsigned()>;
-
-    // Function objects that take one or two arguments and hold no state.
-    using UnaryOperation = unsigned (*)(unsigned) noexcept;
-    using BinaryOperation = unsigned (*)(unsigned, unsigned) noexcept;
-
     template<typename Function>
-    using Operations = std::unordered_map<std::string_view, Function>;
+    std::string UnrecognizedOperation<Function>::build_message(
+            const std::string_view operation_name) noexcept
+    {
+        auto out = std::ostringstream{};
+
+        out << "unrecognized " << arity_adjective() << " operation \""
+            << operation_name << '"';
+
+        return out.str();
+    }
+
+    template<>
+    [[nodiscard]] constexpr std::string_view
+    UnrecognizedOperation<UnaryOperation>::arity_adjective() noexcept
+    {
+        return "unary"sv;
+    }
+
+    template<>
+    [[nodiscard]] constexpr std::string_view
+    UnrecognizedOperation<BinaryOperation>::arity_adjective() noexcept
+    {
+        return "binary"sv;
+    }
+
+    template<typename Function,
+             typename Map = std::unordered_map<std::string_view, Function>>
+    class Operations {
+    public:
+        Operations(const std::initializer_list<typename Map::value_type> ilist)
+                noexcept
+            : table_(ilist) { }
+
+        [[nodiscard]] Function
+        operator[](const std::string_view operation_name) const
+        {
+            try {
+                return table_.at(operation_name);
+            } catch (const std::out_of_range&) {
+                throw UnrecognizedOperation<Function>{operation_name};
+            }
+        }
+
+    private:
+        Map table_ {};
+    };
 
     Operations<UnaryOperation> get_unary_operations() noexcept
     {
@@ -75,16 +129,6 @@ namespace {
         };
     }
 
-    // template<typename Function>
-    // Function get_operation(const std::string_view operation_name)
-    // {
-    //     try {
-    //         return operations<Function>.at(operation_name);
-    //     } catch (const std::out_of_range&) {
-    //         throw UnrecognizedOperation<Function>{std::string{operation_name}};
-    //     }
-    // }
-
     [[nodiscard]] std::vector<std::string>
     lex(const std::string& expression) noexcept
     {
@@ -98,8 +142,6 @@ namespace {
         return tokens;
     }
 
-    // FIXME: Is it really worth the confusion of taking some std::string
-    //        parameters by value and others by reference?
     class Scope {
     public:
         Scope() noexcept
@@ -210,7 +252,7 @@ namespace {
     Scope::make_unary_evaluator(const std::string_view unary_operation_name,
                                 Thunk arg_supplier)
     {
-        return [operation = unary_operations_.at(unary_operation_name),
+        return [operation = unary_operations_[unary_operation_name],
                 arg_supplier = std::move(arg_supplier)]() noexcept {
             return operation(arg_supplier());
         };
@@ -220,7 +262,7 @@ namespace {
     Scope::make_binary_evaluator(const std::string_view binary_operation_name,
                                  Thunk arg1_supplier, Thunk arg2_supplier)
     {
-        return [operation = binary_operations_.at(binary_operation_name),
+        return [operation = binary_operations_[binary_operation_name],
                 arg1_supplier = std::move(arg1_supplier),
                 arg2_supplier = std::move(arg2_supplier)]() noexcept {
             return operation(arg1_supplier(), arg2_supplier());
@@ -283,7 +325,6 @@ namespace {
 
     std::string_view program_name;
 
-    // FIXME: Make this a C-style variadic, or use {fmt}, or something.
     [[noreturn]] void die(const std::string_view message) noexcept
     {
         std::cerr << program_name << ": error: " << message << '\n';
@@ -311,10 +352,6 @@ int main(int argc, char **argv)
         default:
             die("too many arguments");
         }
-    } catch (const UnrecognizedOperation<UnaryOperation>& e) {
-        die("unrecognized unary operation \""s + e.what() + '"');
-    } catch (const UnrecognizedOperation<BinaryOperation>& e) {
-        die("unrecognized binary operation\""s + e.what() + '"');
     } catch (const MalformedBinding& e) {
         die(e.what());
     } catch (const std::ios_base::failure&) {
