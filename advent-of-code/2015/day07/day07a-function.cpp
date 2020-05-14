@@ -163,7 +163,8 @@ namespace {
             variables_->emplace(std::move(name), make_evaluator(expression));
         }
 
-        unsigned evaluate(const std::string& variable_name) noexcept
+        // Evaluates the given variable. Throws std::out_of_range on failure.
+        unsigned evaluate(const std::string& variable_name)
         {
             return variables_->at(variable_name)();
         }
@@ -239,8 +240,7 @@ namespace {
 
     inline Thunk Scope::make_variable_evaluator(std::string name) noexcept
     {
-        return [name = std::move(name),
-                &variables = *variables_]() noexcept {
+        return [name = std::move(name), &variables = *variables_]() {
             auto &entry = variables.at(name);
             const auto value = entry();
             entry = make_literal_evaluator(value);
@@ -253,7 +253,7 @@ namespace {
                                 Thunk arg_supplier)
     {
         return [operation = unary_operations_[unary_operation_name],
-                arg_supplier = std::move(arg_supplier)]() noexcept {
+                arg_supplier = std::move(arg_supplier)]() {
             return operation(arg_supplier());
         };
     }
@@ -264,7 +264,7 @@ namespace {
     {
         return [operation = binary_operations_[binary_operation_name],
                 arg1_supplier = std::move(arg1_supplier),
-                arg2_supplier = std::move(arg2_supplier)]() noexcept {
+                arg2_supplier = std::move(arg2_supplier)]() {
             return operation(arg1_supplier(), arg2_supplier());
         };
     }
@@ -352,9 +352,12 @@ int main(int argc, char **argv)
         default:
             die("too many arguments");
         }
-    } catch (const MalformedBinding& e) {
-        die(e.what());
     } catch (const std::ios_base::failure&) {
         die(std::strerror(errno));
+    } catch (const MalformedBinding& e) {
+        die(e.what());
+    } catch (const std::out_of_range&) {
+        // TODO: Print a detailed message.
+        die("target variable unreachable or absent");
     }
 }
