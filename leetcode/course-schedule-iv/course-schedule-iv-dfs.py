@@ -6,7 +6,7 @@ class Solution:
         """
         Given a dependency graph of order n described by an edge list
         (prerequisites), answers queries of the form (start, end) to indicate
-        if src is a (possibly indirect) dependency of dest.
+        if start is a (possibly indirect) dependency of end.
         """
         adj = build_adjacency_list(n, prerequisites)
         return [can_reach(adj, start, end) for start, end in queries]
