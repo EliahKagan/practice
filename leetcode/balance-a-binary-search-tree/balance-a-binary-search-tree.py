@@ -6,9 +6,11 @@
 #         self.right = right
 class Solution:
     def balanceBST(self, root: TreeNode) -> TreeNode:
+        """Creates a new balanced BST with the values of the tree at root."""
         return balanced_bst_from(list(inorder(root)))
 
 def inorder(root):
+    """Inorder traversal, yielding values held in nodes."""
     stack = []
     while root or stack:
         # Go left as far as possible.
@@ -24,6 +26,7 @@ def inorder(root):
         root = cur.right
 
 def balanced_bst_from(values):
+    """Builds a balanced BST from a list, which is presumed to be sorted."""
     def subtree(low, high):
         if low >= high:
             return None
