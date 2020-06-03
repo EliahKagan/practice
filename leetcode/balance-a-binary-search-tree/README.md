@@ -13,3 +13,5 @@ suggests that it is even preferred to return a new tree, though I think either w
 It is simpler to make a new tree, which one can build to be balanced initially. This is easiest (and probably also faster, due to the cost of indirections, than a method that traverses the input tree twice) to copy the values, emitted by inorder traversal, into array, then build the new balanced BST from the array by recursively selecting the middle element and building the subtrees.
 
 If the tree is not too badly unbalanced, then this inorder traversal could be performed recursively. I decided that the problem should be solved in a way that avoids a stack overflow even for huge trees that are very unbalanced, and thus wrote the traversal with an iterative technique.
+
+There is no practical reason not to build the new tree recursively, however, since it is balanced, thereby avoiding a stack overflow. In addition to this appropriate recursive approach, I also wrote two versions that unnecessarily implement this operation iteratively, to practice those techniques.
