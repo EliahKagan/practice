@@ -102,4 +102,14 @@ def solve_tiny_example
   end
 end
 
-solve_tiny_example
+def solve_full_problem
+  mappings = as_mappings(ARGF.each_line)
+  variables = as_variables(mappings)
+  puts variables["a"].call
+end
+
+if ARGV.empty?
+  solve_tiny_example
+else
+  solve_full_problem
+end
