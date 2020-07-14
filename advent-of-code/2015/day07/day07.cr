@@ -119,7 +119,6 @@ def solve_full_problem(target, then_rewire_from, then_rewire_to)
   variables = as_variables(mappings)
   show_result("Before rewire", variables[target].call)
 
-  # mappings[then_rewire_to] = variables[then_rewire_from].call.to_s
   mappings << {name: then_rewire_to,
                expression: variables[then_rewire_from].call.to_s}
   show_result("After rewire", as_variables(mappings)[target].call)
