@@ -1,3 +1,8 @@
+# Advent of code 2015, part A
+# Via recursion with memoization, with cycle checking.
+# Implemented with a single table of procs representing thunks.
+# This is like the C# version day07.linq, but in Crystal with Proc(UInt16).
+
 def unary(&block : UInt16 -> UInt16)
   block
 end
@@ -56,8 +61,8 @@ def as_variables(mappings)
     when 2
       as_unary_evaluator.call(tokens[0], as_nullary_evaluator.call(tokens[1]))
     when 3
-      as_binary_evaluator.call(tokens[0],
-                               as_nullary_evaluator.call(tokens[1]),
+      as_binary_evaluator.call(tokens[1],
+                               as_nullary_evaluator.call(tokens[0]),
                                as_nullary_evaluator.call(tokens[2]))
     else
       raise "malformed expression" # FIXME: Raise specific exception type?
