@@ -1,4 +1,4 @@
-# Advent of code 2015, part A
+# Advent of code 2015, both parts
 # Via recursion with memoization, with cycle checking.
 # Implemented with a single table of procs representing thunks.
 # This is like the C# version day07.linq, but in Crystal with Proc(UInt16).
@@ -76,11 +76,16 @@ def as_variables(mappings)
   variables
 end
 
+def as_single_mapping(tokens)
+  raise "wrong syntax for mapping" unless tokens.size == 2
+  {name: tokens[1], expression: tokens[0]}
+end
+
 def as_mappings(lines)
-  lines.map(&.strip).reject(&.empty?).map(&.split(/\s+->\s+/)).map do |tokens|
-    raise "wrong syntax for mapping" unless tokens.size == 2
-    {name: tokens[1], expression: tokens[0]}
-  end
+  lines.map(&.strip)
+       .reject(&.empty?)
+       .map(&.split(/\s+->\s+/)).map { |tokens| as_single_mapping(tokens) }
+       .to_a
 end
 
 def solve_tiny_example
@@ -102,14 +107,26 @@ def solve_tiny_example
   end
 end
 
-def solve_full_problem
+RESULT_LABEL_WIDTH = 13
+RESULT_VALUE_WIDTH = 6
+
+def show_result(label, value)
+  printf "%*s: %*d\n", RESULT_LABEL_WIDTH, label, RESULT_VALUE_WIDTH, value
+end
+
+def solve_full_problem(target, then_rewire_from, then_rewire_to)
   mappings = as_mappings(ARGF.each_line)
   variables = as_variables(mappings)
-  puts variables["a"].call
+  show_result("Before rewire", variables[target].call)
+
+  # mappings[then_rewire_to] = variables[then_rewire_from].call.to_s
+  mappings << {name: then_rewire_to,
+               expression: variables[then_rewire_from].call.to_s}
+  show_result("After rewire", as_variables(mappings)[target].call)
 end
 
 if ARGV.empty?
   solve_tiny_example
 else
-  solve_full_problem
+  solve_full_problem("a", "a", "b")
 end
