@@ -1,10 +1,18 @@
-UNARY_OPERATIONS = {
-  "NOT" => ->(arg: UInt16) { ~arg }
+def unary(&block : UInt16 -> UInt16)
+  block
+end
+
+def binary(&block : (UInt16, UInt16) -> UInt16)
+  block
+end
+
+UNARIES = {
+  "NOT" => unary { |arg| ~arg }
 }
 
-BINARY_OPERATIONS = {
-  "AND" => ->(arg1 : UInt16, arg2 : UInt16) { arg1 & arg2 },
-  "OR" => ->(arg1 : UInt16, arg2 : UInt16) { arg1 | arg2 },
-  "LSHIFT" => ->(arg1 : UInt16, arg2 : UInt16) { arg1 << arg2 },
-  "RSHIFT" => ->(arg1 : UInt16, arg2 : UInt16) { arg1 >> arg2 }
+BINARIES = {
+  "AND" => binary { |arg1, arg2| arg1 & arg2 },
+  "OR" => binary { |arg1, arg2| arg1 | arg2 },
+  "LSHIFT" => binary { |arg1, arg2| arg1 << arg2 },
+  "RSHIFT" => binary { |arg1, arg2| arg1 >> arg2 }
 }
