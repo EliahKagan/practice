@@ -21,16 +21,16 @@ def as_variables(mappings)
   variables = Hash(String, Proc(UInt16)).new
 
   as_nullary_evaluator = ->(simple_expression : String) do
-    literal_value = simple_expression.to_u16?
-    if literal_value
-      lv : UInt16 = literal_value # FIXME: remove after debugging
-      return ->() { literal_value }
-    end
-
-    ->() do
-      computed_value = variables[simple_expression].call
-      variables[simple_expression] = ->() { computed_value }
-      computed_value
+    case simple_expression
+    when /^\d+$/
+      literal_value = simple_expression.to_u16
+      ->() { literal_value }
+    else
+      ->() do
+        computed_value = variables[simple_expression].call
+        variables[simple_expression] = ->() { computed_value }
+        computed_value
+      end
     end
   end
 
