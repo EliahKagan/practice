@@ -26,16 +26,17 @@ def as_variables(mappings)
   variables = Hash(String, Proc(UInt16)).new
 
   as_nullary_evaluator = ->(simple_expression : String) do
-    case simple_expression
-    when /^\d+$/
-      literal_value = simple_expression.to_u16
-      ->() { literal_value }
-    else
+    if (literal_value = simple_expression.to_u16?)
+      copy = literal_value
+      ->() { copy }
+    elsif simple_expression.starts_with?(/[a-zA-Z]/)
       ->() do
         computed_value = variables[simple_expression].call
         variables[simple_expression] = ->() { computed_value }
         computed_value
       end
+    else
+      raise %{term "#{simple_expression}" is neither variable nor constant}
     end
   end
 
