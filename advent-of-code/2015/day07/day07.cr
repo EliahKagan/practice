@@ -85,7 +85,8 @@ end
 def as_mappings(lines)
   lines.map(&.strip)
        .reject(&.empty?)
-       .map(&.split(/\s+->\s+/)).map { |tokens| as_single_mapping(tokens) }
+       .map(&.split(/\s+->\s+/))
+       .map { |tokens| as_single_mapping(tokens) }
        .to_a
 end
 
