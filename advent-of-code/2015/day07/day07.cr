@@ -1,5 +1,5 @@
 # Advent of code 2015, both parts
-# Via recursion with memoization, with cycle checking.
+# Via recursion with memoization, no cycle checking.
 # Implemented with a single table of procs representing thunks.
 # This is like the C# version day07.linq, but in Crystal with Proc(UInt16).
 
