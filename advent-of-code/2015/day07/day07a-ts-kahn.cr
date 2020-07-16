@@ -148,3 +148,45 @@ BINARIES = {
   "LSHIFT" => binary { |arg1, arg2| arg1 << arg2 },
   "RSHIFT" => binary { |arg1, arg2| arg1 >> arg2 }
 }
+
+def as_term(text)
+  if (value = text.to_u16?)
+    value
+  elsif text.starts_with?(/[a-zA-Z]/)
+    text
+  else
+    raise %{term "#{text}" is neither variable nor constant}
+  end
+end
+
+def as_expression(tokens)
+  case tokens.size
+  when 1
+    as_term(tokens[0])
+  when 2
+    {UNARIES[tokens[0]], as_term(tokens[1])}
+  when 3
+    {BINARIES[tokens[1]], as_term(tokens[0]), as_term(tokens[2])}
+  else
+    raise "malformed expression" # FIXME: Raise specific exception type?
+  end
+end
+
+def as_single_mapping(parts)
+  raise "wrong syntax for mapping" unless parts.size == 2
+  {parts[1], as_expression(parts[0].split)}
+end
+
+def as_mappings(lines)
+  lines.map(&.strip)
+       .reject(&.empty?)
+       .map(&.split(/\s+->\s+/))
+       .map { |parts| as_single_mapping(parts) }
+       .to_h
+end
+
+def solve(mappings)
+  graph = HashGraph(String).new
+
+
+end
