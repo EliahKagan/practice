@@ -44,7 +44,9 @@ class Graph(T)
   end
 
   def toposort
-    raise GraphError("Topological sort already started") if @toposort_started
+    if @toposort_started
+      raise GraphError.new("Topological sort already started")
+    end
     @toposort_started = true
 
     queue = roots
@@ -64,7 +66,9 @@ class Graph(T)
   end
 
   def cycle_vertices
-    raise GraphError("topological sort not finished") unless @toposort_finished
+    unless @toposort_finished
+      raise GraphError.new("topological sort not finished")
+    end
 
     @indegrees.each_with_index do |indegree, vertex|
       yield vertex unless indegree.zero?
@@ -84,7 +88,7 @@ end
 
 # Hashable-vertex adjacency-list-based digraph, for topological sort.
 class HashGraph(T)
-  @indices_by_key = Hash(T, Int32) # maps keys to indices
+  @indices_by_key = Hash(T, Int32).new # maps keys to indices
   @keys_by_index = Array(Int32).new # maps indices to keys
   @graph = Graph(T).new # underlying graph whose vertices are indices
 
@@ -125,7 +129,6 @@ class HashGraph(T)
     index
   end
 end
-
 
 def unary(&block : UInt16 -> UInt16)
   block
