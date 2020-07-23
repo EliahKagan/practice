@@ -10,8 +10,8 @@ end
 
 # Integer-vertex adjacency-list-based digraph, for topological sort.
 class Graph(T)
-  @adj = Array(Array(Int32)).new
-  @indegrees = Array(Int32).new
+  @adj = [] of Array(Int32)
+  @indegrees = [] of Int32
   @toposort_started = false
   @toposort_finished = false
 
@@ -88,9 +88,9 @@ end
 
 # Hashable-vertex adjacency-list-based digraph, for topological sort.
 class HashGraph(T)
-  @indices_by_key = Hash(T, Int32).new # maps keys to indices
-  @keys_by_index = Array(Int32).new # maps indices to keys
-  @graph = Graph(T).new # underlying graph whose vertices are indices
+  @indices_by_key = {} of T => Int32 # maps keys to indices
+  @keys_by_index = [] of Int32       # maps indices to keys
+  @graph = Graph(T).new  # underlying graph whose vertices are indices
 
   def order
     @graph.order
@@ -185,8 +185,56 @@ def as_mappings(lines)
        .to_h
 end
 
-def solve(mappings)
-  graph = HashGraph(String).new
+def each_term(expression : (UInt16 | String))
+  yield expression
+end
 
+def each_term(expression : Tuple(Proc(UInt16, UInt16),
+                                 (UInt16 | String)))
+  _, arg = expression
+  yield arg
+end
+
+def each_term(expression : Tuple(Proc(UInt16, UInt16, UInt16),
+                                 (UInt16 | String),
+                                 (UInt16 | String)))
+  _, arg1, arg2 = expression
+  yield arg1
+  yield arg2
+end
+
+def evaluate(variables, term : UInt16)
+  expression
+end
+
+def evaluate(variables, term : String)
+  evaluate(variables, )
+end
+
+def evaluate(variables, expression : Tuple(Proc(UInt16, UInt16),
+                                                (UInt16 | String)))
+
+end
+
+def build_graph(mappings)
+  graph = HashGraph(UInt16 | String).new
+
+  mappings.each do |variable, expression|
+    each_term(expression) { |term| graph.add_edge(term, variable) }
+  end
+
+  graph
+end
+
+def solve(mappings)
+  variables = {} of String => UInt16
+
+  evaluate = ->(term : String) do
+
+  end
+
+  build_graph(mappings).toposort do |term|
+
+  end
 
 end
