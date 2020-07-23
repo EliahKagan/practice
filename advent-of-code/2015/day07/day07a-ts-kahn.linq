@@ -189,7 +189,7 @@ internal sealed class Scope {
                     message: $"malformed binding: {binding.Trim()}");
         }
         
-        Set(parts[0], Expression.FromTokens(Lex(parts[1])));
+        Set(parts[1], Expression.FromTokens(Lex(parts[0])));
     }
     
     internal IDictionary<string, ushort> Solve()
@@ -214,7 +214,7 @@ internal static class Program {
     private static Scope ToScope(this IEnumerable<string> lines)
     {
         var scope = new Scope();
-        var bindings = lines.Where(line => !string.IsNullOrEmpty(line));
+        var bindings = lines.Where(line => !string.IsNullOrWhiteSpace(line));
         foreach (var binding in bindings) scope.Set(binding);
         return scope;
     }
@@ -232,7 +232,11 @@ internal static class Program {
             NOT y -> i
         ";
         
-        example.Split('\n').ToScope().Solve().Dump();
+        example.Split('\n')
+               .ToScope()
+               .Solve()
+               .OrderBy(kv => kv.Key)
+               .Dump();
     }
     
     private static void Main()
