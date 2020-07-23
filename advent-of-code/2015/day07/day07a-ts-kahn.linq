@@ -236,11 +236,26 @@ internal static class Program {
                .ToScope()
                .Solve()
                .OrderBy(kv => kv.Key)
-               .Dump();
+               .Dump("tiny example, showing all variables", noTotals: true);
     }
     
-    private static void Main()
+    private static void SolveFullProblem(string path)
     {
-        SolveTinyExample();
+        var scope = File.ReadLines(path).ToScope();
+        
+        scope.Solve()["a"]
+             .Dump("full problem, showing the specified variable");
+    }
+    
+    private static void Main(string[] args)
+    {
+        if (args == null || args.Length == 0) {
+            SolveTinyExample();
+        } else if (args.Length == 1) {
+            SolveFullProblem(args[0]);
+        } else {
+            throw new ArgumentException(paramName: nameof(args),
+                                        message: "too many arguments");
+        }
     }
 }
