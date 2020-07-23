@@ -49,7 +49,7 @@ internal sealed class IndexGraph {
     
     private Queue<int> GetRoots()
         => new Queue<int>(from vertex in Enumerable.Range(0, Count)
-                          where _indegrees[vertex] != 0
+                          where _indegrees[vertex] == 0
                           select vertex);
     
     private void EnsureExists(int vertex)
