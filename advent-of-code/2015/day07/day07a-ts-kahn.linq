@@ -71,6 +71,9 @@ internal sealed class HashGraph<T> where T : notnull {
     
     internal void AddEdge(T src, T dest)
         => _graph.AddEdge(GetIndex(src), GetIndex(dest));
+    
+    internal IEnumerable<T> TopologicalSort()
+        => _graph.TopologicalSort().Select(index => _keysByIndex[index]);
 
     private int GetIndex(T key)
     {
@@ -94,31 +97,15 @@ internal sealed class HashGraph<T> where T : notnull {
     private readonly List<T> _keysByIndex = new List<T>();
 }
 
-internal sealed class Mapping {
-    internal Mapping(string variable, string? operation,
-                     string firstArgument, string? secondArgument)
-    {
-        // TODO: Validate that variable is a valid variable name.
-    
-        if (secondArgument == null) {
-            if (operation != null && !Unaries.ContainsKey(operation)) {
-                throw new ArgumentException(
-                        paramName: nameof(operation),
-                        message: $"unrecognized unary operation: {operation}");
-            }
-        } else if (operation == null || !Binaries.ContainsKey(operation)) {
-            throw new ArgumentException(
-                paramName: nameof(operation),
-                message: $"unrecognized binary operation: {operation}");
-        }
-    
-        Variable = variable;
-        _operation = operation;
-        _firstArgument = firstArgument;
-        _secondArgument = secondArgument;
-    }
-    
-    internal string Variable { get; }
+internal sealed class Expression {
+    internal static Expression FromTokens(params string[] tokens)
+        => tokens.Length switch {
+            1 => new Expression(null, tokens[0], null),
+            2 => new Expression(tokens[0], tokens[1], null),
+            3 => new Expression(tokens[1], tokens[0], tokens[2]),
+            _ => throw new ArgumentException(paramName: nameof(tokens),
+                                             message: "malformed expression")
+        };
     
     internal IEnumerable<string> Terms
     {
@@ -126,6 +113,41 @@ internal sealed class Mapping {
             yield return _firstArgument;
             if (_secondArgument != null) yield return _secondArgument;
         }
+    }
+    
+    internal ushort Evaluate(IReadOnlyDictionary<string, ushort> variables)
+    {
+        var arg1 = GetTerm(variables, _firstArgument);
+        if (_operation == null) return arg1;
+        if (_secondArgument == null) return Unaries[_operation](arg1);
+        
+        var arg2 = GetTerm(variables, _secondArgument);
+        return Binaries[_operation](arg1, arg2);
+    }
+
+    private Expression(string? operation,
+                       string firstArgument,
+                       string? secondArgument)
+    {
+        if (secondArgument == null) {
+            if (operation != null && !Unaries.ContainsKey(operation)) {
+                throw new ArgumentException(
+                        paramName: nameof(operation),
+                        message: $"unrecognized unary operation: {operation}");
+            }
+        } else if (operation == null) {
+            throw new ArgumentException(
+                    paramName: nameof(secondArgument),
+                    message: "got two arguments but no operation to perform");
+        } else if (!Binaries.ContainsKey(operation)) {
+            throw new ArgumentException(
+                    paramName: nameof(operation),
+                    message: $"unrecognized binary operation: {operation}");
+        }
+    
+        _operation = operation;
+        _firstArgument = firstArgument;
+        _secondArgument = secondArgument;
     }
     
     private static IReadOnlyDictionary<string, Func<ushort, ushort>>
@@ -141,16 +163,6 @@ internal sealed class Mapping {
         { "RSHIFT", (arg1, arg2) => (ushort)(arg1 >> arg2) }
     };
     
-    private ushort Evaluate(IReadOnlyDictionary<string, ushort> variables)
-    {
-        var arg1 = GetTerm(variables, _firstArgument);
-        if (_operation == null) return arg1;
-        if (_secondArgument == null) return Unaries[_operation](arg1);
-        
-        var arg2 = GetTerm(variables, _secondArgument);
-        return Binaries[_operation](arg1, arg2);
-    }
-    
     private ushort GetTerm(IReadOnlyDictionary<string, ushort> variables,
                            string term)
         => ushort.TryParse(term, out var value) ? value : variables[term];
@@ -163,5 +175,68 @@ internal sealed class Mapping {
 }
 
 internal sealed class Scope {
-    private readonly Dictionary<
+    internal void Set(string variable, Expression expression)
+        => _expressions[variable] = expression;
+    
+    internal void Set(string binding)
+    {
+        var parts = Array.ConvertAll(binding.Split(" -> "),
+                                     side => side.Trim());
+        
+        if (parts.Length != 2) {
+            throw new ArgumentException(
+                    paramName: nameof(binding),
+                    message: $"malformed binding: {binding.Trim()}");
+        }
+        
+        Set(parts[0], Expression.FromTokens(Lex(parts[1])));
+    }
+    
+    internal IDictionary<string, ushort> Solve()
+    {
+        var values = new Dictionary<string, ushort>();
+        
+        foreach (var (variable, expression) in _expressions)
+            values[variable] = expression.Evaluate(values);
+        
+        return values;
+    }
+    
+    private static string[] Lex(string record)
+        => record.Split(default(char[]?),
+                        StringSplitOptions.RemoveEmptyEntries);
+
+    private readonly Dictionary<string, Expression> _expressions =
+        new Dictionary<string, Expression>();
+}
+
+internal static class Program {
+    private static Scope ToScope(this IEnumerable<string> lines)
+    {
+        var scope = new Scope();
+        var bindings = lines.Where(line => !string.IsNullOrEmpty(line));
+        foreach (var binding in bindings) scope.Set(binding);
+        return scope;
+    }
+    
+    private static void SolveTinyExample()
+    {
+        var example = @"
+            123 -> x
+            456 -> y
+            x AND y -> d
+            x OR y -> e
+            x LSHIFT 2 -> f
+            y RSHIFT 2 -> g
+            NOT x -> h
+            NOT y -> i
+        ";
+        
+        example.Split('\n').ToScope().Solve().Dump();
+    }
+    
+    private static void Main()
+    {
+        SolveTinyExample();
+    }
 }
