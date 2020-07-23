@@ -196,8 +196,10 @@ internal sealed class Scope {
     {
         var values = new Dictionary<string, ushort>();
         
-        foreach (var (variable, expression) in _expressions)
-            values[variable] = expression.Evaluate(values);
+        foreach (var term in BuildGraph().TopologicalSort()) {
+            if (_expressions.TryGetValue(term, out var expression))
+                values[term] = expression.Evaluate(values);
+        }
         
         return values;
     }
@@ -205,6 +207,20 @@ internal sealed class Scope {
     private static string[] Lex(string record)
         => record.Split(default(char[]?),
                         StringSplitOptions.RemoveEmptyEntries);
+    
+    private HashGraph<string> BuildGraph()
+    {
+        var graph = new HashGraph<string>();
+        
+        foreach (var (variable, expression) in _expressions) {
+            foreach (var term in expression.Terms) {
+                // FIXME: Why even add the literals? Rework everything.
+                graph.AddEdge(term, variable);
+            }
+        }
+        
+        return graph;
+    }
 
     private readonly Dictionary<string, Expression> _expressions =
         new Dictionary<string, Expression>();
