@@ -37,16 +37,11 @@ internal sealed class IndexGraph {
     
     private IEnumerable<int> DoTopologicalSort()
     {
-        //_adj.Dump(nameof(_adj));
-        //_indegrees.Dump(nameof(_indegrees));
-    
-        for (var roots = GetRoots().Dump("vertices starting with indegree 0"); roots.Count != 0; ) {
+        for (var roots = GetRoots().Dump("initial roots"); roots.Count != 0; ) {
             var src = roots.Dequeue();
             
-            foreach (var dest in _adj[src]) {
+            foreach (var dest in _adj[src])
                 if (--_indegrees[dest] == 0) roots.Enqueue(dest);
-                $"vertex {dest} indegree decremented to {_indegrees[dest]}".Dump();
-            }
             
             yield return src.Dump();
         }
@@ -54,7 +49,7 @@ internal sealed class IndexGraph {
     
     private Queue<int> GetRoots()
         => new Queue<int>(from vertex in Enumerable.Range(0, Count)
-                          where _indegrees[vertex] != 0 // FIXME: Here's the bug!
+                          where _indegrees[vertex] != 0
                           select vertex);
     
     private void EnsureExists(int vertex)
