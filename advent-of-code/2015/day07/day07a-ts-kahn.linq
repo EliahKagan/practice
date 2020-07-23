@@ -37,13 +37,13 @@ internal sealed class IndexGraph {
     
     private IEnumerable<int> DoTopologicalSort()
     {
-        for (var roots = GetRoots(); roots.Count != 0; ) {
+        for (var roots = GetRoots().Dump("initial roots"); roots.Count != 0; ) {
             var src = roots.Dequeue();
             
             foreach (var dest in _adj[src])
                 if (--_indegrees[dest] == 0) roots.Enqueue(dest);
             
-            yield return src;
+            yield return src.Dump();
         }
     }
     
@@ -196,7 +196,10 @@ internal sealed class Scope {
     {
         var values = new Dictionary<string, ushort>();
         
-        foreach (var term in BuildGraph().TopologicalSort()) {
+        var toposort = BuildGraph().TopologicalSort().ToList();
+        toposort.Dump("toposort");
+        
+        foreach (var term in toposort) {
             if (_expressions.TryGetValue(term, out var expression))
                 values[term] = expression.Evaluate(values);
         }
