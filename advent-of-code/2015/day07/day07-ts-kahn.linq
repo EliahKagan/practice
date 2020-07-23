@@ -2,7 +2,7 @@
   <Namespace>System.Diagnostics.Contracts</Namespace>
 </Query>
 
-// Advent of code 2015, part A
+// Advent of code 2015, both parts
 // Via bottom-up toposort via Kahn's algorithm, no cycle checking.
 
 internal sealed class IndexGraph {
@@ -258,9 +258,12 @@ internal static class Program {
     private static void SolveFullProblem(string path)
     {
         var scope = File.ReadLines(path).ToScope();
+        var solution = scope.Solve();
+        var a0 = solution["a"];
+        a0.Dump("full problem, before rewire");
         
-        scope.Solve()["a"]
-             .Dump("full problem, showing the specified variable");
+        scope.Set("b", UserQuery.Expression.FromTokens(a0.ToString()));
+        scope.Solve()["a"].Dump("full problem, after rewire");
     }
     
     private static void Main(string[] args)
