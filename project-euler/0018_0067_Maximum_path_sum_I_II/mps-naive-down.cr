@@ -21,7 +21,6 @@ def max_path_sum_to_dest(grid, i, j)
                max_path_sum_to_dest(grid, i - 1, j))
     end
 
-  STDERR.puts "(#{i}, #{j})"
   grid[i][j] + sum_above
 end
 
