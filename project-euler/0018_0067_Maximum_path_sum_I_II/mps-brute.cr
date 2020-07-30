@@ -8,5 +8,11 @@ def read_grid(io = ARGF)
   grid
 end
 
-grid = read_grid
-grid.each { |row| pp row }
+def max_path_sum(grid, i, j)
+  return 0 if i == grid.size
+
+  grid[i][j] + Math.max(max_path_sum(grid, i + 1, j),
+                        max_path_sum(grid, i + 1, j + 1))
+end
+
+puts max_path_sum(read_grid, 0, 0)
