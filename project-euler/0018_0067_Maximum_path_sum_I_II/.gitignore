@@ -1,0 +1,4 @@
+# Ignore files that have no "." (https://stackoverflow.com/a/31326382)
+*
+!*/
+!*.*
