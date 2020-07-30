@@ -6,7 +6,7 @@ class Grid
   def initialize(io)
     @elems = io.each_line.map(&.split.map(&.to_i)).to_a
     raise "wrong grid shape" unless correct_shape?
-    
+
     @memo = (1..@elems.size).map { |width| Array(Int32?).new(width, nil) }
     @memo[0][0] = @elems[0][0]
   end
