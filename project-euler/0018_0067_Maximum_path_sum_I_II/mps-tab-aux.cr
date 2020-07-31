@@ -13,9 +13,7 @@ def max_path_sum(grid)
   nxt = Array(Int32).new(grid.size, 0)
 
   (grid.size - 2).downto(0) do |i|
-    0.upto(i) do |j|
-      nxt[j] = grid[i][j] + Math.max(cur[j], cur[j + 1])
-    end
+    0.upto(i) { |j| nxt[j] = grid[i][j] + Math.max(cur[j], cur[j + 1]) }
     cur, nxt = nxt, cur
   end
 
