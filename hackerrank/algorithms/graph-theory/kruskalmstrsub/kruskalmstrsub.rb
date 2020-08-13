@@ -35,16 +35,14 @@ class DisjointSets
     true
   end
 
-  private def find_set(elem)
-    unless elem.between?(0, @elems.size - 1)
-      raise IndexError.new('specified element does not exist')
-    end
+  private
+
+  def find_set(elem)
+    raise IndexError, 'specified element does not exist' unless exists?(elem)
 
     # Find the ancestor.
     leader = elem
-    while @elems[leader] >= 0
-      leader = @elems[leader]
-    end
+    leader = @elems[leader] while @elems[leader] >= 0
 
     # Compress the path.
     while elem != leader
@@ -54,6 +52,10 @@ class DisjointSets
     end
 
     leader
+  end
+
+  def exists?(elem)
+    elem.between?(0, @elems.size - 1)
   end
 end
 
@@ -67,8 +69,8 @@ if __FILE__ == $PROGRAM_NAME
 
   (1..edge_count)
     .map { read_record }
-    .sort_by! { |u, v, weight| weight }
-    .select { |u, v, weight| sets.union(u, v) }
-    .sum { |u, v, weight| weight }
+    .sort_by! { |_u, _v, weight| weight }
+    .select { |u, v, _weight| sets.union(u, v) }
+    .sum { |_u, _v, weight| weight }
     .tap { |total| puts total }
 end
