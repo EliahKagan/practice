@@ -2,6 +2,7 @@
 
 # A trie for prefix counting. Does not keep track of where words end.
 class Trie
+  # A trie node. Each node instance represents a prefix.
   private class Node
     @children = {} of Char => Node
     property count = 0
