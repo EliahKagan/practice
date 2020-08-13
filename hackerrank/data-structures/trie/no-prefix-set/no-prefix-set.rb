@@ -9,12 +9,14 @@ $VERBOSE = 1
 # existing word in *trie*. Returns true on success and false on failure.
 def add(trie, word)
   node = trie
+
   word.each_char do |ch|
     node = node[ch] ||= {}
-    return false if node.has_key?(nil) # Some previous word is a prefix.
+    return false if node.key?(nil) # Some previous word is a prefix.
   end
 
   return false unless node.empty? # This is a prefix of some previous word.
+
   node[nil] = nil
   true
 end
