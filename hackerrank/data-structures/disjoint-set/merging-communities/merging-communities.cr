@@ -1,3 +1,6 @@
+# https://www.hackerrank.com/challenges/merging-communities
+
+# An element of a set, for union-find.
 class Element
   protected property parent
   protected property size = 1
