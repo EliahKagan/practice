@@ -32,9 +32,11 @@ class Element
 
   attr_accessor :parent
   protected :parent
+  protected :parent=
 
   attr_accessor :size
   protected :size
+  protected :size=
 
   protected
 
