@@ -46,9 +46,6 @@ def count_triples(sizes)
     triples = (triples + pairs * size) % PERIOD
     pairs = (pairs + singles * size) % PERIOD
     singles = (singles + size) % PERIOD
-
-    # FIXME: remove after debugging:
-    STDERR.puts "At #{size}, got #{triples} triples, #{pairs} pairs, #{singles} singles."
   end
 
   triples
