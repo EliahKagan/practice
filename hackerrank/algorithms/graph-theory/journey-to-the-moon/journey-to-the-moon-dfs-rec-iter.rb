@@ -30,25 +30,40 @@ class Graph
       .map { |start| dfs(vis, start) }
   end
 
+  # Stack frame for iteratively implementing recursive depth-first search.
+  class Frame
+    def initialize(row)
+      @row = row
+      @index = 0
+    end
+
+    def next
+      return nil if @index == @row.size
+
+      ret = @row[@index]
+      @index += 1
+      ret
+    end
+  end
+  private_constant :Frame
+
   private
 
   def dfs(vis, start)
     raise 'Bug: start vertex already visited' if vis[start]
 
     vis[start] = true
-    stack = [@adj[start].each]
+    stack = [Frame.new(@adj[start])]
     count = 1
 
     until stack.empty?
-      begin
-        dest = stack[-1].next
-        next if vis[dest]
-
+      dest = stack[-1].next
+      if dest.nil?
+        stack.pop
+      elsif !vis[dest]
         vis[dest] = true
         count += 1
-        stack.push(@adj[dest].each)
-      rescue StopIteration
-        stack.pop
+        stack.push(Frame.new(@adj[dest]))
       end
     end
 
