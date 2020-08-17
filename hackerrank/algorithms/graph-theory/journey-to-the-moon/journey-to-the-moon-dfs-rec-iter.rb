@@ -13,8 +13,8 @@ class Graph
   end
 
   def add_edge(vertex1, vertex2)
-    raise IndexError 'edge vertex1 is out of range' unless exists?(vertex1)
-    raise IndexError 'edge vertex2 us out of range' unless exists?(vertex2)
+    raise IndexError, 'edge vertex1 is out of range' unless exists?(vertex1)
+    raise IndexError, 'edge vertex2 us out of range' unless exists?(vertex2)
 
     @adj[vertex1] << vertex2
     @adj[vertex2] << vertex1
