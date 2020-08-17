@@ -35,6 +35,7 @@ class DisjointSets
   def join(parent, child)
     @parents[child] = parent
     @sizes[parent] += @sizes[child]
+    nil
   end
 
   def find_set(elem)
