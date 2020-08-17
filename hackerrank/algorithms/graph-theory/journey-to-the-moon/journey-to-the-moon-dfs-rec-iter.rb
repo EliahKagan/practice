@@ -36,7 +36,7 @@ class Graph
     raise 'Bug: start vertex already visited' if vis[start]
 
     vis[start] = true
-    stack = [@adj[start].lazy]
+    stack = [@adj[start].each]
     count = 1
 
     until stack.empty?
@@ -46,7 +46,7 @@ class Graph
 
         vis[dest] = true
         count += 1
-        stack.push(@adj[dest].lazy)
+        stack.push(@adj[dest].each)
       rescue StopIteration
         stack.pop
       end
