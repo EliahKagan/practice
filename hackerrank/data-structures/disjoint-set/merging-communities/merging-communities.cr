@@ -50,3 +50,18 @@ class DisjointSets
     leader
   end
 end
+
+vertex_count, query_count = gets.as(String).split.map(&.to_i)
+sets = DisjointSets.new(vertex_count + 1) # +1 for 1-based indexing
+
+query_count.times do
+  tokens = gets.as(String).split
+  case tokens[0]
+  when "M"
+    sets.union(tokens[1].to_i, tokens[2].to_i)
+  when "Q"
+    puts sets.size(tokens[1].to_i)
+  else
+    raise "Unrecognized query type: #{tokens[0]}"
+  end
+end
