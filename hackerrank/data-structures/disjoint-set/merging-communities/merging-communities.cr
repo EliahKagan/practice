@@ -1,6 +1,6 @@
 # https://www.hackerrank.com/challenges/merging-communities
 
-# Disjoint-set union (union-find) data structure Offers O(1) size computation.
+# Disjoint-set union (union-find) data structure. Offers O(1) size computation.
 class DisjointSets
   @parents : Array(Int32)
   @sizes : Array(Int32)

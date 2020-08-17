@@ -5,7 +5,7 @@
 
 $VERBOSE = 1
 
-# Disjoint-set union (union-find) data structure Offers O(1) size computation.
+# Disjoint-set union (union-find) data structure. Offers O(1) size computation.
 class DisjointSets
   def initialize(count)
     @parents = (0...count).to_a
