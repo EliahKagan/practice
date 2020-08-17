@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # https://www.hackerrank.com/challenges/journey-to-the-moon
-# In Crystal. Using iterative depth-first search.
+# In Ruby. Using iterative depth-first search.
 
 $VERBOSE = 1
 
