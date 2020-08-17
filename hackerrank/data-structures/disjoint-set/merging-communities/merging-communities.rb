@@ -1,20 +1,22 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # https://www.hackerrank.com/challenges/merging-communities
+
+$VERBOSE = 1
 
 # Disjoint-set union (union-find) data structure Offers O(1) size computation.
 class DisjointSets
-  @parents : Array(Int32)
-  @sizes : Array(Int32)
-
-  def initialize(count : Int32)
+  def initialize(count)
     @parents = (0...count).to_a
-    @sizes = Array(Int32).new(count, 1)
+    @sizes = Array.new(count, 1)
   end
 
   def size(elem)
     @sizes[find_set(elem)]
   end
 
-  def union(elem1 : Int32, elem2 : Int32)
+  def union(elem1, elem2)
     # Find the ancestors and stop if they are already the same.
     elem1 = find_set(elem1)
     elem2 = find_set(elem2)
@@ -28,19 +30,19 @@ class DisjointSets
     end
   end
 
-  private def join(parent, child)
+  private
+
+  def join(parent, child)
     @parents[child] = parent
     @sizes[parent] += @sizes[child]
   end
 
-  private def find_set(elem)
-    raise IndexError.new("no such element") unless 0 <= elem < @parents.size
+  def find_set(elem)
+    raise IndexError, 'no such element' unless exists?(elem)
 
     # Find the ancestor.
     leader = elem
-    while leader != @parents[leader]
-      leader = @parents[leader]
-    end
+    leader = @parents[leader] while leader != @parents[leader]
 
     # Compress the path.
     while elem != leader
@@ -51,19 +53,25 @@ class DisjointSets
 
     leader
   end
+
+  def exists?(elem)
+    elem.between?(0, @parents.size - 1)
+  end
 end
 
-vertex_count, query_count = gets.as(String).split.map(&.to_i)
-sets = DisjointSets.new(vertex_count + 1) # +1 for 1-based indexing
+if __FILE__ == $PROGRAM_NAME
+  vertex_count, query_count = gets.split.map(&:to_i)
+  sets = DisjointSets.new(vertex_count + 1) # +1 for 1-based indexing
 
-query_count.times do
-  tokens = gets.as(String).split
-  case tokens[0]
-  when "M"
-    sets.union(tokens[1].to_i, tokens[2].to_i)
-  when "Q"
-    puts sets.size(tokens[1].to_i)
-  else
-    raise "Unrecognized query type: #{tokens[0]}"
+  query_count.times do
+    tokens = gets.split
+    case tokens[0]
+    when 'M'
+      sets.union(tokens[1].to_i, tokens[2].to_i)
+    when 'Q'
+      puts sets.size(tokens[1].to_i)
+    else
+      raise "Unrecognized query type: #{tokens[0]}"
+    end
   end
 end
