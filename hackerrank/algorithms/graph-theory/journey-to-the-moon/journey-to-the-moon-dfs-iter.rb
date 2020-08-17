@@ -1,35 +1,40 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # https://www.hackerrank.com/challenges/journey-to-the-moon
 # In Crystal. Using iterative depth-first search.
 
-require "bit_array"
+$VERBOSE = 1
 
 # Adjacency-list representation of an unweighted undirected graph.
 class Graph
-  @adj : Array(Array(Int32))
-
-  def initialize(order : Int32)
-    @adj = (0...order).map { [] of Int32 }
+  def initialize(order)
+    @adj = Array.new(order) { [] }
   end
 
-  def add_edge(u, v)
-    raise IndexError.new("edge u is out of range") unless exists?(u)
-    raise IndexError.new("edge v us out of range") unless exists?(v)
-    @adj[u] << v
-    @adj[v] << u
+  def add_edge(vertex1, vertex2)
+    raise IndexError, 'edge vertex1 is out of range' unless exists?(vertex1)
+    raise IndexError, 'edge vertex2 us out of range' unless exists?(vertex2)
+
+    @adj[vertex1] << vertex2
+    @adj[vertex2] << vertex1
   end
 
   # Counts vertices in each component.
   def component_orders
-    vis = BitArray.new(@adj.size)
+    vis = [false] * @adj.size
 
     (0...@adj.size)
-      .each
+      .lazy
       .reject { |start| vis[start] }
       .map { |start| dfs(vis, start) }
   end
 
-  private def dfs(vis, start)
-    raise "Bug: start vertex already visited" if vis[start]
+  private
+
+  def dfs(vis, start)
+    raise 'Bug: start vertex already visited' if vis[start]
+
     vis[start] = true
     stack = [start]
     count = 1
@@ -37,6 +42,7 @@ class Graph
     until stack.empty?
       @adj[stack.pop].each do |dest|
         next if vis[dest]
+
         vis[dest] = true
         stack.push(dest)
         count += 1
@@ -46,29 +52,24 @@ class Graph
     count
   end
 
-  private def exists?(vertex)
-    0 <= vertex < @adj.size
+  def exists?(vertex)
+    vertex.between?(0, @adj.size - 1)
   end
 end
 
 def read_record
-  gets.as(String).split.map(&.to_i)
+  gets.split.map(&:to_i)
 end
 
 def read_graph
   vertex_count, edge_count = read_record
   graph = Graph.new(vertex_count)
-
-  edge_count.times do
-    u, v = read_record
-    graph.add_edge(u, v)
-  end
-
+  edge_count.times { graph.add_edge(*read_record) }
   graph
 end
 
 def count_pairs(cardinalities)
-  singles = pairs = 0i64
+  singles = pairs = 0
 
   cardinalities.each do |cardinality|
     pairs += singles * cardinality
