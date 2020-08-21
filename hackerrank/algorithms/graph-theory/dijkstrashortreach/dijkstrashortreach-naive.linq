@@ -78,7 +78,10 @@ internal sealed class NaivePrimHeap {
         for (var v = u + 1; v < Capacity; ++v)
             if (_costs[v] < _costs[u]) u = v;
         
-        return new Entry(u, _costs[u]);
+        var ret = new Entry(u, _costs[u]);
+        _costs[u] = NotFound;
+        --Count;
+        return ret;
     }
 
     private const int NotFound = -1;
