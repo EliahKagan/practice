@@ -2,13 +2,15 @@
 
 class LFUCache {
     LFUCache(int capacity) {
-        if (capacity <= 0)
-            throw new IllegalArgumentException("capacity must be positive");
+        if (capacity < 0)
+            throw new IllegalArgumentException("capacity must be nonnegative");
 
         _capacity = capacity;
     }
 
     int get(int key) {
+        if (_capacity == 0) return NOT_FOUND;
+
         var inner = _map.get(key);
         if (inner == null) return NOT_FOUND;
 
@@ -17,6 +19,8 @@ class LFUCache {
     }
 
     void put(int key, int value) {
+        if (_capacity == 0) return;
+
         var inner = _map.get(key);
 
         if (inner != null) {
