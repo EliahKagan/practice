@@ -8,14 +8,15 @@ import java.util.Scanner;
 /** Text buffer supporting appending and truncation, with undo capability. */
 final class Editor {
     void append(String text) {
+        int index = _buffer.length();
         _buffer.append(text);
-        int count = text.length();
-        _undos.push(() -> drop(count));
+        _undos.push(() -> _buffer.setLength(index));
     }
 
     void delete(int count) {
-        String text = _buffer.substring(_buffer.length() - count);
-        drop(count);
+        int index = _buffer.length() - count;
+        String text = _buffer.substring(index);
+        _buffer.setLength(index);
         _undos.push(() -> _buffer.append(text));
     }
 
@@ -27,10 +28,6 @@ final class Editor {
         _undos.pop().run();
     }
     
-    private void drop(int count) {
-        _buffer.delete(_buffer.length() - count, _buffer.length());
-    }
-
     private final StringBuilder _buffer = new StringBuilder();
 
     private final Deque<Runnable> _undos = new ArrayDeque<>();
