@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+# HackerRank - Simple Text Editor
 # https://www.hackerrank.com/challenges/simple-text-editor
+# with an undo stack of inverse actions
 
 $VERBOSE = 1
 
