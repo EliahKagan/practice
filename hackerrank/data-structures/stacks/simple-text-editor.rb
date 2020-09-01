@@ -15,13 +15,13 @@ class Editor
   def append(text)
     @buffer << text
     count = text.size
-    @undos << ->{ @buffer.slice!(-count..) }
+    @undos << -> { @buffer.slice!(-count..) }
     nil
   end
 
   def delete(count)
     text = @buffer.slice!(-count..)
-    @undos << ->{ @buffer << text }
+    @undos << -> { @buffer << text }
     nil
   end
 
