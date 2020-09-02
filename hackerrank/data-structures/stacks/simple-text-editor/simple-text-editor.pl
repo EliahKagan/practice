@@ -1,5 +1,9 @@
 #!/usr/bin/env perl
 
+# HackerRank - Simple Text Editor
+# https://www.hackerrank.com/challenges/simple-text-editor
+# with an undo stack of inverse actions
+
 use strict;
 use warnings;
 use feature qw(say);
