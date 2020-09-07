@@ -13,7 +13,7 @@ internal static class Extensions {
         using (var en = set.GetEnumerator()) {
             if (!en.MoveNext()) {
                 throw new InvalidOperationException(
-                        "cant peek element from empty set");
+                        "can't peek element from empty set");
             }
 
             return en.Current;
