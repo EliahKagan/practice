@@ -11,20 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-internal static class Extensions {
-    internal static
-    TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> map,
-                                     TKey key) where TValue : new()
-    {
-        if (!map.TryGetValue(key, out var value)) {
-            value = new TValue();
-            map.Add(key, value);
-        }
-
-        return value;
-    }
-}
-
 /// <summary>A priority queue with an O(log(n)) remove operation.</summary>
 /// <remarks>
 /// Implemented as a binary heap augmented with a table mapping each key to all
@@ -48,9 +34,14 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
     internal void Push(T value)
     {
         _heap.Add(default(T));
-        var index = SiftUp(value);
-        _map.GetOrCreate(value).Add(index);
-        _heap[index] = value;
+        var child = SiftUp(value);
+
+        if (!_map.TryGetValue(value, out var indices)) {
+            indices = new HashSet<int>();
+            _map.Add(value, indices);
+        }
+
+        _heap[child] = value;
     }
 
     internal T Pop()
@@ -109,12 +100,6 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
 
     private const int NoChild = -1;
 
-    private static int ParentOf(int child) => (child - 1) / 2;
-
-    private static int LeftChildOf(int parent) => parent * 2 + 1;
-
-    private static int RightChildOf(int parent) => parent * 2 + 2;
-
     private BinaryHeap(Comparison<T> comp) => _comp = comp;
 
     private void CutRoot()
@@ -136,7 +121,7 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
         var value = _heap[child];
 
         while (child != 0) {
-            var parent = ParentOf(child);
+            var parent = (child - 1) / 2;
             if (!_heap[parent].Equals(value)) break;
             child = parent;
         }
@@ -147,7 +132,7 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
     private void YankUp(int child)
     {
         while (child != 0) {
-            var parent = ParentOf(child);
+            var parent = (child - 1) / 2;
             var parentValue = _heap[parent];
 
             var indices = _map[parentValue];
@@ -164,7 +149,7 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
         var child = Count - 1;
 
         while (child != 0) {
-            var parent = ParentOf(child);
+            var parent = (child - 1) / 2;
             var parentValue = _heap[parent];
             if (_comp(parentValue, childValue) <= 0) break;
 
@@ -202,10 +187,10 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
 
     private int PickChild(int parent)
     {
-        var left = LeftChildOf(parent);
+        var left = parent * 2 + 1;
         if (left >= Count) return NoChild;
 
-        var right = RightChildOf(parent);
+        var right = left + 1;
         return right >= Count || _comp(_heap[left], _heap[right]) <= 0
                 ? left
                 : right;
