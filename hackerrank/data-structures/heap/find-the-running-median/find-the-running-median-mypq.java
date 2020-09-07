@@ -53,7 +53,7 @@ final class Heap<E> implements Queue<E> {
         E value = element();
 
         if (size() == 1) {
-            _heap.clear();
+            clear();
         } else {
             _heap.set(0, _heap.remove(size() - 1));
             siftDown(0);
