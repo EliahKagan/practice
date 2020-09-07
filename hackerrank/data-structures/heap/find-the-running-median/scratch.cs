@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 
 internal sealed class Pair<T> {
-    internal Pair(T first, T second) => Items = new List<T> { first, second };
+    internal Pair(T first, T second) => _items = new List<T> { first, second };
 
-    internal IList<T> Items { get; }
+    public override string ToString() => $"({_items[0]}, {_items[1]})";
 
-    internal void Swap() => (Items[0], Items[1]) = (Items[1], Items[0]);
+    internal void Swap() => (_items[0], _items[1]) = (_items[1], _items[0]);
+
+    private readonly IList<T> _items;
 }
 
 internal static class Program {
@@ -14,6 +16,6 @@ internal static class Program {
     {
         var pair = new Pair<int>(10, 20);
         pair.Swap();
-        Console.WriteLine($"({pair.Items[0]}, {pair.Items[1]})");
+        Console.WriteLine(pair);
     }
 }
