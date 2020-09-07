@@ -1,21 +1,16 @@
 using System;
 using System.Collections.Generic;
 
-internal sealed class Pair<T> {
-    internal Pair(T first, T second) => _items = new List<T> { first, second };
+internal sealed class PriorityQueue<T> {
+    internal void Swap(int i, int j)
+        => (_heap[i], _heap[j]) = (_heap[j], _heap[i]);
 
-    public override string ToString() => $"({_items[0]}, {_items[1]})";
-
-    internal void Swap() => (_items[0], _items[1]) = (_items[1], _items[0]);
-
-    private readonly IList<T> _items;
+    private readonly IList<T> _heap = new List<T>();
 }
 
 internal static class Program {
     private static void Main()
     {
-        var pair = new Pair<int>(10, 20);
-        pair.Swap();
-        Console.WriteLine(pair);
+        var pq = new PriorityQueue<int>();
     }
 }
