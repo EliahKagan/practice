@@ -288,7 +288,7 @@ internal sealed class MedianBag {
                 return _high.Peek();
 
             case 0:
-                return (_low.Peek() + _high.Peek()) / 2.0;
+                return ((double)_low.Peek() + (double)_high.Peek()) / 2.0;
 
             default:
                 throw new NotSupportedException(
