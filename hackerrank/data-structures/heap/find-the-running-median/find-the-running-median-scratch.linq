@@ -1,5 +1,10 @@
 <Query Kind="Program" />
 
+// HackerRank - Find the Running Median - SCRATCHWORK (test-case hard coded)
+// https://www.hackerrank.com/challenges/find-the-running-median
+// In C# 6.0, because that's what HackerRank supports. Uses two heaps of type
+// PriorityQueue<T>, implemented here as .NET/Mono supplies no priority queue.
+
 internal sealed class ReverseComparer<T> : IComparer<T> {
     internal ReverseComparer(IComparer<T> comparer) => _comparer = comparer;
 

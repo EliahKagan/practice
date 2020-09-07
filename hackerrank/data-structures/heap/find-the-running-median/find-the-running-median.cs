@@ -1,3 +1,8 @@
+// HackerRank - Find the Running Median
+// https://www.hackerrank.com/challenges/find-the-running-median
+// In C# 6.0, because that's what HackerRank supports. Uses two heaps of type
+// PriorityQueue<T>, implemented here as .NET/Mono supplies no priority queue.
+
 using System;
 using System.Collections.Generic;
 
