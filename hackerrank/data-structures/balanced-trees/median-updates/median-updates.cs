@@ -217,6 +217,7 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
 
         for (; ; ) {
             var child = PickChild(parent);
+            if (child == NoChild) break;
             var childValue = _heap[child];
             if (_comp(parentValue, childValue) <= 0) break;
 
@@ -285,6 +286,9 @@ internal sealed class MedianBag {
 
             case +1:
                 return _high.Peek();
+
+            case 0:
+                return (_low.Peek() + _high.Peek()) / 2.0;
 
             default:
                 throw new NotSupportedException(
