@@ -82,7 +82,11 @@ internal sealed class PriorityQueue<T> {
         => _comparer.Compare(_heap[parent], _heap[child]) <= 0;
 
     private void Swap(int i, int j)
-        => (_heap[i], _heap[j]) = (_heap[j], _heap[i]);
+    {
+        var tmp = _heap[i];
+        _heap[i] = _heap[j];
+        _heap[j] = tmp;
+    }
 
     private readonly IList<T> _heap = new List<T>();
 
