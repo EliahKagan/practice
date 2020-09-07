@@ -4,16 +4,13 @@
 // (Ordinarily, it would be better to use java.util.PriorityQueue.)
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Queue;
 import java.util.Scanner;
 
-final class Heap<E> implements Queue<E> {
+final class Heap<E> {
     static <E extends Comparable<? super E>> Heap<E> minHeap() {
         return new Heap<>(Comparator.naturalOrder());
     }
@@ -26,30 +23,24 @@ final class Heap<E> implements Queue<E> {
         _comp = comp;
     }
 
-    @Override
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return _heap.isEmpty();
     }
 
-    @Override
-    public int size() {
+    int size() {
         return _heap.size();
     }
 
-    @Override
-    public void clear() {
+    void clear() {
         _heap.clear();
     }
 
-    @Override
-    public boolean add(E value) {
+    void add(E value) {
         _heap.add(value);
         siftUp(size() - 1);
-        return true;
     }
 
-    @Override
-    public E remove() {
+    E remove() {
         E value = element();
 
         if (size() == 1) {
@@ -62,75 +53,13 @@ final class Heap<E> implements Queue<E> {
         return value;
     }
 
-    @Override
-    public E element() {
+    E element() {
         if (isEmpty()) {
             throw new NoSuchElementException(
                     "empty heap has no first element");
         }
 
         return _heap.get(0);
-    }
-
-    @Override
-    public boolean offer(E value) {
-        return add(value);
-    }
-
-    @Override
-    public E poll() {
-        return isEmpty() ? null : remove();
-    }
-
-    @Override
-    public E peek() {
-        return isEmpty() ? null : element();
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends E> collection) {
-        for (E value : collection) add(value);
-        return true;
-    }
-
-    @Override
-    public boolean contains(Object value) {
-        return _heap.contains(value);
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> collection) {
-        return _heap.containsAll(collection);
-    }
-
-    @Override
-    public Iterator<E> iterator() {
-        return _heap.iterator();
-    }
-
-    @Override
-    public boolean remove(Object value) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> collection) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> collection) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object[] toArray() {
-        return _heap.toArray();
-    }
-
-    @Override
-    public <T> T[] toArray(T[] array) {
-        return _heap.toArray(array);
     }
 
     private static final int NO_CHILD = -1;
@@ -223,9 +152,9 @@ final class MedianBag {
         return _high.size() - _low.size();
     }
 
-    private final Queue<Integer> _low = Heap.maxHeap();
+    private final Heap<Integer> _low = Heap.maxHeap();
 
-    private final Queue<Integer> _high = Heap.minHeap();
+    private final Heap<Integer> _high = Heap.minHeap();
 }
 
 enum Solution {
