@@ -41,6 +41,7 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
             _map.Add(value, indices);
         }
 
+        indices.Add(child);
         _heap[child] = value;
     }
 
