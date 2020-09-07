@@ -6,20 +6,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 internal static class Extensions {
-    internal static T PeekElement<T>(this ISet<T> set)
-    {
-        using (var en = set.GetEnumerator()) {
-            if (!en.MoveNext()) {
-                throw new InvalidOperationException(
-                        "can't peek element from empty set");
-            }
-
-            return en.Current;
-        }
-    }
-
     internal static void EnsureAdd<T>(this ISet<T> set, T element)
     {
         if (!set.Add(element)) {
@@ -123,7 +112,8 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
         if (Count == 1) {
             Clear();
         } else {
-            var child = indices.PeekElement();
+            // Get any index to this value in the heap.
+            var child = indices.First();
 
             if (indices.Count == 1) {
                 _map.EnsureRemove(value);
