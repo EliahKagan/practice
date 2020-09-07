@@ -1,6 +1,6 @@
 // HackerRank - Median Updates
 // https://www.hackerrank.com/challenges/median
-// In C# 6.0, because that's what HackerRank supports. This problem is intended
+// In C# 6.0, because that's what HackerRank supports. The problem is intended
 // to be solved with self-balancing trees, but this solution uses binary heaps
 // equipped with an O(log(n)) remove operation.
 
@@ -251,7 +251,69 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
 }
 
 internal sealed class MedianBag {
+    internal int Count => _low.Count + _high.Count;
 
+    internal void Add(int value)
+    {
+        if (_low.Count != 0 && value < _low.Peek())
+            _low.Push(value);
+        else
+            _high.Push(value);
+
+        Rebalance();
+    }
+
+    internal bool Remove(int value)
+    {
+        if (_low.Remove(value) || _high.Remove(value)) {
+            Rebalance();
+            return true;
+        }
+
+        return false;
+    }
+
+    internal double Median
+    {
+        get {
+            if (Count == 0)
+                throw new InvalidOperationException("empty bag has no median");
+
+            switch (BalanceFactor) {
+            case -1:
+                return _low.Peek();
+
+            case +1:
+                return _high.Peek();
+
+            default:
+                throw new NotSupportedException(
+                        "Bug: balancing invariant violated");
+            }
+        }
+    }
+
+    private void Rebalance()
+    {
+        switch (BalanceFactor) {
+        case -2:
+            _high.Push(_low.Pop());
+            break;
+
+        case +2:
+            _low.Push(_high.Pop());
+            break;
+
+        default:
+            break; // Can't be made more balanced.
+        }
+    }
+
+    private int BalanceFactor => _high.Count - _low.Count;
+
+    private readonly BinaryHeap<int> _low = BinaryHeap<int>.CreateMaxHeap();
+
+    private readonly BinaryHeap<int> _high = BinaryHeap<int>.CreateMinHeap();
 }
 
 internal static class Solution {
