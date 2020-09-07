@@ -317,8 +317,39 @@ internal sealed class MedianBag {
 }
 
 internal static class Solution {
+    private static int ReadValue() => int.Parse(Console.ReadLine());
+
+    private static string[] ReadTokens()
+        => Console.ReadLine()
+                  .Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+
     private static void Main()
     {
+        var bag = new MedianBag();
 
+        for (var count = ReadValue(); count > 0; --count) {
+            var tokens = ReadTokens();
+            var opcode = tokens[0];
+            var argument = int.Parse(tokens[1]);
+
+            switch (opcode) {
+            case "a":
+                bag.Add(argument);
+                Console.WriteLine(bag.Median);
+                break;
+
+            case "r":
+                if (bag.Remove(argument) && bag.Count != 0)
+                    Console.WriteLine(bag.Median);
+                else
+                    Console.WriteLine("Wrong!");
+
+                break;
+
+            default:
+                throw new InvalidOperationException(
+                        $"unrecognized opcode \"{opcode}\"");
+            }
+        }
     }
 }
