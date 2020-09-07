@@ -64,15 +64,7 @@ internal sealed class BinaryHeap<T> where T : IEquatable<T>, IComparable<T> {
         return value;
     }
 
-    internal T Peek()
-    {
-        if (Count == 0) {
-            throw new InvalidOperationException(
-                    "empty heap has no first element");
-        }
-
-        return _heap[0];
-    }
+    internal T Peek() => _heap[0];
 
     internal bool Remove(T value)
     {
@@ -230,9 +222,6 @@ internal sealed class MedianBag {
     internal double Median
     {
         get {
-            if (Count == 0)
-                throw new InvalidOperationException("empty bag has no median");
-
             switch (BalanceFactor) {
             case -1:
                 return _low.Peek();
@@ -286,27 +275,26 @@ internal static class Solution {
 
         for (var count = ReadValue(); count > 0; --count) {
             var tokens = ReadTokens();
-            var opcode = tokens[0];
+            var opcode = tokens[0][0];
             var argument = int.Parse(tokens[1]);
 
             switch (opcode) {
-            case "a":
+            case 'a':
                 bag.Add(argument);
-                Console.WriteLine(bag.Median);
                 break;
 
-            case "r":
-                if (bag.Remove(argument) && bag.Count != 0)
-                    Console.WriteLine(bag.Median);
-                else
+            case 'r':
+                if (!bag.Remove(argument) || bag.Count == 0) {
                     Console.WriteLine("Wrong!");
-
+                    continue;
+                }
                 break;
 
             default:
-                throw new InvalidOperationException(
-                        $"unrecognized opcode \"{opcode}\"");
+                break; // Ignore unrecognized opcodes.
             }
+
+            Console.WriteLine(bag.Median);
         }
     }
 }
