@@ -85,10 +85,7 @@ class BinaryHeap(T)
     true
   end
 
-  protected def initialize(&comparer : T, T -> Int32)
-    @map = {} of T => Set(Int32)  # value => indices
-    @heap = [] of T  # index => value
-    @comparer = comparer
+  protected def initialize(&@comparer : T, T -> Int32)
   end
 
   private def cut_root
@@ -174,7 +171,64 @@ class BinaryHeap(T)
   private def order_ok?(parent_value, child_value)
     @comparer.call(parent_value, child_value) <= 0
   end
+
+  @map = {} of T => Set(Int32)  # value => indices
+  @heap = [] of T  # index => value
+  @comparer : T, T -> Int32
 end
 
-a = BinaryHeap(Int32).make_min_heap # FIXME: remove
-b = BinaryHeap(Int32).make_max_heap # FIXME: remove
+class MedianBag
+  def empty?
+    @low.empty? && @high.empty?
+  end
+
+  def push(value : Int32)
+    if !@low.empty? && value < @low.first
+      @low.push(value)
+    else
+      @high.push(value)
+    end
+
+    rebalance
+  end
+
+  def delete?(value : Int32)
+    if @low.delete?(value) || @high.delete?(value)
+      rebalance
+      true
+    else
+      false
+    end
+  end
+
+  def median
+    case balance_factor
+    when -1
+      @low.first
+    when +1
+      @high.first
+    when 0
+      (@low.first.to_f + @high.first.to_f) / 2.0
+    else
+      raise "Bug: balancing invariant violated"
+    end
+  end
+
+  private def rebalance
+    case balance_factor
+    when -2
+      @high.push(@low.pop)
+    when +2
+      @low.push(@high.pop)
+    end # In other cases, it can't be made more balanced.
+
+    nil
+  end
+
+  private def balance_factor
+    @high.size - @low.size
+  end
+
+  @low = BinaryHeap(Int32).make_max_heap
+  @high = BinaryHeap(Int32).make_min_heap
+end
