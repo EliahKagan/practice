@@ -231,16 +231,26 @@ final class MedianBag {
         return false;
     }
 
-    double median() {
+    void printMedian() {
         switch (balanceFactor()) {
         case -1:
-            return _low.peek();
+            System.out.println(_low.peek());
+            break;
 
         case +1:
-            return _high.peek();
+            System.out.println(_high.peek());
+            break;
 
         case 0:
-            return ((double)_low.peek() + (double)_high.peek()) / 2.0;
+            long sum = (long)_low.peek() + (long)_high.peek();
+            long half = sum / 2;
+
+            if (sum % 2 == 0)
+                System.out.println(half);
+            else
+                System.out.println(half + ".5");
+
+            break;
 
         default:
             throw new AssertionError("Bug: balancing invariant violated");
@@ -300,16 +310,9 @@ enum Solution {
                     break; // Ignore unrecognized opcodes.
                 }
 
-                printWithoutTrailingFractionalZero(bag.median());
+                bag.printMedian();
             }
         }
-    }
-
-    private static void printWithoutTrailingFractionalZero(double value) {
-        if (value == Math.floor(value))
-            System.out.format("%.0f%n", value);
-        else
-            System.out.format("%.1f%n", value);
     }
 
     private static int readValue(BufferedReader br) throws IOException {
