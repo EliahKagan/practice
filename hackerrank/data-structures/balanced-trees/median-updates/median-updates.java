@@ -248,6 +248,8 @@ final class MedianBag {
 
             if (sum % 2 == 0)
                 System.out.println(half);
+            else if (sum == -1)
+                System.out.println("-0.5");
             else
                 System.out.println(half + ".5");
 
