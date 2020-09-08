@@ -306,12 +306,10 @@ enum Solution {
     }
 
     private static void printWithoutTrailingFractionalZero(double value) {
-        int roundedValue = (int)value;
-
-        if (value == roundedValue)
-            System.out.println(roundedValue);
+        if (value == Math.floor(value))
+            System.out.format("%.0f%n", value);
         else
-            System.out.println(value);
+            System.out.format("%.1f%n", value);
     }
 
     private static int readValue(BufferedReader br) throws IOException {
