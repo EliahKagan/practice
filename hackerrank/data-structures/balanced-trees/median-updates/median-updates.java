@@ -315,7 +315,7 @@ enum Solution {
     }
 
     private static int readValue(BufferedReader br) throws IOException {
-        return Integer.parseInt(br.readLine());
+        return Integer.parseInt(br.readLine().strip());
     }
 
     private static String[] readTokens(BufferedReader br) throws IOException {
