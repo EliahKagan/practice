@@ -4,19 +4,41 @@
 // Using trees of element frequencies. This is a two-tree solution, analogous
 // to the two-heap solution to the simpler variant that has no removals.
 //
-// This version is rewritten to trade elegance and clarity for speed.
+// This version has some optimizations trading elegance and clarity for speed.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// An ascending BST-based multiset stored as value-frequency mappings.
-/// </summary>
-internal sealed class MinTree {
+internal static class ReverseComparer {
+    internal static IComparer<T> Reverse<T>(this IComparer<T> comparer)
+        => new ReverseComparer<T>(comparer);
+}
+
+internal sealed class ReverseComparer<T> : IComparer<T> {
+    internal ReverseComparer(IComparer<T> comparer) => _comparer = comparer;
+
+    public int Compare(T lhs, T rhs) => _comparer.Compare(rhs, lhs);
+
+    private readonly IComparer<T> _comparer;
+}
+
+internal static class SortedBag {
+    internal static SortedBag<T> CreateMinTree<T>()
+        => new SortedBag<T>(Comparer<T>.Default);
+
+    internal static SortedBag<T> CreateMaxTree<T>()
+        => new SortedBag<T>(Comparer<T>.Default.Reverse());
+}
+
+internal sealed class SortedBag<T> {
+
+    internal SortedBag(IComparer<T> comparer)
+        => _freqs = new SortedDictionary<T, int>(comparer);
+
     internal int Count { get; private set; } = 0;
 
-    internal void Push(long value)
+    internal void Push(T value)
     {
         if (_freqs.TryGetValue(value, out var freq))
             _freqs[value] = freq + 1;
@@ -26,7 +48,7 @@ internal sealed class MinTree {
         ++Count;
     }
 
-    internal bool Remove(long value)
+    internal bool Remove(T value)
     {
         if (!_freqs.TryGetValue(value, out var freq)) return false;
 
@@ -39,7 +61,7 @@ internal sealed class MinTree {
         return true;
     }
 
-    internal long Pop()
+    internal T Pop()
     {
         var entry = _freqs.First();
         var value = entry.Key;
@@ -54,33 +76,15 @@ internal sealed class MinTree {
         return value;
     }
 
-    internal long Peek() => _freqs.First().Key;
+    internal T Peek() => _freqs.First().Key;
 
-    private readonly SortedDictionary<long, int> _freqs =
-        new SortedDictionary<long, int>();
-}
-
-/// <summary>
-/// An descending BST-based multiset stored as value-frequency mappings.
-/// </summary>
-internal sealed class MaxTree {
-    internal int Count => _tree.Count;
-
-    internal void Push(long value) => _tree.Push(-value);
-
-    internal bool Remove(long value) => _tree.Remove(-value);
-
-    internal long Pop() => -_tree.Pop();
-
-    internal long Peek() => -_tree.Peek();
-
-    private readonly MinTree _tree = new MinTree();
+    private readonly SortedDictionary<T, int> _freqs;
 }
 
 internal sealed class MedianBag {
     internal int Count => _low.Count + _high.Count;
 
-    internal void Add(long value)
+    internal void Add(int value)
     {
         if (_low.Count != 0 && value < _low.Peek())
             _low.Push(value);
@@ -90,7 +94,7 @@ internal sealed class MedianBag {
         Rebalance();
     }
 
-    internal bool Remove(long value)
+    internal bool Remove(int value)
     {
         if (_low.Remove(value) || _high.Remove(value)) {
             Rebalance();
@@ -103,6 +107,9 @@ internal sealed class MedianBag {
     internal double Median
     {
         get {
+            if (Count == 0)
+                throw new InvalidOperationException("empty bag has no median");
+
             switch (BalanceFactor) {
             case -1:
                 return _low.Peek();
@@ -111,7 +118,7 @@ internal sealed class MedianBag {
                 return _high.Peek();
 
             case 0:
-                return (_low.Peek() + _high.Peek()) / 2.0;
+                return ((double)_low.Peek() + (double)_high.Peek()) / 2.0;
 
             default:
                 throw new NotSupportedException(
@@ -138,13 +145,13 @@ internal sealed class MedianBag {
 
     private int BalanceFactor => _high.Count - _low.Count;
 
-    private readonly MaxTree _low = new MaxTree();
+    private readonly SortedBag<int> _low = SortedBag.CreateMaxTree<int>();
 
-    private readonly MinTree _high = new MinTree();
+    private readonly SortedBag<int> _high = SortedBag.CreateMinTree<int>();
 }
 
 internal static class Solution {
-    private static int ReadCount() => int.Parse(Console.ReadLine());
+    private static int ReadValue() => int.Parse(Console.ReadLine());
 
     private static string[] ReadTokens()
         => Console.ReadLine()
@@ -154,10 +161,10 @@ internal static class Solution {
     {
         var bag = new MedianBag();
 
-        for (var count = ReadCount(); count > 0; --count) {
+        for (var count = ReadValue(); count > 0; --count) {
             var tokens = ReadTokens();
             var opcode = tokens[0][0];
-            var argument = long.Parse(tokens[1]);
+            var argument = int.Parse(tokens[1]);
 
             switch (opcode) {
             case 'a':
