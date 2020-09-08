@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -287,12 +288,13 @@ enum Solution {
     public static void main(String[] args) throws IOException {
         MedianBag bag = new MedianBag();
 
-        try (Reader isr = new InputStreamReader(System.in);
-             BufferedReader br = new BufferedReader(isr)) {
-            for (int count = readValue(br); count > 0; --count) {
-                String[] tokens = readTokens(br);
-                char opcode = tokens[0].charAt(0);
-                int argument = Integer.parseInt(tokens[1]);
+        try (   Reader isr = new InputStreamReader(System.in);
+                BufferedReader br = new BufferedReader(isr)) {
+            Matcher matcher = TOKEN.matcher(br.readLine());
+            for (int count = nextInt(matcher); count > 0; --count) {
+                matcher.reset(br.readLine());
+                char opcode = next(matcher).charAt(0);
+                int argument = nextInt(matcher);
 
                 switch (opcode) {
                 case 'a':
@@ -315,13 +317,14 @@ enum Solution {
         }
     }
 
-    private static int readValue(BufferedReader br) throws IOException {
-        return Integer.parseInt(br.readLine().strip());
+    private static String next(Matcher matcher) {
+        matcher.find();
+        return matcher.group();
     }
 
-    private static String[] readTokens(BufferedReader br) throws IOException {
-        return WHITESPACE.split(br.readLine().stripLeading());
+    private static int nextInt(Matcher matcher) {
+        return Integer.parseInt(next(matcher));
     }
 
-    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+    private static final Pattern TOKEN = Pattern.compile("\\S+");
 }
