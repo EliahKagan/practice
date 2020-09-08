@@ -3,6 +3,8 @@
 // In C# 6.0, because that's what HackerRank supports.
 // Using trees of element frequencies. This is a two-tree solution, analogous
 // to the two-heap solution to the simpler variant that has no removals.
+//
+// This version has some optimizations trading elegance and clarity for speed.
 
 using System;
 using System.Collections.Generic;
@@ -161,27 +163,26 @@ internal static class Solution {
 
         for (var count = ReadValue(); count > 0; --count) {
             var tokens = ReadTokens();
-            var opcode = tokens[0];
+            var opcode = tokens[0][0];
             var argument = int.Parse(tokens[1]);
 
             switch (opcode) {
-            case "a":
+            case 'a':
                 bag.Add(argument);
-                Console.WriteLine(bag.Median);
                 break;
 
-            case "r":
-                if (bag.Remove(argument) && bag.Count != 0)
-                    Console.WriteLine(bag.Median);
-                else
+            case 'r':
+                if (!bag.Remove(argument) || bag.Count == 0) {
                     Console.WriteLine("Wrong!");
-
+                    continue;
+                }
                 break;
 
             default:
-                throw new InvalidOperationException(
-                        $"unrecognized opcode \"{opcode}\"");
+                break; // Ignore unrecognized opcodes.
             }
+
+            Console.WriteLine(bag.Median);
         }
     }
 }
