@@ -71,7 +71,7 @@ class BinaryHeap(T)
     else
       child = indices.first # Get any index to this value in the heap.
 
-      if indices.count == 1
+      if indices.size == 1
         @map.delete(value)
       else
         child = highest_equal_ancestor(child)
@@ -91,7 +91,7 @@ class BinaryHeap(T)
   private def cut_root
     value = @heap.pop
     indices = @map[value]
-    indices.remove(size)
+    indices.delete(size)
 
     index = sift_down(value)
     indices.add(index)
@@ -151,7 +151,7 @@ class BinaryHeap(T)
       child_value = @heap[child]
       break if order_ok?(parent_value, child_value)
 
-      @map[child_value].remove(child).add(parent)
+      @map[child_value].delete(child).add(parent)
       @heap[parent] = child_value
 
       parent = child
@@ -165,7 +165,7 @@ class BinaryHeap(T)
     return nil if left >= size
 
     right = left + 1
-    right == size || orde_ok?(@heap[left], @heap[right]) ? left : right
+    right == size || order_ok?(@heap[left], @heap[right]) ? left : right
   end
 
   private def order_ok?(parent_value, child_value)
@@ -231,4 +231,26 @@ class MedianBag
 
   @low = BinaryHeap(Int32).make_max_heap
   @high = BinaryHeap(Int32).make_min_heap
+end
+
+bag = MedianBag.new
+
+gets.as(String).to_i.times do
+  tokens = gets.as(String).split
+  opcode = tokens[0]
+  argument = tokens[1].to_i
+
+  case opcode
+  when "a"
+    bag.push(argument)
+  when "r"
+    if !bag.delete?(argument) || bag.empty?
+      puts "Wrong!"
+      next
+    end
+  else
+    raise "Unrecognized opcode."
+  end
+
+  puts bag.median
 end
