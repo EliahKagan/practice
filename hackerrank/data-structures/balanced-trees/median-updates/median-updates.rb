@@ -226,7 +226,7 @@ class MedianBag
     when 0
       (@low.first + @high.first) / 2.0
     else
-      raise "Bug: balancing invariant violated"
+      raise 'Bug: balancing invariant violated'
     end
   end
 
@@ -238,7 +238,8 @@ class MedianBag
       @high.push(@low.pop)
     when +2
       @low.push(@high.pop)
-    end # In other cases, it can't be made more balanced.
+    end
+    # In other cases, it can't be made more balanced.
 
     nil
   end
