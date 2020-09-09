@@ -1,3 +1,6 @@
-# build files
+# CMake build files
+build/
+
+# Crystal build files
 median-updates
 median-updates-alt
