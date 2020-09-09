@@ -1,5 +1,13 @@
+// HackerRank - Median Updates
+// https://www.hackerrank.com/challenges/median
+// In C++14, since that's what HackerRank supports. Uses a pair of tree
+// multisets (std::multiset) analogously to the two-heap approach typically
+// used to solve the easier problem (with insertion but not erasure).
+
+#include <cmath>
 #include <cstdlib>
 #include <functional>
+#include <iomanip>
 #include <iostream>
 #include <set>
 #include <string>
@@ -116,11 +124,18 @@ namespace {
     {
         return high_.size() - low_.size();
     }
+
+    void print_without_trailing_fractional_zeros(const double value)
+    {
+        const auto precision = (value == std::nearbyint(value) ? 0 : 1);
+        std::cout << std::setprecision(precision) << value << '\n';
+    }
 }
 
 int main()
 {
     std::ios_base::sync_with_stdio(false);
+    std::cout << std::fixed;
 
     auto bag = MedianBag{};
 
@@ -128,8 +143,7 @@ int main()
     for (std::cin >> count; count > 0; --count) {
         auto opcode = std::string{};
         auto argument = int{};
-        if (!(std::cin >> opcode >> argument))
-            abort();
+        if (!(std::cin >> opcode >> argument)) abort();
 
         if (opcode == "a") {
             bag.insert(argument);
@@ -142,7 +156,6 @@ int main()
             abort(); // Unrecognized opcode.
         }
 
-        // FIXME: Output with desired precision.
-        std::cout << bag.median() << '\n';
+        print_without_trailing_fractional_zeros(bag.median());
     }
 }
