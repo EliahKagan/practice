@@ -233,6 +233,14 @@ class MedianBag
   @high = BinaryHeap(Int32).make_min_heap
 end
 
+def print_without_trailing_fractional_zeros(value)
+  if value.is_a?(Float) && (rounded_value = value.to_i) == value
+    puts rounded_value
+  else
+    puts value
+  end
+end
+
 bag = MedianBag.new
 
 gets.as(String).to_i.times do
@@ -252,5 +260,5 @@ gets.as(String).to_i.times do
     raise "Unrecognized opcode."
   end
 
-  puts bag.median
+  print_without_trailing_fractional_zeros(bag.median)
 end
