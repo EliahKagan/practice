@@ -8,6 +8,10 @@
 infer-out/
 
 # Large test cases (some of which *might* be copyright-encumbered).
-input*.txt
-output*.txt
+input[0-9][0-9].txt
+output[0-9][0-9].txt
+
+# Program outout of large test cases (of limited use without the input).
 out.txt
+out[0-9][0-9].txt
+out[0-9][0-9][afp].txt
