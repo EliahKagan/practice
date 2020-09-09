@@ -177,12 +177,13 @@ class BinaryHeap(T)
   @comparer : T, T -> Int32
 end
 
+# A multiset with O(log(n)) insertion and deletion and O(1) median finding.
 class MedianBag
   def empty?
     @low.empty? && @high.empty?
   end
 
-  def push(value : Int32)
+  def add(value : Int32)
     if !@low.empty? && value < @low.first
       @low.push(value)
     else
@@ -250,7 +251,7 @@ gets.as(String).to_i.times do
 
   case opcode
   when "a"
-    bag.push(argument)
+    bag.add(argument)
   when "r"
     if !bag.delete?(argument) || bag.empty?
       puts "Wrong!"
