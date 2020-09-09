@@ -27,7 +27,7 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
     add_compile_options(
         -Weverything
         -Wno-c++98-compat
-        #-Wno-padded
+        -Wno-padded
     )
 elseif(MSVC)
     # cl but not clang-cl accepts /Za to reject Microsoft extensions.
@@ -41,6 +41,7 @@ else()
 endif()
 
 add_executable(median-updates-tree median-updates-tree.cpp)
+add_executable(median-updates median-updates.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
