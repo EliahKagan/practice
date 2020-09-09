@@ -183,7 +183,7 @@ class MedianBag
     @low.empty? && @high.empty?
   end
 
-  def add(value : Int32)
+  def <<(value : Int32)
     if !@low.empty? && value < @low.first
       @low.push(value)
     else
@@ -251,7 +251,7 @@ gets.as(String).to_i.times do
 
   case opcode
   when "a"
-    bag.add(argument)
+    bag << argument
   when "r"
     if !bag.delete?(argument) || bag.empty?
       puts "Wrong!"
