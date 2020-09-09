@@ -47,6 +47,8 @@ namespace {
         return value;
     }
 
+    // A multiset with O(log(n)) insertion and deletion and O(1) median
+    // finding.
     class MedianBag {
     public:
         bool empty() const noexcept;
@@ -154,7 +156,7 @@ int main()
                 continue;
             }
         } else {
-            abort(); // Unrecognized opcode.
+            std::abort(); // Unrecognized opcode.
         }
 
         print_without_trailing_fractional_zeros(bag.median());
