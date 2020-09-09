@@ -49,7 +49,7 @@ class BinaryHeap(T)
       if indices.size == 1
         @map.delete(value)
       else
-        indices.delete(0);
+        indices.delete(0)
       end
 
       cut_root
@@ -172,8 +172,8 @@ class BinaryHeap(T)
     @comparer.call(parent_value, child_value) <= 0
   end
 
-  @map = {} of T => Set(Int32)  # value => indices
-  @heap = [] of T  # index => value
+  @map = {} of T => Set(Int32) # value => indices
+  @heap = [] of T              # index => value
   @comparer : T, T -> Int32
 end
 
