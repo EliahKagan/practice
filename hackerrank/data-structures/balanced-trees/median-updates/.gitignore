@@ -1,6 +1,7 @@
 # CMake build files
 build/
 
-# Crystal build files
+# Manual Crystal and C++ build files
 median-updates
 median-updates-alt
+median-updates-tree
