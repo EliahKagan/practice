@@ -42,6 +42,7 @@ endif()
 
 add_executable(median-updates-tree median-updates-tree.cpp)
 add_executable(median-updates median-updates.cpp)
+add_executable(median-updates-tree-absl median-updates-tree-absl.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
