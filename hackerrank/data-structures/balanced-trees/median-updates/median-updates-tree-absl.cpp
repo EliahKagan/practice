@@ -66,7 +66,7 @@ namespace {
 
     private:
         void rebalance();
-        std::size_t balance_factor() const noexcept;
+        long balance_factor() const noexcept;
 
         MaxTree<int> low_ {};
         MinTree<int> high_ {};
@@ -100,13 +100,13 @@ namespace {
     double MedianBag::median() const noexcept
     {
         switch (balance_factor()) {
-        case static_cast<std::size_t>(-1):
+        case -1:
             return first(low_);
 
-        case static_cast<std::size_t>(+1):
+        case +1:
             return first(high_);
 
-        case static_cast<std::size_t>(0):
+        case 0:
             return (static_cast<double>(first(high_))
                     + static_cast<double>(first(low_))) / 2.0;
 
@@ -118,11 +118,11 @@ namespace {
     void MedianBag::rebalance()
     {
         switch (balance_factor()) {
-        case static_cast<std::size_t>(-2):
+        case -2:
             high_.insert(extract_first(low_));
             break;
 
-        case static_cast<std::size_t>(+2):
+        case +2:
             low_.insert(extract_first(high_));
             break;
 
@@ -131,7 +131,7 @@ namespace {
         }
     }
 
-    inline std::size_t MedianBag::balance_factor() const noexcept
+    inline long MedianBag::balance_factor() const noexcept
     {
         return high_.size() - low_.size();
     }
