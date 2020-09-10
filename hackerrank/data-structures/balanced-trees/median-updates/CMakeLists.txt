@@ -40,9 +40,14 @@ else()
     add_compile_options(-Wall -Wextra)
 endif()
 
+find_package(absl CONFIG REQUIRED)
+
 add_executable(median-updates-tree median-updates-tree.cpp)
 add_executable(median-updates median-updates.cpp)
 add_executable(median-updates-tree-absl median-updates-tree-absl.cpp)
+add_executable(median-updates-absl median-updates-absl.cpp)
+
+target_link_libraries(median-updates-absl PRIVATE absl::base absl::hash absl::container)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
