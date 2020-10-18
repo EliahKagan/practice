@@ -3,8 +3,14 @@
 use strict;
 use warnings;
 use 5.022;
+use English;
 
-while (<<>>) {
-    print "$1,$2\n" if m{<a\s(?:.*?\s)??href="(.+?)".*?>(.*?)</a>}msxi;
+local $INPUT_RECORD_SEPARATOR = undef;
+my $corpus = <<>>;
+my @links = $corpus =~ m{<a\s(?:.*?\s)??href="(.+?)".*?>(.*?)</a>}msxig;
+
+while (@links) {
+    my $url = shift @links;
+    my $text = shift @links;
+    print "$url,$text\n";
 }
-
