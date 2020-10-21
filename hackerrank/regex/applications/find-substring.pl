@@ -21,7 +21,7 @@ sub read_trimmed_lines {
 }
 
 my $text = join q{ }, read_trimmed_lines();
-my @patterns = read_trimmed_lines();
+my @patterns = grep { /\A\w+\z/msx } read_trimmed_lines();
 my $match_count = 0;
 
 for my $pattern (@patterns) {
