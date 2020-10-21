@@ -20,13 +20,20 @@ sub read_trimmed_lines {
     return @lines;
 }
 
-my $text = join q{ }, read_trimmed_lines();
-my @patterns = read_trimmed_lines();
-my $match_count = 0;
+sub count_proper_subword_matches {
+    my ($text, $pattern) = @_;
 
-for my $pattern (@patterns) {
-    my @matches = $text =~ /\w(?=\Q$pattern\E\w)/msxg;
-    $match_count += scalar @matches;
+    if ($pattern =~ /\A\w+\z/msx) {
+        my @matches = $text =~ /\w(?=\Q$pattern\E\w)/msxg;
+        return scalar @matches;
+    }
+
+    return 0;
 }
 
-print "$match_count\n";
+my $text = join q{ }, read_trimmed_lines();
+my @patterns = read_trimmed_lines();
+
+for my $pattern (@patterns) {
+    say count_proper_subword_matches($text, $pattern);
+}
