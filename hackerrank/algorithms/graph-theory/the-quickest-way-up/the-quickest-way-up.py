@@ -31,6 +31,8 @@ class Game:
         self._check_index(start)
         self._check_index(finish)
 
+        vis = [False] * len(self._board)
+        vis[start] = True
         queue = collections.deque((start,))
         distance = 0
 
@@ -40,6 +42,9 @@ class Game:
             for _ in range(len(queue)):
                 src = queue.popleft()
                 for dest in self._destinations(src):
+                    if vis[dest]:
+                        continue
+                    vis[dest] = True
                     if dest == finish:
                         return distance
                     queue.append(dest)
