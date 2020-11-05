@@ -84,8 +84,8 @@ def read_snakes_or_ladders(game):
 def run():
     """Reads a board configuration and reports the BFS distance."""
     game = Game(size=100, max_reach=6)
-    read_snakes_or_ladders(game)  # snakes
     read_snakes_or_ladders(game)  # ladders
+    read_snakes_or_ladders(game)  # snakes
     distance = game.compute_distance(1, 100)
     print(-1 if distance == math.inf else distance)
 
