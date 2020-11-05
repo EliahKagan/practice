@@ -86,7 +86,8 @@ def run():
     game = Game(size=100, max_reach=6)
     read_snakes_or_ladders(game)  # snakes
     read_snakes_or_ladders(game)  # ladders
-    print(game.compute_distance(1, 100))
+    distance = game.compute_distance(1, 100)
+    print(-1 if distance == math.inf else distance)
 
 
 if __name__ == '__main__':
