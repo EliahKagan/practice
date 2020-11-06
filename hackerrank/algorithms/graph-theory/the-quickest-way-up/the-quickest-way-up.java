@@ -16,7 +16,7 @@ final class Game {
     }
 
     /** Adds a snake or ladder from {@code src} to {@code dest}.
-     * (!-based indexing.) */
+     * (1-based indexing.) */
     void addSnakeOrLadder(int src, int dest) {
         checkIndex(src);
         checkIndex(dest);
