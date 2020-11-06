@@ -23,7 +23,7 @@ namespace {
         // Creates a new board of the specified size and die reach.
         Game(int size, int max_reach) noexcept;
 
-        // Adds a snake orl adder from src to dest. (1-based indexing.)
+        // Adds a snake or ladder from src to dest. (1-based indexing.)
         void add_snake_or_ladder(int src, int dest) noexcept;
 
         // Computes the minimum distance from start to finish via BFS.
