@@ -15,7 +15,7 @@ class Game:
     __slots__ = ('_board', '_max_reach')
 
     def __init__(self, size, max_reach):
-        """Creates a new of the specified board size and die reach."""
+        """Creates a new board of the specified size and die reach."""
         self._board = list(range(size + 1))
         self._max_reach = max_reach
 
@@ -54,7 +54,7 @@ class Game:
     def _check_index(self, position):
         """Throws if the position is not of a valid board cell."""
         if not 0 < position < len(self._board):
-            raise ValueError('position is off the board')
+            raise IndexError('position is off the board')
 
     def _destinations(self, src):
         """
