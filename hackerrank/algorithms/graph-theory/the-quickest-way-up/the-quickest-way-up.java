@@ -1,5 +1,6 @@
 // Snakes and Ladders: The Quickest Way Up
 // https://www.hackerrank.com/challenges/the-quickest-way-up
+// In Java 8, via BFS on an implicit graph.
 
 import java.util.ArrayDeque;
 import java.util.OptionalInt;
@@ -52,6 +53,7 @@ final class Game {
         return OptionalInt.empty();
     }
 
+    /** Throws if the position is not of a valid board cell. */
     private void checkIndex(int position) {
         if (!(0 < position && position < _board.length))
             throw new IllegalArgumentException("position is off the board");
