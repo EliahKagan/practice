@@ -23,7 +23,7 @@ class Game
     check_index(start)
     check_index(finish)
 
-    vis = Array(Bool).new(@board.size, false)
+    vis = [false] * @board.size
     vis[0] = true
     queue = Deque(Int32).new
     queue.push(start)
@@ -69,7 +69,7 @@ def read_value
   gets.as(String).to_i
 end
 
-# Reas a line as a sequence of integers.
+# Reads a line as a sequence of integers.
 def read_record
   gets.as(String).split.map(&.to_i)
 end
@@ -84,7 +84,7 @@ end
 
 # Reads a board configuration and reports the BFS distance.
 def run
-  game = Game.new(size = 100, max_reach = 6)
+  game = Game.new(size: 100, max_reach: 6)
   2.times { read_snakes_or_ladders(game) } # First ladders, then snakes.
   puts game.compute_distance(1, 100) || -1
 end
