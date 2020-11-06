@@ -53,9 +53,9 @@ class Game
 
   # Throws if the position is not of a valid board cell.
   def check_index(position)
-    unless position.between?(1, @board.size - 1)
-      raise IndexError, 'position is off the board'
-    end
+    return if position.between?(1, @board.size - 1)
+
+    raise IndexError, 'position is off the board'
   end
 
   # Calls a block for each destination from a given source position.
