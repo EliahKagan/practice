@@ -26,8 +26,8 @@ class Network
       @group_completion_times[group] == NOT_CONNECTED ? {group => 1} : nil
     end
 
-    @elem_parents = Array(Int32).new(total_size) { |elem| elem }
-    @elem_ranks = Array(Int32).new(total_size, 0)
+    @elem_parents = (0...total_size).to_a
+    @elem_ranks = [0] * total_size
   end
 
   # Retrieves the times at which each group finished becoming connected.
