@@ -27,17 +27,17 @@ namespace {
         void add_snake_or_ladder(int src, int dest) noexcept;
 
         // Computes the minimum distance from start to finish via BFS.
-        int compute_distance(int start, int finish) noexcept;
+        int compute_distance(int start, int finish) const noexcept;
 
         static constexpr auto unreachable = -1;
 
     private:
         // Terminates abnormally if the position is not of a valid board cell.
-        void check_index(int position) noexcept;
+        void check_index(int position) const noexcept;
 
         // Computes the range of destinations from a given source position.
         // This accounts for the traversal of snakes and ladders.
-        std::vector<int> destinations(int src) noexcept;
+        std::vector<int> destinations(int src) const noexcept;
 
         std::vector<int> board_;
         int max_reach_;
@@ -57,7 +57,8 @@ namespace {
         board_[src] = dest;
     }
 
-    int Game::compute_distance(const int start, const int finish) noexcept
+    int
+    Game::compute_distance(const int start, const int finish) const noexcept
     {
         check_index(start);
         check_index(finish);
@@ -87,12 +88,12 @@ namespace {
         return unreachable;
     }
 
-    void Game::check_index(const int position) noexcept
+    void Game::check_index(const int position) const noexcept
     {
         ensure(0 < position && position < board_.size());
     }
 
-    std::vector<int> Game::destinations(const int src) noexcept
+    std::vector<int> Game::destinations(const int src) const noexcept
     {
         const auto low = src + 1;
         const auto high = std::min(low + max_reach_,
