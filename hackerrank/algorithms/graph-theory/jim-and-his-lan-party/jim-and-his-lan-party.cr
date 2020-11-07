@@ -22,7 +22,7 @@ class Network
       size < 2 ? @time : NOT_CONNECTED
     end
 
-    @elem_contributions = element_groups.map_with_index do |group, elem|
+    @elem_contributions = element_groups.map do |group|
       @group_completion_times[group] == NOT_CONNECTED ? {group => 1} : nil
     end
 
