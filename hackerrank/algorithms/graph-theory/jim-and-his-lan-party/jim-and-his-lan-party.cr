@@ -85,7 +85,7 @@ class Network
   end
 
   # Merges contributions into whichever contribution hash started out larger,
-  # recording an removing items that become complete as a result.
+  # recording and removing items that become complete as a result.
   # Returns the resulting hash, or nil if that hash is ultimately empty.
   private def merge_contributions(contrib1, contrib2)
     # If either are both are nil, there is nothing to do.
