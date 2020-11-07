@@ -6,6 +6,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <queue>
 #include <tuple>

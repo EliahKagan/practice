@@ -2,6 +2,15 @@
     "python.pythonPath": "C:\\Program Files\\Python39\\python.exe",
     "files.associations": {
         "xiosbase": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "vector": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "regex": "cpp",
+        "xhash": "cpp",
+        "xstring": "cpp",
+        "xtree": "cpp"
     }
 }
