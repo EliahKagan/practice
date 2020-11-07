@@ -130,8 +130,8 @@ def read_record
   gets.as(String).split.map(&.to_i)
 end
 
-# Read the problem parameters. (player_count is currently not checked.)
-player_count, game_count, wire_count = read_record
+# Read the problem parameters. (_player_count is currently not checked.)
+_player_count, game_count, wire_count = read_record
 
 # Make the LAN. The extra 0 element and 0 group facilitate 1-based indexing.
 network = Network.new(game_count + 1, read_record.unshift(0))
