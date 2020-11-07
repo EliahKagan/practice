@@ -82,4 +82,6 @@ def run
   puts game.compute_distance(1, 100) || -1
 end
 
-gets.to_i.times { run }
+if __FILE__ == $PROGRAM_NAME
+  gets.to_i.times { run }
+end
