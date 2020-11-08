@@ -28,23 +28,11 @@ package Network {
             elem_ranks => [(0) x $total_size],
         };
 
-        for my $group (@element_groups) {
-            ++$self->{group_sizes}[$group];
-        }
-
-        while (my ($group, $size) = each @{$self->{group_sizes}}) {
-            if ($size < 2) {
-                $self->{group_completion_times}[$group] = $self->{time};
-            }
-        }
-
-        while (my ($elem, $group) = each @element_groups) {
-            if ($self->{group_completion_times}[$group] == NOT_CONNECTED) {
-                $self->{elem_contributions}[$elem] = {$group => 1};
-            }
-        }
-
-        return bless $self, $class;
+        bless $self, $class;
+        $self->_set_initial_group_sizes(\@element_groups);
+        $self->_set_initial_group_completion_times();
+        $self->_set_initial_elem_contributions(\@element_groups);
+        return $self;
     }
 
     # Retrieves the times at which each group finished becoming connected.
@@ -71,7 +59,31 @@ package Network {
             }
             $self->_join($elem1, $elem2);
         }
+        return;
+    }
 
+    sub _set_initial_group_sizes($self, $element_groups) {
+        for my $group (@{$element_groups}) {
+            ++$self->{group_sizes}[$group];
+        }
+        return;
+    }
+
+    sub _set_initial_group_completion_times($self) {
+        while (my ($group, $size) = each @{$self->{group_sizes}}) {
+            if ($size < 2) {
+                $self->{group_completion_times}[$group] = $self->{time};
+            }
+        }
+        return;
+    }
+
+    sub _set_initial_elem_contributions($self, $element_groups) {
+        while (my ($elem, $group) = each @{$element_groups}) {
+            if ($self->{group_completion_times}[$group] == NOT_CONNECTED) {
+                $self->{elem_contributions}[$elem] = {$group => 1};
+            }
+        }
         return;
     }
 
