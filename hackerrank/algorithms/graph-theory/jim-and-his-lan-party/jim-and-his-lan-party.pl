@@ -32,14 +32,13 @@ package Network {
             ++$self->{group_sizes}[$group];
         }
 
-        for my $group (0..$#{$self->{group_sizes}}) { # TODO: use each
-            if ($self->{group_sizes}[$group] < 2) {
+        while (my ($group, $size) = each @{$self->{group_sizes}}) {
+            if ($size < 2) {
                 $self->{group_completion_times}[$group] = $self->{time};
             }
         }
 
-        for my $elem (0..$#element_groups) { # TODO: use each
-            my $group = $element_groups[$elem];
+        while (my ($elem, $group) = each @element_groups) {
             if ($self->{group_completion_times}[$group] == NOT_CONNECTED) {
                 $self->{elem_contributions}[$elem] = {$group => 1};
             }
