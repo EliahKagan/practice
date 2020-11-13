@@ -23,4 +23,13 @@ def weird_hash(text)
   freqs.each.first(5).map { |(ch, freq)| ch }.join
 end
 
-puts weird_hash("not-a-real-room")
+PATTERN = /^\s*(?<name>[a-z-]+)-(?<id>\d+)\[(?<hash>[a-z]+)\]\s*$/
+
+acc = 0
+ARGF.each_line do |line|
+  match = PATTERN.match(line)
+  next if match.nil? || match["hash"] != weird_hash(match["name"])
+  acc += match["id"].to_i
+end
+
+puts acc
