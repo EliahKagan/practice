@@ -14,10 +14,12 @@ def find_first_revisited_position(input, debug)
   trail = Set{position}
 
   input.scan(/([LR])(\d+)/) do |(_, turn, distance)|
+    STDERR.puts "DEBUG: turn=\"#{turn}\", distance=\"#{distance}\"" if debug
     orientation *= TURNS[turn[0]]
-    position += orientation * distance.to_i
-    STDERR.puts "DEBUG: turn=\"#{turn}\", distance=\"#{distance}\", position=\"#{position}\"" if debug
-    return position unless trail.add?(position)
+    distance.to_i.times do
+      position += orientation
+      return position unless trail.add?(position)
+    end
   end
   nil
 end
