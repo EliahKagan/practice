@@ -3,3 +3,11 @@ input
 
 # CMake build files
 build/
+
+# Compiled executables in "top-level" directories
+day[[:digit:]][[:digit:]]
+!day[[:digit:]][[:digit:]]/
+day[[:digit:]][[:digit:]][ab]
+!day[[:digit:]][[:digit:]][ab]/
+day[[:digit:]][[:digit:]].exe
+day[[:digit:]][[:digit:]][ab].exe
