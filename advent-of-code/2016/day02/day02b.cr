@@ -44,7 +44,7 @@ class Board
     raise ArgumentError.new("empty grid not allowed") if @grid.empty?
 
     if @grid.any? { |row| row.size != width }
-      raise ArgumentError.new("jagged grid not allowed") 
+      raise ArgumentError.new("jagged grid not allowed")
     end
 
     raise ArgumentError.new("empty row not allowed") if @grid.any?(&.empty?)
