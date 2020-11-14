@@ -29,7 +29,7 @@ class Scanner
     length * repcount
   end
 
-  def read_number
+  private def read_number
     acc = 0
     while '0' <= (ch = @text[@pos]) <= '9'
       acc = acc * 10 + (ch - '0')
@@ -38,7 +38,7 @@ class Scanner
     acc
   end
 
-  def read_specific_char(need_ch)
+  private def read_specific_char(need_ch)
     ch = @text[@pos]
     raise Error.new("expected '#{need_ch}', got '#{ch}'") if ch != need_ch
     @pos += 1
