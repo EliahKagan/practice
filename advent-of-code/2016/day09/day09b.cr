@@ -20,7 +20,7 @@ end
 # Reads a subexpression s of length k from text. Returns {pos + k, m} where m
 # is the length s would hypothetically expand to.
 def decode_initial_length(text, pos)
-  return {pos + 1, 1} if text[pos] != '('
+  return {pos + 1, 1_i64} if text[pos] != '('
 
   pos, real_length = read_number(text, pos + 1)
   assert_char(text, pos, 'x')
@@ -28,13 +28,13 @@ def decode_initial_length(text, pos)
   assert_char(text, pos, ')')
 
   endpos = pos + 1 + real_length
-  expanded_length = decode_length(text, pos + 1, endpos) * repcount
+  expanded_length = decode_length(text, pos + 1, endpos) * repcount.to_i64
   {endpos, expanded_length}
 end
 
 # Computes the length of the hypothetical expansion of text[pos..(endpos - 1)].
 def decode_length(text, pos, endpos)
-  acc = 0
+  acc = 0_i64
   while pos < endpos
     pos, delta = decode_initial_length(text, pos)
     acc += delta
