@@ -5,7 +5,15 @@ class BotCircus
   end
 
   private struct Bot
-    def subscribe(&action : Proc(Int32, Int32, Nil))
+    @action : Proc(Int32, Int32, Int32, Nil)? = nil
+    @low : Int32? = nil
+    @high : Int32? = nil
+
+    def initialize(@id : Int32)
+    end
+
+    # The action will be called as if by action.call(id, low, high).
+    def subscribe(&action : Proc(Int32, Int32, Int32, Nil))
       raise Error.new("can't subscribe two event handlers") if @action
       @action = action
       maybe_run
@@ -30,11 +38,8 @@ class BotCircus
       return unless action && low && high
 
       @low = @high = nil
-      action.call(low, high)
+      action.call(@id, low, high)
     end
 
-    @action : Proc(Int32, Int32, Nil)? = nil
-    @low : Int32? = nil
-    @high : Int32? = nil
   end
 end
