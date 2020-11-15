@@ -32,7 +32,7 @@ class BotCircus
   def tell_bot(bot_id : Int32,
                low_dest : ToBot | ToOut,
                high_dest : ToBot | ToOut)
-    get_bot[bot_id].subscribe_consumer do |low, high|
+    get_bot(bot_id).subscribe_consumer do |low, high|
       give(low, low_dest)
       give(high, high_dest)
     end
@@ -85,7 +85,7 @@ class BotCircus
       consumer.call(low, high)
     end
 
-    @consumer : Proc(Int32, Int32, Int32, Nil)? = nil
+    @consumer : Proc(Int32, Int32, Nil)? = nil
     @low : Int32? = nil
     @high : Int32? = nil
   end
@@ -96,4 +96,30 @@ class BotCircus
 
   @bots = {} of Int32 => Bot
   @outs = {} of Int32 => Int32
+end
+
+def parse_dest(dest)
+  case dest
+  when /^bot\s+(\d+)$/
+    _, bot_id = $~
+    BotCircus::ToBot.new(bot_id.to_i)
+  when /^output\s+(\d+)$/
+    _, output_bin = $~
+    BotCircus::ToOut.new(output_bin.to_i)
+  else
+    raise "Unrecognized destination: #{dest}"
+  end
+end
+
+circus = BotCircus.new
+
+ARGF.each_line.map(&.strip).reject(&.empty?).each do |line|
+  case line
+  when /^value\s+(\d+)\s+goes\s+to\s+(.+)/
+    _, value, dest = $~
+    circus.give(value.to_i, parse_dest(dest))
+  when /^bot\s+(\d+)\s+gives\s+low\s+to\s+(.+?)\s+and\s+high\s+to\s+(.+)/
+    _, bot_id, low_dest, high_dest = $~
+    circus.tell_bot(bot_id.to_i, parse_dest(low_dest), parse_dest(high_dest))
+  end
 end
