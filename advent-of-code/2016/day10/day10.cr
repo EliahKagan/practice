@@ -91,7 +91,9 @@ class BotCircus
   end
 
   private def get_bot(id)
-    @bots[id] ||= Bot.new { |low, high| "Bot #{id}: low=#{low}, high=#{high}" }
+    @bots[id] ||= Bot.new do |low, high|
+      puts "Bot #{id}: low=#{low}, high=#{high}"
+    end
   end
 
   @bots = {} of Int32 => Bot
