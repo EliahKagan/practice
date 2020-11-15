@@ -1,0 +1,2 @@
+#!/bin/sh
+./day10 input | grep --color -P '^Bot \K\d+(?=: low=17, high=61$)'
