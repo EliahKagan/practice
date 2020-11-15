@@ -18,20 +18,40 @@ class BotCircus
     getter bin
   end
 
+  def give(value : Int32, dest : ToBot)
+    get_bot(dest.id).put(value)
+  end
+
+  def give(value : Int32, dest : ToOut)
+    if @outs.has_key?(dest.bin)
+      raise Error.new("can't write output bin #{dest.bin} twice")
+    end
+    @outs[dest.bin] = value
+  end
+
+  def tell_bot(bot_id : Int32,
+               low_dest : ToBot | ToOut,
+               high_dest : ToBot | ToOut)
+    get_bot[bot_id].subscribe_consumer do |low, high|
+      give(low, low_dest)
+      give(high, high_dest)
+    end
+  end
+
   private class Bot
-    def initialize(@id : Int32)
+    # Creates a new bot of the given id, subscribing the given reporter.
+    # The reporter will be called as if by reporter.call(low, high) when low
+    # and high have both been set (whether or not consumer has been set).
+    def initialize(&@reporter : Proc(Int32, Int32, Nil))
     end
 
-    # The reporter will be called as if by reporter.call(id, low, high) when
-    # low and high have both been set (whether or not consumer has been set).
-    def subscribe_reporter(&reporter: Proc(Int32, Int32, Int32, Nil))
-      raise Error.new("can't subscribe two reporters") if @reporter
-      @reporter = reporter
+    def initialize
+      @reporter = nil
     end
 
-    # The consumer will be called as if by consumer.call(id, low, high) when
+    # The consumer will be called as if by consumer.call(low, high) when
     # consumer, low, and high have all been set.
-    def subscribe_consumer(&consumer : Proc(Int32, Int32, Int32, Nil))
+    def subscribe_consumer(&consumer : Proc(Int32, Int32, Nil))
       raise Error.new("can't subscribe two event handlers") if @consumer
       @consumer = consumer
       try_consume
@@ -51,7 +71,7 @@ class BotCircus
     private def set_inputs(low, high)
       @low = low
       @high = high
-      @reporter.try &.call(@id, low, high)
+      @reporter.try &.call(low, high)
       try_consume
     end
 
@@ -62,15 +82,18 @@ class BotCircus
       return unless consumer && low && high
 
       @low = @high = nil
-      consumer.call(@id, low, high)
+      consumer.call(low, high)
     end
 
-    @reporter : Proc(Int32, Int32, Int32, Nil)? = nil
     @consumer : Proc(Int32, Int32, Int32, Nil)? = nil
     @low : Int32? = nil
     @high : Int32? = nil
   end
 
-  @bots = {} of Bot
-  @outs = {} of Int32
+  private def get_bot(id)
+    @bots[id] ||= Bot.new { |low, high| "Bot #{id}: low=#{low}, high=#{high}" }
+  end
+
+  @bots = {} of Int32 => Bot
+  @outs = {} of Int32 => Int32
 end
