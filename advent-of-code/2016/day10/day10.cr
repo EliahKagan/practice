@@ -121,5 +121,7 @@ ARGF.each_line.map(&.strip).reject(&.empty?).each do |line|
   when /^bot\s+(\d+)\s+gives\s+low\s+to\s+(.+?)\s+and\s+high\s+to\s+(.+)/
     _, bot_id, low_dest, high_dest = $~
     circus.tell_bot(bot_id.to_i, parse_dest(low_dest), parse_dest(high_dest))
+  else
+    raise "Unrecognized statement: #{line}"
   end
 end
