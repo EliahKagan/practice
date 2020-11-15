@@ -1,2 +1,4 @@
 #!/bin/sh
+# Advent of Code 2016, day 10 - extraction script for part A
+
 ./day10 input | grep --color -P '^Bot \K\d+(?=: low=17, high=61$)'

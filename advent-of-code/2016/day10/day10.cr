@@ -1,4 +1,5 @@
-# Advent of Code 2016, day 10, part A
+# Advent of Code 2016, day 10, parts A and B
+# See filter-a and filter-b scripts for extraction and reporting.
 
 class BotCircus
   class Error < Exception
@@ -26,7 +27,9 @@ class BotCircus
     if @outs.has_key?(dest.bin)
       raise Error.new("can't write output bin #{dest.bin} twice")
     end
+
     @outs[dest.bin] = value
+    puts "Output #{dest.bin}: value=#{value}"
   end
 
   def tell_bot(bot_id : Int32,

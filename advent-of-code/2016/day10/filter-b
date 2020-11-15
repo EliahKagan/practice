@@ -1,0 +1,14 @@
+#!/bin/sh
+# Advent of Code 2016, day 10 - extraction script for part B
+
+./day10 input | awk -F= '
+    BEGIN {
+        acc = 1
+    }
+    /^Output [012]: value=[[:digit:]]+$/ {
+        print
+        acc *= $2
+    }
+    END {
+        printf "The product is \033[01;31m%d\033[0m.\n", acc
+    }'
