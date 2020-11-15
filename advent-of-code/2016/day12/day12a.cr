@@ -1,6 +1,11 @@
 # Advent of Code 2016, day 12, part A
 
+require "option_parser"
+
 class Emulator
+  REGISTERS = %w[a b c d]
+  INITIAL_VALUE = 0
+
   class Error < Exception
   end
 
@@ -93,6 +98,36 @@ class Emulator
   end
 
   @program = [] of Proc(Nil)
-  @registers = {"a" => 0, "b" => 0, "c" => 0, "d" => 0}
+
+  @registers : Hash(String, Int32) = Emulator::REGISTERS.to_h do |register|
+    {register, Emulator::INITIAL_VALUE}
+  end
+
   @pos = 0
+end
+
+verbose = false
+OptionParser.parse do |parser|
+  parser.on "-h", "--help", "Show options help" do
+    puts parser
+    exit
+  end
+  parser.on "-v", "--verbose", "Show all registers after run" do
+    verbose = true
+  end
+  parser.on "-q", "--quiet", %q{Show only register "a" after run (default)} do
+    verbose = false
+  end
+end
+
+emulator = Emulator.new
+ARGF.each_line.map(&.strip).reject(&.empty?).each { |line| emulator << line }
+emulator.run
+
+if verbose
+  Emulator::REGISTERS.each do |register|
+    puts "#{register}: #{emulator.read_register(register)}"
+  end
+else
+  puts emulator.read_register("a")
 end
