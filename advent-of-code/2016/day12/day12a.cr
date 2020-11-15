@@ -9,6 +9,10 @@ class Emulator
   class Error < Exception
   end
 
+  def [](register : String)
+    @registers[register]
+  end
+
   def <<(instruction : String)
     @program << translate(instruction)
   end
@@ -20,10 +24,6 @@ class Emulator
     end
 
     raise Error.new("negative instruction pointer not supported") if @pos < 0
-  end
-
-  def read_register(name : String)
-    @registers[name]
   end
 
   private def translate(instruction)
@@ -126,8 +126,8 @@ emulator.run
 
 if verbose
   Emulator::REGISTERS.each do |register|
-    puts "#{register}: #{emulator.read_register(register)}"
+    puts "#{register}: #{emulator[register]}"
   end
 else
-  puts emulator.read_register("a")
+  puts emulator["a"]
 end
