@@ -1,0 +1,2 @@
+#!/bin/sh
+seq 0 150 | xargs -n1 ./day13b -D
