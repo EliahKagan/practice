@@ -20,6 +20,8 @@ internal sealed class Graph {
 
     internal (IList<int> tour, int cost) FindMinCostTour()
     {
+        _adj.Dump(nameof(_adj));
+
         var bestTour = Enumerable.Repeat(-1, Order).ToArray();
         var bestCost = Infinity;
         var vis = new bool[Order];
@@ -121,7 +123,7 @@ internal static class Program {
         var path = (args.Length == 0 ? "input" : args[0]);
 
         var (tour, cost) = ReadEdges(path)
-            .ToList() // Fail fast on syntax errors.
+            .Reverse()//.ToList() // Fail fast on syntax errors.
             .ToKeyGraph()
             .FindMinCostTour();
 
