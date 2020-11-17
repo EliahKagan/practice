@@ -24,21 +24,21 @@ internal sealed class Graph {
     internal void AddDirectedEdge(int src, int dest, int weight)
         => _adj[src, dest] = Math.Min(_adj[src, dest], weight);
 
-    internal (IList<int> tour, int cost) FindMinCostTour()
+    internal (IList<int> path, int cost) FindMinCostHamiltonianPath()
     {
-        var bestTour = Enumerable.Repeat(-1, Order).ToArray();
+        var bestPath = Enumerable.Repeat(-1, Order).ToArray();
         var bestCost = Infinity;
         var vis = new bool[Order];
-        var tour = new List<int>();
+        var path = new List<int>();
         var cost = 0;
 
         void SearchFrom(int src)
         {
             Debug.Assert(!vis[src]);
             vis[src] = true;
-            tour.Add(src);
+            path.Add(src);
 
-            if (tour.Count < Order) {
+            if (path.Count < Order) {
                 for (var dest = 0; dest < Order; ++dest) {
                     if (vis[dest] || _adj[src, dest] == Infinity) continue;
 
@@ -47,16 +47,16 @@ internal sealed class Graph {
                     cost = checked(cost - _adj[src, dest]);
                 }
             } else if (cost < bestCost) {
-                tour.CopyTo(bestTour);
+                path.CopyTo(bestPath);
                 bestCost = cost;
             }
 
-            tour.RemoveAt(tour.Count - 1);
+            path.RemoveAt(path.Count - 1);
             vis[src] = false;
         }
 
         for (var start = 0; start < Order; ++start) SearchFrom(start);
-        return (bestTour, bestCost);
+        return (bestPath, bestCost);
     }
 
     private const int Infinity = int.MaxValue;
@@ -107,10 +107,10 @@ internal sealed class KeyGraph<T> where T : notnull {
         private readonly List<(int src, int dest, int weight)> _edges = new();
     }
 
-    internal (IList<T> tour, int cost) FindMinCostTour()
+    internal (IList<T> path, int cost) FindMinCostHamiltonianPath()
     {
-        var (tour, cost) = _graph.FindMinCostTour();
-        return (tour.Select(vertex => _keys[vertex]).ToList(), cost);
+        var (path, cost) = _graph.FindMinCostHamiltonianPath();
+        return (path.Select(vertex => _keys[vertex]).ToList(), cost);
     }
 
     private KeyGraph(Graph graph, IReadOnlyList<T> keys)
@@ -124,20 +124,20 @@ internal sealed class KeyGraph<T> where T : notnull {
 internal static class Program {
     private static void Main(string[] args)
     {
-        var path = (args.Length == 0 ? "input" : args[0]);
+        var filespec = (args.Length == 0 ? "input" : args[0]);
 
-        var (tour, cost) = ReadEdges(path)
+        var (path, cost) = ReadEdges(filespec)
             .ToList() // Fail fast on syntax errors.
             .ToKeyGraph()
-            .FindMinCostTour();
+            .FindMinCostHamiltonianPath();
 
-        tour.Dump(nameof(tour));
+        path.Dump(nameof(path));
         cost.Dump(nameof(cost));
     }
 
     private static IEnumerable<(string src, string dest, int weight)>
-    ReadEdges(string path)
-        => from line in File.ReadLines(path)
+    ReadEdges(string filespec)
+        => from line in File.ReadLines(filespec)
            where !string.IsNullOrWhiteSpace(line)
            select EdgePattern.Match(line) into match
            select (match.Get("src"),
