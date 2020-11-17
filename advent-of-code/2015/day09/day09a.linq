@@ -1,6 +1,8 @@
-<Query Kind="Statements" />
+<Query Kind="Program" />
 
 // Advent of Code, day 9, part A
+
+#LINQPad optimize+
 
 internal sealed class Graph {
     internal Graph(int order)
@@ -16,7 +18,7 @@ internal sealed class Graph {
     internal void AddEdge(int src, int dest, int weight)
         => _adj[src, dest] = Math.Min(_adj[src, dest], weight);
 
-    internal (int[] tour, int cost) FindMinCostTour()
+    internal (IList<int> tour, int cost) FindMinCostTour()
     {
         var bestTour = Enumerable.Repeat(-1, Order).ToArray();
         var bestCost = Infinity;
@@ -99,10 +101,10 @@ internal sealed class KeyGraph<T> where T : notnull {
         private readonly List<(int src, int dest, int weight)> _edges = new();
     }
 
-    internal (T[] tour, int cost) FindMinCostTour()
+    internal (IList<T> tour, int cost) FindMinCostTour()
     {
         var (tour, cost) = _graph.FindMinCostTour();
-        return (Array.ConvertAll(tour, vertex => _keys[vertex]), cost);
+        return (tour.Select(vertex => _keys[vertex]).ToList(), cost);
     }
 
     private KeyGraph(Graph graph, IReadOnlyList<T> keys)
@@ -111,4 +113,46 @@ internal sealed class KeyGraph<T> where T : notnull {
     private readonly Graph _graph;
 
     private readonly IReadOnlyList<T> _keys;
+}
+
+internal static class Program {
+    private static void Main(string[] args)
+    {
+        var path = (args.Length == 0 ? "input" : args[0]);
+
+        var (tour, cost) = ReadEdges(path)
+            .ToList() // Fail fast on syntax errors.
+            .ToKeyGraph()
+            .FindMinCostTour();
+
+        tour.Dump(nameof(tour));
+        cost.Dump(nameof(cost));
+    }
+
+    private static IEnumerable<(string src, string dest, int weight)>
+    ReadEdges(string path)
+        => from line in File.ReadLines(path)
+           where !string.IsNullOrWhiteSpace(line)
+           select EdgePattern.Match(line) into match
+           select (match.Get("src"),
+                   match.Get("dest"),
+                   int.Parse(match.Get("weight")));
+
+    private static KeyGraph<T>
+    ToKeyGraph<T>(this IEnumerable<(T src, T dest, int weight)> edges)
+        where T : notnull
+    {
+        var builder = new KeyGraph<T>.Builder();
+
+        foreach (var (src, dest, weight) in edges)
+            builder.AddEdge(src, dest, weight);
+
+        return builder.Build();
+    }
+
+    private static string Get(this Match match, string name)
+        => match.Groups[name].Value;
+
+    private static readonly Regex EdgePattern =
+        new(@"^\s*(?<src>\w+)\s+to\s+(?<dest>\w+)\s+=\s+(?<weight>\d+)\s*$");
 }
