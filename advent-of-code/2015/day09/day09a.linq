@@ -70,7 +70,7 @@ internal sealed class KeyGraph<T> where T : notnull {
             foreach (var (src, dest, weight) in _edges)
                 graph.AddEdge(src, dest, weight);
 
-            return new KeyGraph<T>(graph, _vertices, _keys);
+            return new KeyGraph<T>(graph, _keys);
         }
 
         private int GetVertex(T key)
@@ -105,14 +105,10 @@ internal sealed class KeyGraph<T> where T : notnull {
         return (Array.ConvertAll(tour, vertex => _keys[vertex]), cost);
     }
 
-    private KeyGraph(Graph graph,
-                     IReadOnlyDictionary<T, int> vertices,
-                     IReadOnlyList<T> keys)
-        => (_graph, _vertices, _keys) = (graph, vertices, keys);
+    private KeyGraph(Graph graph, IReadOnlyList<T> keys)
+        => (_graph, _keys) = (graph, keys);
 
     private readonly Graph _graph;
-
-    private readonly IReadOnlyDictionary<T, int> _vertices;
 
     private readonly IReadOnlyList<T> _keys;
 }
