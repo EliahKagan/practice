@@ -15,7 +15,13 @@ internal sealed class Graph {
         }
     }
 
-    internal void AddEdge(int src, int dest, int weight)
+    internal void AddUndirectedEdge(int src, int dest, int weight)
+    {
+        AddDirectedEdge(src, dest, weight);
+        AddDirectedEdge(dest, src, weight);
+    }
+
+    internal void AddDirectedEdge(int src, int dest, int weight)
         => _adj[src, dest] = Math.Min(_adj[src, dest], weight);
 
     internal (IList<int> tour, int cost) FindMinCostTour()
@@ -70,7 +76,7 @@ internal sealed class KeyGraph<T> where T : notnull {
             var graph = new Graph(Order);
 
             foreach (var (src, dest, weight) in _edges)
-                graph.AddEdge(src, dest, weight);
+                graph.AddUndirectedEdge(src, dest, weight);
 
             return new KeyGraph<T>(graph, _keys);
         }
