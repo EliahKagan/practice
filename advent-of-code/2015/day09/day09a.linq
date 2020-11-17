@@ -33,6 +33,7 @@ internal sealed class Graph {
             Debug.Assert(!vis[src]);
             vis[src] = true;
             tour.Add(src);
+            tour.Dump("advancing");
 
             if (tour.Count < Order) {
                 for (var dest = 0; dest < Order; ++dest) {
@@ -43,15 +44,25 @@ internal sealed class Graph {
                     cost = checked(cost - _adj[src, dest]);
                 }
             } else if (cost < bestCost) {
+                new { cost, bestCost }.Dump();
                 tour.CopyTo(bestTour);
                 bestCost = cost;
+            } else {
+                throw new NotImplementedException("This should get reached, isn't it??");
             }
 
             tour.RemoveAt(tour.Count - 1);
+            tour.Dump("retreating");
             vis[src] = false;
         }
 
-        for (var start = 0; start < Order; ++start) SearchFrom(start);
+        for (var start = 0; start < Order; ++start) {
+            Debug.Assert(!vis.Any(v => v));
+            Debug.Assert(tour.Count == 0);
+            Debug.Assert(cost == 0);
+            SearchFrom(start);
+        }
+
         return (bestTour, bestCost);
     }
 
@@ -123,7 +134,7 @@ internal static class Program {
         var path = (args.Length == 0 ? "input" : args[0]);
 
         var (tour, cost) = ReadEdges(path)
-            .Reverse()//.ToList() // Fail fast on syntax errors.
+            .ToList() // Fail fast on syntax errors.
             .ToKeyGraph()
             .FindMinCostTour();
 
