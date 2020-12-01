@@ -9,5 +9,8 @@ day[[:digit:]][[:digit:]]
 !day[[:digit:]][[:digit:]]/
 day[[:digit:]][[:digit:]][ab]
 !day[[:digit:]][[:digit:]][ab]/
+day[[:digit:]][[:digit:]][ab][[:digit:]]
+!day[[:digit:]][[:digit:]][ab][[:digit:]]/
 day[[:digit:]][[:digit:]].exe
 day[[:digit:]][[:digit:]][ab].exe
+day[[:digit:]][[:digit:]][ab][[:digit:]].exe
