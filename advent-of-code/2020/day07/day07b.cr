@@ -7,7 +7,7 @@ end
 # A weighted directed graph with no parallel edges.
 class Graph(T)
   def add_edge(src : T, dest : T, weight : Int64)
-    if weight <= 0_i64
+    if weight <= 0i64
       raise ArgumentError.new("Weight #{weight} is not strictly positive.")
     end
 
@@ -29,7 +29,7 @@ class Graph(T)
     return memo[src] if memo.has_key?(src)
     
     memo[src] = nil # To detect cycles and return nil if one is encountered.
-    src_cost = 1_i64
+    src_cost = 1i64
 
     @adj[src].each do |dest, weight|
       dest_cost = do_sum_paths(memo, dest)
@@ -85,7 +85,7 @@ end
 
 case bag_count = build_bag_graph(ARGF).sum_paths("shiny gold")
 when Int64
-  puts bag_count - 1
+  puts bag_count - 1i64
   exit 0
 when Infinity
   puts "Infinity"
