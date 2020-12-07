@@ -1,5 +1,6 @@
-# Advent of Code, day 7, part A
+# Advent of Code 2020, day 7, part A
 
+# An unweighted directed graph with no parallel edges.
 class Graph(T)
   def add_edge(src : T, dest : T)
     @adj[src] << dest
