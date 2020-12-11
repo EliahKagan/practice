@@ -2,11 +2,26 @@
 
 require "option_parser"
 
+# When the adjacent population drops this low, a cell is populated.
+BIRTH_THRESHOLD = 0
+
+# When the adjacent population rises this high, a cells is depopulated.
+DEATH_THRESHOLD = 4
+
+# Cells with this symbol can never be populated. They are "holes" in the board.
+BLOCKED = '.'
+
+# Cells with this symbol are not currently populated but potentially could be.
+VACANT = 'L'
+
+# Cells with this symbol are currently populated.
+OCCUPIED = '#'
+
 class Board
   class Error < Exception
   end
 
-  def initialize(io : IO)
+  def initialize(io)
     lines = io.each_line.map(&.rstrip).to_a
     while !lines.empty? && lines.last.empty?
       lines.pop
@@ -25,7 +40,7 @@ class Board
 
     0.upto(height - 1) do |i|
       0.upto(width - 1) do |j|
-        unless ".L#".includes?(@rows[i][j])
+        unless {BLOCKED, VACANT, OCCUPIED}.includes?(@rows[i][j])
           raise Error.new("invalid character #{@rows[i][j]} at (#{i}, #{j})")
         end
       end
@@ -66,11 +81,15 @@ class Board
     0.upto(height - 1) do |i|
       0.upto(width - 1) do |j|
         case original.rows[i][j]
-        when 'L'
-          @rows[i][j] = '#' if original.count_adjacent(i, j, '#').zero?
-        when '#'
-          @rows[i][j] = 'L' if original.count_adjacent(i, j, '#') >= 4
-        when '.'
+        when VACANT
+          if original.count_adjacent(i, j, OCCUPIED) <= BIRTH_THRESHOLD
+            @rows[i][j] = OCCUPIED
+          end
+        when OCCUPIED
+          if original.count_adjacent(i, j, OCCUPIED) >= DEATH_THRESHOLD
+            @rows[i][j] = VACANT
+          end
+        when BLOCKED
           next # Spaces with no seat are never changed.
         else
           raise "Bug: invalid cell state"
@@ -117,11 +136,11 @@ end
 
 board = Board.new(ARGF)
 loop do
-  evolved = board.successor
-  break if evolved == board
+  next_board = board.successor
+  break if next_board == board
   puts board if verbosity >= 2
-  board = evolved
+  board = next_board
 end
 
 puts board if verbosity >= 1
-puts board.count('#')
+puts board.count(OCCUPIED)

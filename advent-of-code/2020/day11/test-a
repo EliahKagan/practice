@@ -1,2 +1,2 @@
 #!/bin/sh
-./day11a -v -v example | diff example-vv -
+./day11a -v -v example | diff example-vv-a -
