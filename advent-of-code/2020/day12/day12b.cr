@@ -31,21 +31,7 @@ def compose(secondary, primary)
 end
 
 def apply(matrix, vector)
-  m = matrix.size
-  raise ArgumentError.new("empty matrix not supported") if m.zero?
-
-  n = matrix.first.size
-  if matrix.any? { |row| row.size != n }
-    raise ArgumentError.new(%q{jagged "matrix" not supported})
-  end
-  raise ArgumentError.new("zero-width matrix not supported") if n.zero?
-
-  if vector.size != n
-    raise ArgumentError.new(
-        "can't multiply #{m}-by-#{n} matrix by #{vector.size}-vector")
-  end
-
-  (0...m).map { |i| (0...n).sum { |j| matrix[i][j] * vector[j] } }
+  compose(matrix, vector.map { |component| {component} }).map(&.first)
 end
 
 def scale(scalar, vector)
