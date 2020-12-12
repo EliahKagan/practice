@@ -25,7 +25,7 @@ def compose(secondary, primary)
 
   (0...m).map do |i|
     (0...p).map do |k|
-      (0...n).sum { |j| primary[i][j] * secondary[j][k] }
+      (0...n).sum { |j| secondary[i][j] * primary[j][k] }
     end
   end
 end
