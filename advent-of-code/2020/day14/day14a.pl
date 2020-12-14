@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use 5.022;
 use bigint;
-use feature qw(say);
+use experimental qw(signatures);
 use Carp;
 use List::Util qw(sum0);
 use Readonly;
@@ -14,8 +14,7 @@ Readonly my $DEBUG => 0;
 Readonly my $WIDTH => 36;
 Readonly my $MAX => 2**$WIDTH - 1;
 
-sub from_binary {
-    my ($binary) = @_;
+sub from_binary($binary) {
     return oct "0b$binary";
 }
 
