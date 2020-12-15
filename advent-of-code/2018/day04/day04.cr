@@ -1,4 +1,4 @@
-# Advent of Code 2018, day 4, part A
+# Advent of Code 2018, day 4, parts A and B
 
 HOURS_PER_DAY = 24
 MINUTES_PER_HOUR = 60
@@ -47,6 +47,11 @@ end
 
 raise "guard #{guard} is still asleep!" if start
 
-guard, row = slumbers.max_by { |_, row| row.sum }
-_, minute = row.each_with_index.max
-puts guard * minute
+report = ->(label : String, selector : Array(Int32) -> Int32) do
+  sleeper, row = slumbers.max_by { |_, row| selector.call(row) }
+  _, minute = row.each_with_index.max
+  puts "#{label}:  #{sleeper * minute}"
+end
+
+report.call "Strategy 1 (part A)", ->(row : Array(Int32)) { row.sum }
+report.call "Strategy 2 (part B)", ->(row : Array(Int32)) { row.max }
