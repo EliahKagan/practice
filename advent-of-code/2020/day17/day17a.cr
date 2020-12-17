@@ -35,13 +35,15 @@ def each_adjacent(point, &block)
   end
 end
 
+# Makes a hash that maps each cell that is active or that is adjacent to an
+# active cell to the count of how many cells it is adjacent to. The result
+# has a default value of 0, since all other cells are known to be empty.
+# But active cells are stored explicitly even if they have no neighbors,
+# since that's one of the situations where they must be updated.
 def count_adjacency(active)
   counts = Hash({Int32, Int32, Int32}, Int32).new(0)
-
-  active.each do |src|
-    each_adjacent(src) { |dest| counts[dest] += 1 }
-  end
-
+  active.each { |src| counts[src] = 0 }
+  active.each { |src| each_adjacent(src) { |dest| counts[dest] += 1 } }
   counts
 end
 
