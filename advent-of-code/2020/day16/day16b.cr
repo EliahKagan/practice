@@ -7,26 +7,73 @@ module Iterator(T)
 end
 
 class PermutationConstraintSolver
-  def initialize(allowed_y_rows)
-    allowed_y_rows = allowed_y_rows.to_a
-    raise "Order must be positive." if allowed_y_rows.empty?
+  def initialize(allowed_ys) # allowed_ys[x] are the ys allowed for x.
+    allowed_ys = allowed_ys.to_a
+    raise "Order must be positive." if allowed_ys.empty?
 
-    @constraints = allowed_y_rows.map do |ys|
-      unless ys.all? { |y| 0 <= y < allowed_y_rows.size }
+    @constraints = allowed_ys.map do |ys|
+      unless ys.all? { |y| 0 <= y < allowed_ys.size }
         raise "y value out of range."
       end
       ys.reduce(0) { |acc, y| acc | (1 << y) }
     end
+
+    @chain = Array(Int32).new(allowed_ys.size)
   end
 
-  # FIXME: implement the rest!
+  def solve
+    check_chain_size
+
+    unless @solved_or_exhausted
+      raise "Bug: not solved but a solution is populated?" unless @chain.empty?
+      dfs(full_mask)
+      check_chain_size
+      @solved_or_exhausted = true
+    end
+
+    @chain.empty? ? nil : @chain.dup
+  end
+
+  # First, I'm going to try a simple backtracking solution with no memoization.
+  private def dfs(mask)
+    if mask.zero?
+      raise "Bug: inconsistent solver state during run" if @chain.size != order
+      return true
+    end
+
+    x = @chain.size
+    choices = @constraints[x] & mask
+    return false if choices.zero? # Simple optimization, not sure if it helps.
+
+    0.upto(order - 1) do |y|
+      bit = 1 << y
+      next if (choices & bit).zero?
+
+      @chain.push(y)
+      return true if dfs(mask & ~bit)
+      @chain.pop
+    end
+
+    false
+  end
 
   private def order
     @constraints.size
   end
 
+  private def full_mask
+    (1 << order) - 1
+  end
+
+  private def check_chain_size
+    unless @chain.empty? || @chain.size == order
+      raise "Bug: corrupted solver state between runs"
+    end
+  end
+
   @constraints : Array(Int32) # x -> bitfield of allowed ys
-  # @memo : ???
+  @chain : Array(Int32) # Partial solution during backtracking.
+  @solved_or_exhausted = false
 end
 
 struct Field
@@ -149,11 +196,12 @@ def with_possible_column_indices(fields, columns)
   fields.zip(possibles)
 end
 
-def assemble_problem(fields, tickets)
+def assemble_constraint_problem(fields, tickets)
   longform_problem = with_possible_column_indices(fields, tickets.transpose)
 
   puts "Assembling problem. Possible column indices for each field:"
-  longform_problem.each { |field, indices| puts "#{field}: #{indices}" }
+  longform_problem.each { |field, indices| puts "#{field}:  #{indices}" }
+  puts
 
   unsatisfiables = longform_problem
     .select { |_field, indices| indices.empty? }
@@ -170,5 +218,52 @@ def assemble_problem(fields, tickets)
   longform_problem.sort_by! { |field, indices| indices.size }
 end
 
+def solve_constraint_problem(longform_problem)
+  allowed_cols = longform_problem.map { |_field, indices| indices }
+  solution = PermutationConstraintSolver.new(allowed_cols).solve
+
+  unless solution
+    puts "No solution!"
+    exit 1
+  end
+
+  fields = longform_problem.map { |field, _indices| field }
+
+  column_fields = solution.zip(fields)
+    .sort_by! { |col, _field| col }
+    .map { |_col, field| field }
+
+  puts "Solved. The fields, by column number, are as follows."
+  column_fields.each_with_index do |field, col|
+    puts "Column ##{col}:  #{field}"
+  end
+  puts
+
+  column_fields
+end
+
+def display_your_ticket(column_fields, your_ticket)
+  if column_fields.size != your_ticket.size
+    raise "Bug: wrong number of solution field labels for your ticket"
+  end
+
+  puts "The fields of your ticket, with their values, are thus as follows."
+  column_fields.zip(your_ticket) { |field, value| puts "#{field}:  #{value}" }
+  puts
+end
+
+def report_departure_product(column_fields, your_ticket)
+  departure_product = column_fields
+    .map(&.name)
+    .zip(your_ticket)
+    .select { |name, _value| name.starts_with?("departure") }
+    .product { |_name, value| value.to_i64 }
+
+  puts "The product of the departure fields' values is:  #{departure_product}"
+end
+
 fields, tickets = process_input
-longform_problem = assemble_problem(fields, tickets)
+longform_problem = assemble_constraint_problem(fields, tickets)
+column_fields = solve_constraint_problem(longform_problem)
+display_your_ticket(column_fields, tickets.first)
+report_departure_product(column_fields, tickets.first)
