@@ -1,0 +1,2 @@
+#!/bin/sh
+./day18b -v example | head -n -1 | diff example.expected-b -

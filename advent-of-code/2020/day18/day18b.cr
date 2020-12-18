@@ -1,4 +1,4 @@
-# Advent of Code 2020, day 18, part A
+# Advent of Code 2020, day 18, part B
 
 require "option_parser"
 
@@ -16,16 +16,36 @@ end
 struct RightParen
 end
 
-alias BinaryOp = Val, Val -> Val
+struct Add
+  def call(arg1, arg2)
+    arg1 + arg2
+  end
+
+  def precedence
+    0
+  end
+end
+
+struct Multiply
+  def call(arg1, arg2)
+    arg1 * arg2
+  end
+
+  def precedence
+    1
+  end
+end
+
+alias BinaryOp = Add | Multiply
 
 PUNCTUATORS = {
   "(" => LeftParen.new,
   ")" => RightParen.new,
-  "+" => ->(arg1 : Val, arg2 : Val) { arg1 + arg2 },
-  "*" => ->(arg1 : Val, arg2 : Val) { arg1 * arg2 },
+  "+" => Add.new,
+  "*" => Multiply.new,
 }
 
-alias Token = LeftParen | RightParen | BinaryOp | Val
+alias Token = Val | LeftParen | RightParen | BinaryOp
 
 def lex(expr)
   expr.split(/\s+|\b|(?=[[:punct:]])/).reject(&.empty?).map do |lexeme|
@@ -33,26 +53,27 @@ def lex(expr)
   end
 end
 
-# Shunting-yard algorithm, simplified for operators of equal precedence.
+# Shunting-yard algorithm for left-associating binary operators.
 def to_rpn(tokens : Enumerable(Token))
   stack = [] of LeftParen | BinaryOp
-  rpn = [] of BinaryOp | Val
+  rpn = [] of Val | BinaryOp
 
   tokens.each do |token|
     if token.is_a?(Val)
       rpn << token
-    elsif token.is_a?(BinaryOp)
-      while (top = stack.last?).is_a?(BinaryOp)
+    elsif token.is_a?(LeftParen)
+      stack << token
+    elsif token.is_a?(RightParen)
+      until (top = stack.pop).is_a?(LeftParen)
+        rpn << top
+      end
+    else # BinaryOp
+      while (top = stack.last?).is_a?(BinaryOp) &&
+            top.precedence <= token.precedence
         rpn << top
         stack.pop
       end
       stack << token
-    elsif token.is_a?(LeftParen)
-      stack << token
-    else # RightParen
-      until (top = stack.pop).is_a?(LeftParen)
-        rpn << top
-      end
     end
   end
 
@@ -67,7 +88,7 @@ def to_rpn(tokens : Enumerable(Token))
   rpn
 end
 
-def eval_rpn(rpn : Enumerable(BinaryOp | Val))
+def eval_rpn(rpn : Enumerable(Val | BinaryOp))
   stack = [] of Val
 
   rpn.each do |symbol|
