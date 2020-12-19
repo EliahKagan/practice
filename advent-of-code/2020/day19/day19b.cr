@@ -1,4 +1,4 @@
-# Advent of Code 2020, day 19, part A
+# Advent of Code 2020, day 19, part B
 
 require "option_parser"
 
@@ -10,10 +10,6 @@ end
 
 def each_line_in_stanza
   ARGF.each_line.map(&.strip).take_until(&.empty?)
-end
-
-def each_line_in_stanza(&block)
-  each_line_in_stanza.each { |line| yield line }
 end
 
 show_pattern = false
@@ -42,18 +38,35 @@ make_rule = ->(id : Int32, expr : String) do
   else
     template = expr
       .split(/\s+\|\s+/) # alternation
-      .map(&.split(/\s+/).map(&.to_i)) # concatenation
+      .map(&.split(/\s+/) # concatenation
+            .map(&.to_i)
+            .map { |k| k == id ? nil : k }) # recursion
 
     ->do
       rules[id] = ->{ raise "cyclic dependency for rule #{id}" }
 
-      alternatives = template.map(&.map { |k| rules[k].call }.join)
+      simple_recursive = false
 
-      if alternatives.size == 1
-        pattern = alternatives.first
-      else
-        pattern = "(?:#{alternatives.join('|')})"
-      end
+      alternatives = template
+        .map(&.map do |k|
+            if k
+              rules[k].call
+            else
+              simple_recursive = true
+              "(?-1)"
+            end
+          end.join) # TODO: This is ugly and should be cleaned up.
+
+      unparenthesized = alternatives.join('|')
+
+      pattern =
+        if simple_recursive
+          "(#{unparenthesized})"
+        elsif alternatives.size > 1
+          "(?:#{unparenthesized})"
+        else
+          unparenthesized
+        end
 
       rules[id] = ->{ pattern }
       pattern
@@ -61,7 +74,16 @@ make_rule = ->(id : Int32, expr : String) do
   end
 end
 
-each_line_in_stanza do |rule|
+each_line_in_stanza.map do |rule|
+  case rule
+  when "8: 42"
+    "8: 42 | 42 8"
+  when "11: 42 31"
+    "11: 42 31 | 42 11 31"
+  else
+    rule
+  end
+end.each do |rule|
 	digits, expr = rule.split(/:\s+/)
 	id = digits.to_i
   rules[id] = make_rule.call(id, expr)
