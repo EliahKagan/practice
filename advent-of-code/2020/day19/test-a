@@ -1,0 +1,23 @@
+#!/bin/bash
+
+failures=0
+
+try() {
+    implementation="$1"
+
+    if ! $1 -g example-a | diff example-a-expected -; then
+        printf '%s: unexpected result from "%s"\n' "$0" "$implementation" >&2
+        ((++failures))
+    fi
+}
+
+try ./day19a
+try ./day19a.rb
+
+if ((failures == 1)); then
+    printf '%s: %d failure\n' "$0" "$failures" >&2
+else
+    printf '%s: %d failures\n' "$0" "$failures" >&2
+fi
+
+exit "$((failures == 0 ? 0 : 1))"

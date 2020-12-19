@@ -34,37 +34,40 @@ end
 
 rules = {} of Int32 => (-> String)
 
-make_rule = ->(id : Int32, expr : String) do
+make_nonterminal_rule = ->(id : Int32, template : Array(Array(Int32))) do
+  ->do
+    rules[id] = ->{ raise "cyclic dependency for rule #{id}" }
+
+    alternatives = template.map(&.map { |k| rules[k].call }.join)
+
+    if alternatives.size == 1
+      pattern = alternatives.first
+    else
+      pattern = "(?:#{alternatives.join('|')})"
+    end
+
+    rules[id] = ->{ pattern }
+    pattern
+  end
+end
+
+add_rule = ->(id : Int32, expr : String) do
   if expr =~ /^"([^"]+)"$/
     _, literal = $~
     escaped = Regex.escape(literal)
-    ->{ escaped }
+    rules[id] = ->{ escaped }
   else
     template = expr
       .split(/\s+\|\s+/) # alternation
       .map(&.split(/\s+/).map(&.to_i)) # concatenation
 
-    ->do
-      rules[id] = ->{ raise "cyclic dependency for rule #{id}" }
-
-      alternatives = template.map(&.map { |k| rules[k].call }.join)
-
-      if alternatives.size == 1
-        pattern = alternatives.first
-      else
-        pattern = "(?:#{alternatives.join('|')})"
-      end
-
-      rules[id] = ->{ pattern }
-      pattern
-    end
+    rules[id] = make_nonterminal_rule.call(id, template)
   end
 end
 
 each_line_in_stanza do |rule|
-	digits, expr = rule.split(/:\s+/)
-	id = digits.to_i
-  rules[id] = make_rule.call(id, expr)
+	id_digits, expr = rule.split(/:\s+/)
+  add_rule.call(id_digits.to_i, expr)
 end
 
 pattern = rules[0].call

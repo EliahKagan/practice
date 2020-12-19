@@ -1,4 +1,5 @@
-# Advent of Code 2020, day 19, part B
+# Advent of Code 2020, day 19, part B attempt
+# This produces the wrong result, because PCRE1 recursion is atomic.
 
 require "option_parser"
 
@@ -30,47 +31,44 @@ end
 
 rules = {} of Int32 => (-> String)
 
-make_rule = ->(id : Int32, expr : String) do
+make_nonterminal_rule = ->(id : Int32, template : Array(Array(Int32?))) do
+  direct_recursive = template.any?(&.includes?(nil))
+
+  ->do
+    rules[id] = ->{ raise "cyclic dependency for rule #{id}" }
+
+    alternatives =
+      template.map(&.map { |k| k ? rules[k].call : "(?-1)" }.join)
+
+    unparenthesized = alternatives.join('|')
+
+    pattern =
+      if direct_recursive
+        "(#{unparenthesized})"
+      elsif alternatives.size > 1
+        "(?:#{unparenthesized})"
+      else
+        unparenthesized
+      end
+
+    rules[id] = ->{ pattern }
+    pattern
+  end
+end
+
+add_rule = ->(id : Int32, expr : String) do
   if expr =~ /^"([^"]+)"$/
     _, literal = $~
     escaped = Regex.escape(literal)
-    ->{ escaped }
+    rules[id] = ->{ escaped }
   else
     template = expr
       .split(/\s+\|\s+/) # alternation
       .map(&.split(/\s+/) # concatenation
             .map(&.to_i)
-            .map { |k| k == id ? nil : k }) # recursion
+            .map { |k| k == id ? nil : k }) # direct recursion
 
-    ->do
-      rules[id] = ->{ raise "cyclic dependency for rule #{id}" }
-
-      simple_recursive = false
-
-      alternatives = template
-        .map(&.map do |k|
-            if k
-              rules[k].call
-            else
-              simple_recursive = true
-              "(?-1)"
-            end
-          end.join) # TODO: This is ugly and should be cleaned up.
-
-      unparenthesized = alternatives.join('|')
-
-      pattern =
-        if simple_recursive
-          "(#{unparenthesized})"
-        elsif alternatives.size > 1
-          "(?:#{unparenthesized})"
-        else
-          unparenthesized
-        end
-
-      rules[id] = ->{ pattern }
-      pattern
-    end
+    rules[id] = make_nonterminal_rule.call(id, template)
   end
 end
 
@@ -84,9 +82,8 @@ each_line_in_stanza.map do |rule|
     rule
   end
 end.each do |rule|
-	digits, expr = rule.split(/:\s+/)
-	id = digits.to_i
-  rules[id] = make_rule.call(id, expr)
+	id_digits, expr = rule.split(/:\s+/)
+  add_rule.call(id_digits.to_i, expr)
 end
 
 pattern = rules[0].call
