@@ -13,6 +13,7 @@ try() {
 
 try ./day19b-wrong
 try ./day19b.rb
+try ./day19b.pl
 
 if ((failures == 1)); then
     printf '%s: %d failure\n' "$0" "$failures" >&2
