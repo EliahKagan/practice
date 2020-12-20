@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+# each_line_in_stanza scratchwork.
+
+use strict;
+use warnings;
+use 5.020;
+use feature qw(say);
+use experimental qw(signatures);
+
+sub each_line_in_stanza :prototype(&) ($code) {
+    while (<<>>) {
+        s/\s+$//msx;
+        s/^\s+//msx;
+        last if length == 0;
+        $code->();
+    }
+    return;
+}
+
+sub echo_stanza($label) {
+    my @stanza;
+    each_line_in_stanza { push @stanza, $_ };
+    print "$label:\n";
+    for my $line (@stanza) { say $line }
+    print "\n";
+    return;
+}
+
+for my $index (1..2) {
+    echo_stanza("Stanza #$index");
+}
