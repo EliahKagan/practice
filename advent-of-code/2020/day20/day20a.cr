@@ -11,7 +11,6 @@ MARGIN = "   "
 
 struct Tile
   getter id : Int64
-  getter rows : Array(String)
 
   def initialize(stanza)
     raise "empty stanza" if stanza.empty?
@@ -51,6 +50,8 @@ struct Tile
   private def right
     @rows.map { |row| row[-1] }
   end
+
+  @rows : Array(String)
 end
 
 def read_tiles
