@@ -12,46 +12,47 @@ MARGIN = "   "
 struct Tile
   getter id : Int64
 
+  getter deoriented_sides : Tuple(String, String, String, String)
+
   def initialize(stanza)
+    @id = Tile.parse_id(stanza)
+
+    rows = Tile.parse_rows(stanza)
+
+    sides = {
+      rows.first.chars,           # top
+      rows.last.chars,            # bottom
+      rows.map { |row| row[0] },  # left
+      rows.map { |row| row[-1] }, # right
+    }
+
+    @deoriented_sides = sides.map { |side| Math.min(side, side.reverse).join }
+  end
+
+  protected def self.parse_id(stanza)
     raise "empty stanza" if stanza.empty?
     raise "can't find tile title" unless stanza.first =~ /^Tile\s+(\d+):$/i
     _, id_digits = $~
-    @id = id_digits.to_i64
+    id_digits.to_i64
+  end
 
-    @rows = stanza[1..].map(&.rstrip)
-    unless @rows.size == SIZE
-      if @rows.size == 1
-        raise "got #{@rows.size} row, need #{SIZE}"
+  protected def self.parse_rows(stanza)
+    rows = stanza[1..].map(&.rstrip)
+
+    unless rows.size == SIZE
+      if rows.size == 1
+        raise "got #{rows.size} row, need #{SIZE}"
       else
-        raise "got #{@rows.size} rows, need #{SIZE}"
+        raise "got #{rows.size} rows, need #{SIZE}"
       end
     end
-    unless @rows.all? { |row| row.size == SIZE }
+
+    unless rows.all? { |row| row.size == SIZE }
       raise "not all rows have size #{SIZE}"
     end
-  end
 
-  def deoriented_sides
-    {top, right, bottom, left}.map { |side| Math.min(side, side.reverse).join }
+    rows
   end
-
-  private def top
-    @rows.first.chars
-  end
-
-  private def bottom
-    @rows.last.chars
-  end
-
-  private def left
-    @rows.map { |row| row[0] }
-  end
-
-  private def right
-    @rows.map { |row| row[-1] }
-  end
-
-  @rows : Array(String)
 end
 
 def read_tiles
