@@ -9,10 +9,6 @@ CORNER_COUNT = 4
 # Printed to the left of secondary output lines (unrelated to board geometry).
 MARGIN = "   "
 
-def pl(count, noun)
-  count == 1 ? "#{count} #{noun}" : "#{count} #{noun}s"
-end
-
 struct Tile
   getter id : Int64
   getter rows : Array(String)
@@ -25,7 +21,11 @@ struct Tile
 
     @rows = stanza[1..].map(&.rstrip)
     unless @rows.size == SIZE
-      raise %Q[got #{pl(@rows.size, "row")}, need #{SIZE}]
+      if @rows.size == 1
+        raise "got #{@rows.size} row, need #{SIZE}"
+      else
+        raise "got #{@rows.size} rows, need #{SIZE}"
+      end
     end
     unless @rows.all? { |row| row.size == SIZE }
       raise "not all rows have size #{SIZE}"
