@@ -1,13 +1,7 @@
-# Advent of Code 2020, day 20, part B
+# Advent of Code 2020, day 20, part B (unfinished)
 
 # The side length of each tile, including its border.
 FULL_SIZE = 10
-
-# The number of tiles that are needed as corners.
-CORNER_COUNT = 4
-
-# Printed to the left of secondary output lines (unrelated to board geometry).
-MARGIN = "   "
 
 class String
   def first
@@ -31,12 +25,8 @@ class Grid
       raise "grid is not square"
     end
 
-    @top = rows.first
-    @bottom = rows.last
     @left = rows.map(&.first).join
     @right = rows.map(&.last).join
-
-    @deoriented_sides = {@top, @bottom, @left, @right}.map(&.deorient)
   end
 
   def initialize(rows : Array(Array(Char)))
@@ -53,11 +43,25 @@ class Grid
     @rows.size
   end
 
-  getter top : String
-  getter bottom : String
+  def top
+    @rows.first
+  end
+
+  def bottom
+    @rows.last
+  end
+
   getter left : String
+
   getter right : String
-  getter deoriented_sides : Tuple(String, String, String, String)
+
+  def sides
+    {top, bottom, left, right}
+  end
+
+  def deoriented_sides
+    sides.map(&.deorient)
+  end
 
   def orient_top(side)
     image = do_orient_top(side)
@@ -149,6 +153,30 @@ class Grid
   end
 end
 
+class TilesBySide
+  def initialize(tiles : Enumerable(Grid))
+    tiles.each do |tile|
+      tile.deoriented_sides.each { |side| tiles_by_side[side] << tile }
+    end
+  end
+
+  def [](side : String)
+    @groups[side.deorient]
+  end
+
+  def edge_side?(side : String)
+    self[side].size == 1
+  end
+
+  def corner_tile?(tile : Grid)
+    tile.sides.count { |side| edge_side?(side) } == 2
+  end
+
+  @groups = Hash(String, Array(Grid)).new do |hash, key|
+    hash[key] = [] of Grid
+  end
+end
+
 def make_tile(rows)
   unless rows.size == FULL_SIZE
     if rows.size == 1
@@ -175,29 +203,64 @@ def read_tiles
   end
 end
 
-def group_tiles_by_side(tiles)
-  tiles_by_side = Hash(String, Array(Grid)).new do |hash, key|
-    hash[key] = [] of Grid
+def check_corners(corners)
+  raise "too few obvious corners" if corners.size < 4
+  raise "too many obvious corners" if corners.size > 4
+end
+
+def orient_top_left_corner(tiles_by_side, corner)
+  edges = corner.deoriented_sides.select do |side|
+    tiles_by_side.edge_side?(side)
   end
 
-  tiles.each do |tile|
-    tile.deoriented_sides.each { |side| tiles_by_side[side] << tile }
+  raise "can't orient non-corner as corner" unless edges.size == 2
+  top, left = edges
+
+  images = corner.symmetry_images.select do |tile|
+    tile.top.deorient == top && tile.left.deorient == left
   end
 
-  tiles_by_side
+  raise "can't orient corner" if images.empty?
+  images.first
+end
+
+def arrange(tiles_by_side, corner)
+  tiling = [[orient_top_left_corner(tiles_by_side, corner)]]
+  used = Set{corner}
+  preimages = {tiling.first.first => corner}
+
+  until tiles_by_side.edge_side?((prev = tiling.first.last).right)
+    both = tiles_by_side[prev.right]
+    raise "Bug: vertical side can't join two tiles" unless both.size == 2
+    raise "Bug: inconsistent right side" unless both.includes?(preimages[prev])
+
+    cur = both.reject(preimages[prev]).first
+    raise "next tile already used" if used.includes?(preimage)
+    used << preimage
+
+    image = preimage.orient_left(image.right)
+    raise "next tile can't be oriented to left neighbor" unless image
+    raise "top side is not an edge" if tiles_by_side.edge_side?(image.top)
+    tiling.first << image
+  end
+
+  until tiles_by_side.edge_side?(image.bottom)
+    both = tiles_by_side[image.bottom]
+    raise "Bug: horizontal side can't join two tiles" unless both.size == 2
+    raise "Bug: inconsistent bottom side" unless both.includes?(preimage)
+    #
+  end
+
+  #
 end
 
 ids_by_tile = read_tiles
 tiles = ids_by_tile.keys
-tiles_by_side = group_tiles_by_side(tiles)
+tiles_by_side = TilesBySide.new(tiles)
 
-corners = tiles.select do |tile|
-  tile.deoriented_sides.count { |side| tiles_by_side[side].size == 1 } == 2
-end
-
-raise "too few obvious corners" if corners.size < CORNER_COUNT
-raise "too many obvious corners" if corners.size > CORNER_COUNT
-
-# FIXME: Implement the rest of part B (and probably remove this):
+corners = tiles.select { |tile| tiles_by_side.corner_tile?(tile) }
+check_corners(corners)
 corner_ids = corners.map { |tile| ids_by_tile[tile] }
 puts %Q[Obvious corners are #{corner_ids.join(", ")}]
+
+arrange(tiles_by_side, corners.first) # FIXME: use the result
