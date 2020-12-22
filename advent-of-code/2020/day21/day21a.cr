@@ -1,4 +1,4 @@
-# Advent of Code, day 21, part A
+# Advent of Code 2020, day 21, part A
 
 # ingredient => how many times it has appeared
 ingredient_freqs = Hash(String, Int32).new(0)

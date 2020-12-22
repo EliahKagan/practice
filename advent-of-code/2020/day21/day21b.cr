@@ -1,4 +1,4 @@
-# Advent of Code, day 21, part B - investigation
+# Advent of Code 2020, day 21, part B
 
 require "option_parser"
 
