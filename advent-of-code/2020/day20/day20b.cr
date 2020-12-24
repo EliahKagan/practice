@@ -1,7 +1,7 @@
 # Advent of Code 2020, day 20, part B (unfinished)
 
 # The side length of each tile, including its border.
-FULL_SIZE = 10
+FULL_TILE_SIZE = 10
 
 class String
   def first
@@ -65,17 +65,15 @@ class Grid
 
   def orient_top(side)
     image = do_orient_top(side)
-    if image && image.top != side
-      raise "bug: orient_top computed wrong result"
-    end
+    raise "can't orient to top neighbor" unless image
+    raise "Bug: orient_top computed wrong result" if image.top != side
     image
   end
 
   def orient_left(side)
     image = do_orient_left(side)
-    if image && image.left != side
-      raise "Bug: orient_left computed wrong result"
-    end
+    raise "can't orient to left neighbor" unless image
+    raise "Bug: orient_left computed wrong result" if image.left != side
     image
   end
 
@@ -156,7 +154,7 @@ end
 class TilesBySide
   def initialize(tiles : Enumerable(Grid))
     tiles.each do |tile|
-      tile.deoriented_sides.each { |side| tiles_by_side[side] << tile }
+      tile.deoriented_sides.each { |side| @groups[side] << tile }
     end
   end
 
@@ -178,15 +176,15 @@ class TilesBySide
 end
 
 def make_tile(rows)
-  unless rows.size == FULL_SIZE
+  unless rows.size == FULL_TILE_SIZE
     if rows.size == 1
-      raise "got #{rows.size} row, need #{FULL_SIZE}"
+      raise "got #{rows.size} row, need #{FULL_TILE_SIZE}"
     else
-      raise "got #{rows.size} rows, need #{FULL_SIZE}"
+      raise "got #{rows.size} rows, need #{FULL_TILE_SIZE}"
     end
   end
-  unless rows.all? { |row| row.size == FULL_SIZE }
-    raise "not all rows have size #{FULL_SIZE}"
+  unless rows.all? { |row| row.size == FULL_TILE_SIZE }
+    raise "not all rows have size #{FULL_TILE_SIZE}"
   end
 
   Grid.new(rows)
@@ -224,34 +222,81 @@ def orient_top_left_corner(tiles_by_side, corner)
   images.first
 end
 
-def arrange(tiles_by_side, corner)
-  tiling = [[orient_top_left_corner(tiles_by_side, corner)]]
-  used = Set{corner}
-  preimages = {tiling.first.first => corner}
+def arrange_top_row(tiles_by_side, mark_used, corner)
+  preimage = corner
+  mark_used.call(preimage)
+  image = orient_top_left_corner(tiles_by_side, preimage)
+  pre_top_row = [preimage]
+  top_row = [image]
 
-  until tiles_by_side.edge_side?((prev = tiling.first.last).right)
-    both = tiles_by_side[prev.right]
-    raise "Bug: vertical side can't join two tiles" unless both.size == 2
-    raise "Bug: inconsistent right side" unless both.includes?(preimages[prev])
+  until tiles_by_side.edge_side?(image.right)
+    both = tiles_by_side[image.right]
+    raise "Bug: vertical side can't join two tiles" if both.size != 2
+    raise "Bug: inconsistent right side" unless both.includes?(preimage)
 
-    cur = both.reject(preimages[prev]).first
-    raise "next tile already used" if used.includes?(preimage)
-    used << preimage
+    preimage = both.reject(preimage).first
+    mark_used.call(preimage)
+    pre_top_row << preimage
 
     image = preimage.orient_left(image.right)
-    raise "next tile can't be oriented to left neighbor" unless image
-    raise "top side is not an edge" if tiles_by_side.edge_side?(image.top)
-    tiling.first << image
+    raise "top edge mismatch" unless tiles_by_side.edge_side?(image.top)
+    top_row << image
   end
 
-  until tiles_by_side.edge_side?(image.bottom)
-    both = tiles_by_side[image.bottom]
-    raise "Bug: horizontal side can't join two tiles" unless both.size == 2
-    raise "Bug: inconsistent bottom side" unless both.includes?(preimage)
-    #
+  {pre_top_row, top_row}
+end
+
+def arrange_next_row(tiles_by_side, mark_used, upper_pre_row, upper_row)
+  pre_row = [] of Grid
+  row = [] of Grid
+
+  upper_pre_row.zip(upper_row) do |upper_preimage, upper_image|
+    both = tiles_by_side[upper_image.bottom]
+    raise "Bug: horizontal side can't join two tiles" if both.size != 2
+    raise "Bug: inconsistent bottom side" unless both.includes?(upper_preimage)
+
+    preimage = both.reject(upper_preimage).first
+    mark_used.call(preimage)
+    pre_row << preimage
+
+    image = preimage.orient_top(upper_image.bottom)
+    if row.empty?
+      raise "left edge mismatch" unless tiles_by_side.edge_side?(image.left)
+    else
+      raise "interior left side mismatch" unless image.left == row.last.right
+    end
+    row << image
   end
 
-  #
+  raise "right edge mismatch" unless tiles_by_side.edge_side?(row.last.right)
+
+  {pre_row, row}
+end
+
+def arrange_all_rows(tiles_by_side, corner)
+  used = Set(Grid).new
+
+  mark_used = ->(tile : Grid) do
+    raise "next tile already used" if used.includes?(tile)
+    used << tile
+    nil
+  end
+
+  pre_row, row = arrange_top_row(tiles_by_side, mark_used, corner)
+  pre_tiling = [pre_row]
+  tiling = [row]
+
+  until tiles_by_side.edge_side?(row.first.bottom)
+    pre_row, row = arrange_next_row(tiles_by_side, mark_used, pre_row, row)
+    pre_tiling << pre_row
+    tiling << row
+  end
+
+  unless tiling.last.all? { |tile| tiles_by_side.edge_side?(tile.bottom) }
+    raise "bottom edge mismatch"
+  end
+
+  tiling
 end
 
 ids_by_tile = read_tiles
@@ -263,4 +308,4 @@ check_corners(corners)
 corner_ids = corners.map { |tile| ids_by_tile[tile] }
 puts %Q[Obvious corners are #{corner_ids.join(", ")}]
 
-arrange(tiles_by_side, corners.first) # FIXME: use the result
+tiling = arrange_all_rows(tiles_by_side, corners.first)
