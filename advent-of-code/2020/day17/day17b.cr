@@ -1,4 +1,6 @@
 # Advent of Code 2020, day 17, part B
+# 4-dimensional game in the style of Conway's Game of Life.
+# See also day 17 part A (3-dimensional) and day 24 part B (hexagonal).
 
 require "option_parser"
 
@@ -56,7 +58,6 @@ def update(active)
     else
       active.add(point) if count == 3
     end
-    nil
   end
 end
 
