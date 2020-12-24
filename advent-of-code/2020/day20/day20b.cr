@@ -3,6 +3,12 @@
 # The side length of each tile, including its border.
 FULL_TILE_SIZE = 10
 
+module Indexable
+  def square?
+    all? { |row| row.size == size }
+  end
+end
+
 class String
   def first
     self[0]
@@ -18,12 +24,17 @@ class String
 end
 
 class Grid
+  def self.from_tiles(tiles : Array(Array(Grid)))
+    raise "no tiles to create grid from" if tiles.empty?
+    raise "non-square tile arrangement" unless tiles.square?
+
+    Grid.new(tiles.flat_map(&.map(&.rows).transpose.map(&.join)))
+  end
+
   def initialize(rows : Array(String))
     @rows = rows.dup
     raise "empty grid not supported" if @rows.empty?
-    unless @rows.all? { |row| row.size == @rows.size }
-      raise "grid is not square"
-    end
+    raise "grid is not square" unless @rows.square?
 
     @left = rows.map(&.first).join
     @right = rows.map(&.last).join
@@ -90,6 +101,10 @@ class Grid
     }
   end
 
+  def interior
+    Grid.new(@rows[1...-1].map! { |row| row[1...-1] })
+  end
+
   protected getter rows : Array(String)
 
   private def do_orient_top(side)
@@ -153,10 +168,17 @@ end
 
 class TilesBySide
   def initialize(tiles : Enumerable(Grid))
+    count = 0
+
     tiles.each do |tile|
       tile.deoriented_sides.each { |side| @groups[side] << tile }
+      count += 1
     end
+
+    @tile_count = count
   end
+
+  getter tile_count : Int32
 
   def [](side : String)
     @groups[side.deorient]
@@ -296,6 +318,10 @@ def arrange_all_rows(tiles_by_side, corner)
     raise "bottom edge mismatch"
   end
 
+  if used.size != tiles_by_side.tile_count
+    raise "used count #{used.size} != tile count #{tiles_by_side.tile_count}"
+  end
+
   tiling
 end
 
@@ -309,3 +335,7 @@ corner_ids = corners.map { |tile| ids_by_tile[tile] }
 puts %Q[Obvious corners are #{corner_ids.join(", ")}]
 
 tiling = arrange_all_rows(tiles_by_side, corners.first)
+raise "full tiling is not square" unless tiling.square?
+puts "Constructed full tiling of #{tiling.size} by #{tiling.size} tiles."
+
+board = Grid.from_tiles(tiling.map(&.map(&.interior)))
