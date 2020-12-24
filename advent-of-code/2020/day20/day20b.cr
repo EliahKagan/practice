@@ -1,9 +1,10 @@
 # Advent of Code 2020, day 20, part B (unfinished)
 
-# The side length of each tile, including its border.
-FULL_TILE_SIZE = 10
-
 module Indexable
+  def rectangle?
+    all? { |row| row.size == first.size }
+  end
+
   def square?
     all? { |row| row.size == size }
   end
@@ -21,6 +22,33 @@ class String
   def deorient
     Math.min(self, reverse)
   end
+end
+
+class Pattern
+  def initialize(*rows : String)
+    initialize(' ', *rows)
+  end
+
+  def initialize(@bg : Char, *rows : String)
+    raise "non-rectangular pattern" unless rows.rectangle?
+    @rows = rows.to_a
+  end
+
+  getter bg
+
+  def [](row_index)
+    @rows[row_index]
+  end
+
+  def height
+    @rows.size
+  end
+
+  def width
+    @rows.first.size
+  end
+
+  @rows : Array(String)
 end
 
 class Grid
@@ -105,6 +133,36 @@ class Grid
     Grid.new(@rows[1...-1].map! { |row| row[1...-1] })
   end
 
+  def count_matches(pattern : Pattern)
+    count = 0
+    each_match(pattern) { count += 1 }
+    count
+  end
+
+  def count_matches_without_reuse(pattern : Pattern)
+    count = 0
+    each_match_without_reuse(pattern) { count += 1 }
+    count
+  end
+
+  def each_match(pattern : Pattern, &block)
+    0.upto(size - pattern.height) do |i|
+      0.upto(size - pattern.width) do |j|
+        yield(i, j) if matches_at?(pattern, i, j)
+      end
+    end
+  end
+
+  def each_match_without_reuse(pattern : Pattern, &block)
+    used = Set(Tuple(Int32, Int32)).new
+
+    0.upto(size - pattern.height) do |i|
+      0.upto(size - pattern.width) do |j|
+        yield(i, j) if matches_without_reuse_at?(pattern, i, j, used)
+      end
+    end
+  end
+
   protected getter rows : Array(String)
 
   private def do_orient_top(side)
@@ -164,6 +222,37 @@ class Grid
   private def flip_minor_diagonal
     Grid.new(@rows.reverse.transpose.reverse!)
   end
+
+  private def matches_at?(pattern, i, j)
+    0.upto(pattern.height - 1) do |di|
+      0.upto(pattern.width - 1) do |dj|
+        ch = pattern[di][dj]
+        return false if ch != pattern.bg && @rows[i + di][j + dj] != ch
+      end
+    end
+
+    true
+  end
+
+  private def matches_without_reuse_at?(pattern, i, j, used)
+    coords = [] of {Int32, Int32}
+
+    0.upto(pattern.height - 1) do |di|
+      0.upto(pattern.width - 1) do |dj|
+        ch = pattern[di][dj]
+        next if ch == pattern.bg
+
+        i2 = i + di
+        j2 = j + dj
+        return false if @rows[i2][j2] != ch || used.includes?({i2, j2})
+
+        coords << {i2, j2}
+      end
+    end
+
+    used.concat(coords)
+    true
+  end
 end
 
 class TilesBySide
@@ -196,6 +285,16 @@ class TilesBySide
     hash[key] = [] of Grid
   end
 end
+
+# The side length of each tile, including its border.
+FULL_TILE_SIZE = 10
+
+# The pattern to search for in boards arranged-tile interiors.
+SEA_MONSTER = Pattern.new(
+  "                  # ",
+  "#    ##    ##    ###",
+  " #  #  #  #  #  #   ",
+)
 
 def make_tile(rows)
   unless rows.size == FULL_TILE_SIZE
@@ -333,9 +432,19 @@ corners = tiles.select { |tile| tiles_by_side.corner_tile?(tile) }
 check_corners(corners)
 corner_ids = corners.map { |tile| ids_by_tile[tile] }
 puts %Q[Obvious corners are #{corner_ids.join(", ")}]
+puts
 
 tiling = arrange_all_rows(tiles_by_side, corners.first)
 raise "full tiling is not square" unless tiling.square?
 puts "Constructed full tiling of #{tiling.size} by #{tiling.size} tiles."
+puts
 
 board = Grid.from_tiles(tiling.map(&.map(&.interior)))
+
+board.symmetry_images.each_with_index do |image, index|
+  allowing_reuse = image.count_matches(SEA_MONSTER)
+  without_reuse = image.count_matches_without_reuse(SEA_MONSTER)
+
+  printf "%d: %3d allowing reuse, %3d without reuse\n",
+         index, allowing_reuse, without_reuse
+end
