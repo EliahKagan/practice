@@ -8,6 +8,10 @@ module Indexable
   def square?
     all? { |row| row.size == size }
   end
+
+  def count_in_rows(value)
+    sum(&.count(value))
+  end
 end
 
 class String
@@ -46,6 +50,10 @@ class Pattern
 
   def width
     @rows.first.size
+  end
+
+  def count(ch : Char)
+    @rows.count_in_rows(ch)
   end
 
   @rows : Array(String)
@@ -161,6 +169,10 @@ class Grid
         yield(i, j) if matches_without_reuse_at?(pattern, i, j, used)
       end
     end
+  end
+
+  def count(ch : Char)
+    @rows.count_in_rows(ch)
   end
 
   protected getter rows : Array(String)
@@ -304,6 +316,7 @@ def make_tile(rows)
       raise "got #{rows.size} rows, need #{FULL_TILE_SIZE}"
     end
   end
+
   unless rows.all? { |row| row.size == FULL_TILE_SIZE }
     raise "not all rows have size #{FULL_TILE_SIZE}"
   end
@@ -431,7 +444,7 @@ tiles_by_side = TilesBySide.new(tiles)
 corners = tiles.select { |tile| tiles_by_side.corner_tile?(tile) }
 check_corners(corners)
 corner_ids = corners.map { |tile| ids_by_tile[tile] }
-puts %Q[Obvious corners are #{corner_ids.join(", ")}]
+puts %Q[Obvious corners are: #{corner_ids.join(", ")}]
 puts
 
 tiling = arrange_all_rows(tiles_by_side, corners.first)
@@ -441,10 +454,36 @@ puts
 
 board = Grid.from_tiles(tiling.map(&.map(&.interior)))
 
-board.symmetry_images.each_with_index do |image, index|
-  allowing_reuse = image.count_matches(SEA_MONSTER)
-  without_reuse = image.count_matches_without_reuse(SEA_MONSTER)
-
-  printf "%d: %3d allowing reuse, %3d without reuse\n",
-         index, allowing_reuse, without_reuse
+counts = board.symmetry_images.map do |image|
+  {allowing_reuse: image.count_matches(SEA_MONSTER),
+   without_reuse: image.count_matches_without_reuse(SEA_MONSTER)}
 end
+
+counts.each_with_index do |pair, index|
+  printf "%d: %3d allowing reuse, %3d without reuse\n",
+         index, pair[:allowing_reuse], pair[:without_reuse]
+end
+puts
+
+support = counts.reject do |pair|
+  pair[:allowing_reuse].zero? && pair[:without_reuse].zero?
+end
+raise "sea monsters appear in multiple symmetry images" if support.size != 1
+
+sea_monster_count = support.first[:allowing_reuse]
+unless sea_monster_count == support.first[:without_reuse]
+  raise "sea-monster counts differ with and without overlap"
+end
+
+uncalm_area = board.count('#')
+area_per_sea_monster = SEA_MONSTER.count('#')
+total_sea_monster_area = area_per_sea_monster * sea_monster_count
+rough_area = uncalm_area - total_sea_monster_area
+
+puts "The area per sea monster is #{area_per_sea_monster}."
+puts "The number of sea monsters is #{sea_monster_count}."
+puts "As they don't overlap, their total area is #{total_sea_monster_area}."
+puts "The number of cells that are rough or a sea monster is #{uncalm_area}."
+puts "No cell is both, so the number of rough cells is #{rough_area}."
+puts
+puts rough_area # Show it again on its own line, as it is the puzzle solution.
