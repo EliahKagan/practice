@@ -102,10 +102,10 @@ end
 game_length = DEFAULT_GAME_LENGTH
 
 OptionParser.parse do |parser|
-  parser.on "-c COUNT", "--count=COUNT" do |count|
+  parser.on "-c COUNT", "--count=COUNT", "number of moves to take" do |count|
     game_length = count.to_i
   end
-  parser.on "-h", "--help" do
+  parser.on "-h", "--help", "show options help" do
     puts parser
     exit
   end
