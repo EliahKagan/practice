@@ -11,8 +11,8 @@ class Node(T)
   include Enumerable(T)
 
   getter value : T
-  property left : Node(T)
-  property right : Node(T)
+  getter left : Node(T)
+  getter right : Node(T)
 
   def initialize(@value : T)
     # Pretend to inititialize @left and @right so the compiler gives us self.
@@ -32,9 +32,9 @@ class Node(T)
     end
   end
 
-  def connect(new_right : Node(T))
-    @right = new_right
-    new_right.left = self
+  def splice_in(other : Node(T))
+    other.left.connect(@right)
+    connect(other)
     nil
   end
 
@@ -47,23 +47,15 @@ class Node(T)
     final = initial.hop_right(count - 1)
 
     # Make the rest of the original chain a loop without it.
-    initial.left.right = final.right
-    final.right.left = initial.left
+    initial.left.connect(final.right)
 
     # Make the removed subchain a loop.
-    initial.left = final
-    final.right = initial
+    final.connect(initial)
 
     initial
   end
 
-  def splice_in(other : Node(T))
-    other.left.right = @right
-    @right.left = other.left
-    @right = other
-    other.left = self
-    nil
-  end
+  protected setter left, right
 
   protected def hop_right(distance : Int32)
     raise "distance #{distance} is negative" if distance < 0
@@ -71,6 +63,12 @@ class Node(T)
     node = self
     distance.times { node = node.right }
     node
+  end
+
+  protected def connect(new_right : Node(T))
+    @right = new_right
+    new_right.left = self
+    nil
   end
 end
 
@@ -84,18 +82,16 @@ def read_cup_values
   values
 end
 
-def connect_initial_cups(cups, values)
+def build_initial_cup_chain(cups, values)
   values.each_cons_pair do |left_value, right_value|
-    cups[left_value].connect(cups[right_value])
+    cups[left_value].splice_in(cups[right_value])
   end
-
-  cups[values.last].connect(cups[values.first])
 end
 
 def read_initial_state
   values = read_cup_values
   cups = Array(Node(Int32)).new(MAX_CUP + 1) { |value| Node.new(value) }
-  connect_initial_cups(cups, values)
+  build_initial_cup_chain(cups, values)
   {cups, cups[values.first]}
  end
 
@@ -116,16 +112,11 @@ OptionParser.parse do |parser|
 end
 
 cups, major = read_initial_state
-# FIXME: remove after debugging:
-#cups.each { |node| puts "#{node.left.value} -> #{node.value} -> #{node.right.value}" }
 
 game_length.times do
   # Pick a handful of cups immediately clockwise of the current cup.
   minor = major.splice_out(1, HANDFUL)
   hand = minor.to_a
-
-  # FIXME: remove after debugging
-  STDERR.puts "DEBUG: major: #{major.to_a} minor: #{hand}"
 
   # Select a destination cup.
   dest_value = predecessor(major.value)
