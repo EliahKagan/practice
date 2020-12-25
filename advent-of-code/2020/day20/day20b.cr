@@ -1,4 +1,4 @@
-# Advent of Code 2020, day 20, part B (unfinished)
+# Advent of Code 2020, day 20, part B
 
 module Indexable
   def rectangle?
