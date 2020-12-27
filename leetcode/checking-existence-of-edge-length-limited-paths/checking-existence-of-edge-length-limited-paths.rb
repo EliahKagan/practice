@@ -51,7 +51,7 @@ end
 # @param {Integer[][]} queries
 # @return {Boolean[]}
 def distance_limited_paths_exist(order, edges, queries)
-  edges.sort_by! { |u, v, weight| weight }
+  edges.sort_by! { |_u, _v, weight| weight }
   sets = DisjointSets.new(order)
   results = Array.new(queries.size)
 
