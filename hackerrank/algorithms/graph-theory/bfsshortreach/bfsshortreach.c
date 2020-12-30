@@ -306,11 +306,14 @@ static inline void read_edge(const struct graph *const graphp)
 {
     assert(graphp);
 
-    Vertex u = -1;
-    Vertex v = -1;
+    Vertex u = 0;
+    Vertex v = 0;
+
     ensure(scanf("%d%d", &u, &v) == 2);
-    ensure(graph_has_vertex(graphp, u));
-    ensure(graph_has_vertex(graphp, v));
+
+    // Don't allow vertex 0.
+    ensure(0 < u && u < graph_order(graphp));
+    ensure(0 < v && v < graph_order(graphp));
 
     graph_add_edge(graphp, u, v);
 }
@@ -323,7 +326,8 @@ static struct graph read_graph(void)
     ensure(order > 0);
     ensure(size > 0);
 
-    const struct graph graph = graph_create(order);
+    // Allocate an extra unused vertex (0) to facilitate 1-based indexing.
+    const struct graph graph = graph_create(order + 1);
     while (size-- > 0) read_edge(&graph);
     return graph;
 }
@@ -348,14 +352,18 @@ static void run_bfs(const struct graph *restrict const graphp,
     assert(fringep);
 
     for (int depth = 1; !queue_empty(fringep); ++depth) {
+        fprintf(stderr, "DEBUG: depth=%d\n", depth); // FIXME: remove
+
         for (size_t breadth = queue_size(fringep); breadth != 0u; --breadth) {
             const Vertex src = queue_dequeue(fringep);
+            fprintf(stderr, "DEBUG: breadth=%zu src=%d\n", breadth, src); // FIXME: remove
             const Vertex *const row_begin = graph_neighbors_begin(graphp, src);
             const Vertex *const row_end = graph_neighbors_end(graphp, src);
 
             for (const Vertex *destp = row_begin; destp != row_end; ++destp) {
                 if (vis[*destp]) continue;
 
+                fprintf(stderr, "DEBUG: dest=%d\n", *destp); // FIXME: remove
                 vis[*destp] = true;
                 costs[*destp] = depth;
                 queue_enqueue(fringep, *destp);
@@ -385,9 +393,12 @@ static int *bfs(const struct graph *const graphp, const Vertex start)
 static void
 print_scaled_costs(const int *const costs, const int order, const Vertex start)
 {
+    assert(costs);
+    assert(0 < start && start < order); // Don't allow vertex 0.
+
     const char *sep = "";
 
-    for (Vertex vertex = 0; vertex < order; ++vertex) {
+    for (Vertex vertex = 1; vertex < order; ++vertex) {
         if (vertex == start) continue;
 
         const int display = (costs[vertex] == k_infinity
@@ -406,9 +417,9 @@ static void run_query(void)
 {
     struct graph graph = read_graph();
 
-    Vertex start = -1;
+    Vertex start = 0;
     ensure(scanf("%d", &start) == 1);
-    ensure(graph_has_vertex(&graph, start));
+    ensure(0 < start && start < graph_order(&graph)); // Don't allow vertex 0.
 
     int *costs = bfs(&graph, start);
     print_scaled_costs(costs, graph_order(&graph), start);
