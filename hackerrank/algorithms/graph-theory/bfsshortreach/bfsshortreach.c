@@ -253,9 +253,7 @@ static void graph_destroy(struct graph *const graphp)
     assert(graphp);
 
     for (Vertex i = 0; i < graphp->order; ++i) vec_destroy(&graphp->adj[i]);
-    free(graphp->adj);
-    graphp->adj = NULL;
-
+    DESTROY(graphp->adj);
     graphp->order = 0;
 }
 
