@@ -7,10 +7,9 @@
 
 #define DESTROY(p) do { free(p); (p) = NULL; } while (false)
 
-// FIXME: After preliminary testing, change initial nonzero capacities to 8.
 enum data_structure_constants {
-    k_vec_initial_nonzero_capacity = 1,
-    k_queue_initial_nonzero_capacity = 1,
+    k_vec_initial_nonzero_capacity = 8,
+    k_queue_initial_nonzero_capacity = 8,
 };
 
 enum graph_constants {
