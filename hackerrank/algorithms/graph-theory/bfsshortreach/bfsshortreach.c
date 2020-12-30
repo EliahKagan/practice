@@ -352,18 +352,14 @@ static void run_bfs(const struct graph *restrict const graphp,
     assert(fringep);
 
     for (int depth = 1; !queue_empty(fringep); ++depth) {
-        fprintf(stderr, "DEBUG: depth=%d\n", depth); // FIXME: remove
-
         for (size_t breadth = queue_size(fringep); breadth != 0u; --breadth) {
             const Vertex src = queue_dequeue(fringep);
-            fprintf(stderr, "DEBUG: breadth=%zu src=%d\n", breadth, src); // FIXME: remove
             const Vertex *const row_begin = graph_neighbors_begin(graphp, src);
             const Vertex *const row_end = graph_neighbors_end(graphp, src);
 
             for (const Vertex *destp = row_begin; destp != row_end; ++destp) {
                 if (vis[*destp]) continue;
 
-                fprintf(stderr, "DEBUG: dest=%d\n", *destp); // FIXME: remove
                 vis[*destp] = true;
                 costs[*destp] = depth;
                 queue_enqueue(fringep, *destp);
