@@ -1,3 +1,7 @@
+// https://www.hackerrank.com/challenges/bfsshortreach
+// In C11. (Using breadth-first search.)
+// This version uses a separate visitation list from the costs array.
+
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
