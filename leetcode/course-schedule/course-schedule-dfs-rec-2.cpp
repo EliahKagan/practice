@@ -1,11 +1,11 @@
-// LeetCode #210 - Course Schedule II
-// https://leetcode.com/problems/course-schedule-ii/
-// Via recursive DFS implemented with std::function.
+// LeetCode #207 - Course Schedule
+// https://leetcode.com/problems/course-schedule/
+// Via recursive DFS implemented with a helper member function.
 
 class Solution {
 public:
-    [[nodiscard]] static vector<int>
-    findOrder(int numCourses,
+    [[nodiscard]] static bool
+    canFinish(int numCourses,
               const vector<vector<int>>& prerequisites) noexcept;
 };
 
@@ -15,12 +15,6 @@ namespace {
     {
         if (condition) return;
         abort();
-    }
-
-    template<typename C, typename F>
-    constexpr bool any_of(const C& items, F predicate) noexcept
-    {
-        return any_of(cbegin(items), cend(items), predicate);
     }
 
     // Visitation states for depth-first traversal of a directed graph.
@@ -42,9 +36,12 @@ namespace {
 
         void add_edge(int src, int dest) noexcept;
 
-        [[nodiscard]] optional<vector<int>> reverse_toposort() const noexcept;
+        [[nodiscard]] bool has_cycle() const noexcept;
 
     private:
+        [[nodiscard]] bool
+        has_cycle_from(vector<Color>& vis, int src) const noexcept;
+
         [[nodiscard]] bool exists(int vertex) const noexcept
         {
             return 0 <= vertex && vertex < vertex_count();
@@ -62,35 +59,37 @@ namespace {
         adj_[src].push_back(dest);
     }
 
-    optional<vector<int>> Graph::reverse_toposort() const noexcept
+    bool Graph::has_cycle() const noexcept
     {
         auto vis = vector(vertex_count(), Color::white);
-        auto out = vector<int>{};
-
-        // Puts vertices into the reverse toposort while checking for a cycle.
-        const function<bool(int)> has_cycle_from {[&](const int src) noexcept {
-            switch (vis[src]) {
-            case Color::white:
-                vis[src] = Color::gray;
-                if (any_of(adj_[src], has_cycle_from)) return true;
-                vis[src] = Color::black;
-                out.push_back(src);
-                return false;
-
-            case Color::gray:
-                return true;
-
-            case Color::black:
-                return false;
-            }
-
-            abort(); // Unrecognized visitation state.
-        }};
 
         for (auto start = 0; start != vertex_count(); ++start)
-            if (has_cycle_from(start)) return nullopt;
+            if (has_cycle_from(vis, start)) return true;
 
-        return out;
+        return false;
+    }
+
+    bool
+    Graph::has_cycle_from(vector<Color>& vis, const int src) const noexcept
+    {
+        switch (vis[src]) {
+        case Color::white:
+            vis[src] = Color::gray;
+
+            for (const auto dest : adj_[src])
+                if (has_cycle_from(vis, dest)) return true;
+
+            vis[src] = Color::black;
+            return false;
+
+        case Color::gray:
+            return true;
+
+        case Color::black:
+            return false;
+        }
+
+        abort(); // Unrecognized visitation state.
     }
 
     Graph build_graph(const int vertex_count,
@@ -107,11 +106,8 @@ namespace {
     }
 }
 
-vector<int>
-Solution::findOrder(int numCourses,
-                    const vector<vector<int>>& prerequisites) noexcept
+bool Solution::canFinish(const int numCourses,
+                         const vector<vector<int>>& prerequisites) noexcept
 {
-    auto order = build_graph(numCourses, prerequisites).reverse_toposort();
-    if (order) return move(*order);
-    return {};
+    return !build_graph(numCourses, prerequisites).has_cycle();
 }

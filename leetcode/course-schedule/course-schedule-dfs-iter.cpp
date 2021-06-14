@@ -1,11 +1,11 @@
-// LeetCode #210 - Course Schedule II
-// https://leetcode.com/problems/course-schedule-ii/
+// LeetCode #210 - Course Schedule
+// https://leetcode.com/problems/course-schedule/
 // Via iterative DFS.
 
 class Solution {
 public:
-    [[nodiscard]] static vector<int>
-    findOrder(int numCourses,
+    [[nodiscard]] static bool
+    canFinish(int numCourses,
               const vector<vector<int>>& prerequisites) noexcept;
 };
 
@@ -41,7 +41,7 @@ namespace {
 
         void add_edge(int src, int dest) noexcept;
 
-        [[nodiscard]] optional<vector<int>> reverse_toposort() const noexcept;
+        [[nodiscard]] bool has_cycle() const noexcept;
 
     private:
         [[nodiscard]] bool exists(int vertex) const noexcept
@@ -61,10 +61,9 @@ namespace {
         adj_[src].push_back(dest);
     }
 
-    optional<vector<int>> Graph::reverse_toposort() const noexcept
+    bool Graph::has_cycle() const noexcept
     {
         auto vis = vector(vertex_count(), Color::white);
-        auto out = vector<int>{};
         auto frames = stack<Frame>{};
 
         const auto push = [&](const auto vertex) noexcept {
@@ -73,7 +72,6 @@ namespace {
             frames.push({vertex, 0});
         };
 
-        // Puts vertices into the reverse toposort while checking for a cycle.
         const auto has_cycle_from = [&](const int start) noexcept {
             if (vis[start] != Color::black) push(start);
 
@@ -82,7 +80,6 @@ namespace {
 
                 if (index == size(adj_[src])) {
                     vis[src] = Color::black;
-                    out.push_back(src);
                     frames.pop();
                 } else {
                     const auto dest = adj_[src][index++];
@@ -96,9 +93,9 @@ namespace {
         };
 
         for (auto start = 0; start != vertex_count(); ++start)
-            if (has_cycle_from(start)) return nullopt;
+            if (has_cycle_from(start)) return true;
 
-        return out;
+        return false;
     }
 
     Graph build_graph(const int vertex_count,
@@ -115,11 +112,8 @@ namespace {
     }
 }
 
-vector<int>
-Solution::findOrder(int numCourses,
-                    const vector<vector<int>>& prerequisites) noexcept
+bool Solution::canFinish(const int numCourses,
+                         const vector<vector<int>>& prerequisites) noexcept
 {
-    auto order = build_graph(numCourses, prerequisites).reverse_toposort();
-    if (order) return move(*order);
-    return {};
+    return !build_graph(numCourses, prerequisites).has_cycle();
 }

@@ -1,6 +1,6 @@
 // LeetCode #210 - Course Schedule II
 // https://leetcode.com/problems/course-schedule-ii/
-// Via Kahn's algorithm with a queue (FIFO).
+// Via Kahn's algorithm with recursive DFS with std::function.
 
 class Solution {
 public:
@@ -15,6 +15,12 @@ namespace {
     {
         if (condition) return;
         abort();
+    }
+
+    template<typename C, typename F>
+    void for_each(const C& items, F action) noexcept
+    {
+        for_each(cbegin(items), cend(items), action);
     }
 
     class Graph {
@@ -36,7 +42,7 @@ namespace {
             return 0 <= vertex && vertex < vertex_count();
         }
 
-        [[nodiscard]] queue<int> get_roots() const noexcept;
+        [[nodiscard]] vector<int> get_roots() const noexcept;
 
         vector<vector<int>> adj_;
 
@@ -58,27 +64,24 @@ namespace {
     {
         auto out = vector<int>{};
 
-        for (auto roots = get_roots(); !empty(roots); ) {
-            auto src = roots.front();
-            roots.pop();
-
+        const function<void(int)> dfs = [&](const int src) noexcept {
             out.push_back(src);
 
             for (const auto dest : adj_[src])
-                if (--indegrees_[dest] == 0) roots.push(dest);
-        }
+                if (--indegrees_[dest] == 0) dfs(dest);
+        };
 
+        for_each(get_roots(), dfs);
         if (size(out) == vertex_count()) return out;
-
         return nullopt;
     }
 
-    queue<int> Graph::get_roots() const noexcept
+    vector<int> Graph::get_roots() const noexcept
     {
-        auto roots = queue<int>{};
+        auto roots = vector<int>{};
 
         for (auto vertex = 0; vertex != vertex_count(); ++vertex)
-            if (indegrees_[vertex] == 0) roots.push(vertex);
+            if (indegrees_[vertex] == 0) roots.push_back(vertex);
 
         return roots;
     }

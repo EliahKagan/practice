@@ -1,11 +1,11 @@
-// LeetCode #210 - Course Schedule II
-// https://leetcode.com/problems/course-schedule-ii/
+// LeetCode #210 - Course Schedule
+// https://leetcode.com/problems/course-schedule/
 // Via Kahn's algorithm with a queue (FIFO).
 
 class Solution {
 public:
-    [[nodiscard]] static vector<int>
-    findOrder(int numCourses,
+    [[nodiscard]] static bool
+    canFinish(int numCourses,
               const vector<vector<int>>& prerequisites) noexcept;
 };
 
@@ -23,7 +23,7 @@ namespace {
 
         void add_edge(int src, int dest) noexcept;
 
-        [[nodiscard]] optional<vector<int>> toposort() && noexcept;
+        [[nodiscard]] bool has_cycle() && noexcept;
 
     private:
         [[nodiscard]] int vertex_count() const noexcept
@@ -54,23 +54,21 @@ namespace {
         ++indegrees_[dest];
     }
 
-    optional<vector<int>> Graph::toposort() && noexcept
+    bool Graph::has_cycle() && noexcept
     {
-        auto out = vector<int>{};
+        auto count = vertex_count();
 
         for (auto roots = get_roots(); !empty(roots); ) {
             auto src = roots.front();
             roots.pop();
 
-            out.push_back(src);
+            --count;
 
             for (const auto dest : adj_[src])
                 if (--indegrees_[dest] == 0) roots.push(dest);
         }
 
-        if (size(out) == vertex_count()) return out;
-
-        return nullopt;
+        return count != 0;
     }
 
     queue<int> Graph::get_roots() const noexcept
@@ -83,8 +81,8 @@ namespace {
         return roots;
     }
 
-    Graph build_reverse_graph(const int vertex_count,
-                              const vector<vector<int>>& edges) noexcept
+    Graph build_graph(const int vertex_count,
+                      const vector<vector<int>>& edges) noexcept
     {
         ensure(vertex_count >= 0);
 
@@ -92,18 +90,15 @@ namespace {
 
         for (const auto& edge : edges) {
             ensure(size(edge) == 2);
-            graph.add_edge(edge[1], edge[0]);
+            graph.add_edge(edge[0], edge[1]);
         }
 
         return graph;
     }
 }
 
-vector<int>
-Solution::findOrder(int numCourses,
-                    const vector<vector<int>>& prerequisites) noexcept
+bool Solution::canFinish(const int numCourses,
+                         const vector<vector<int>>& prerequisites) noexcept
 {
-    auto order = build_reverse_graph(numCourses, prerequisites).toposort();
-    if (order) return move(*order);
-    return {};
+    return !build_graph(numCourses, prerequisites).has_cycle();
 }

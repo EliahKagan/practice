@@ -1,6 +1,6 @@
 // LeetCode #210 - Course Schedule II
 // https://leetcode.com/problems/course-schedule-ii/
-// Via Kahn's algorithm with a queue (FIFO).
+// Via Kahn's algorithm with recursive DFS with a fixed-point combinator.
 
 class Solution {
 public:
@@ -36,7 +36,7 @@ namespace {
             return 0 <= vertex && vertex < vertex_count();
         }
 
-        [[nodiscard]] queue<int> get_roots() const noexcept;
+        [[nodiscard]] vector<int> get_roots() const noexcept;
 
         vector<vector<int>> adj_;
 
@@ -58,27 +58,24 @@ namespace {
     {
         auto out = vector<int>{};
 
-        for (auto roots = get_roots(); !empty(roots); ) {
-            auto src = roots.front();
-            roots.pop();
-
+        const auto dfs = [&](const auto me, const int src) noexcept -> void {
             out.push_back(src);
 
             for (const auto dest : adj_[src])
-                if (--indegrees_[dest] == 0) roots.push(dest);
-        }
+                if (--indegrees_[dest] == 0) me(me, dest);
+        };
 
+        for (const auto root : get_roots()) dfs(dfs, root);
         if (size(out) == vertex_count()) return out;
-
         return nullopt;
     }
 
-    queue<int> Graph::get_roots() const noexcept
+    vector<int> Graph::get_roots() const noexcept
     {
-        auto roots = queue<int>{};
+        auto roots = vector<int>{};
 
         for (auto vertex = 0; vertex != vertex_count(); ++vertex)
-            if (indegrees_[vertex] == 0) roots.push(vertex);
+            if (indegrees_[vertex] == 0) roots.push_back(vertex);
 
         return roots;
     }

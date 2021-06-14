@@ -1,6 +1,6 @@
 // LeetCode #210 - Course Schedule II
 // https://leetcode.com/problems/course-schedule-ii/
-// Via Kahn's algorithm with a queue (FIFO).
+// Via Kahn's algorithm with a stack (LIFO).
 
 class Solution {
 public:
@@ -36,7 +36,7 @@ namespace {
             return 0 <= vertex && vertex < vertex_count();
         }
 
-        [[nodiscard]] queue<int> get_roots() const noexcept;
+        [[nodiscard]] stack<int> get_roots() const noexcept;
 
         vector<vector<int>> adj_;
 
@@ -59,7 +59,7 @@ namespace {
         auto out = vector<int>{};
 
         for (auto roots = get_roots(); !empty(roots); ) {
-            auto src = roots.front();
+            auto src = roots.top();
             roots.pop();
 
             out.push_back(src);
@@ -73,9 +73,9 @@ namespace {
         return nullopt;
     }
 
-    queue<int> Graph::get_roots() const noexcept
+    stack<int> Graph::get_roots() const noexcept
     {
-        auto roots = queue<int>{};
+        auto roots = stack<int>{};
 
         for (auto vertex = 0; vertex != vertex_count(); ++vertex)
             if (indegrees_[vertex] == 0) roots.push(vertex);
