@@ -10,22 +10,22 @@
  * };
  */
 
-static int dfs(const struct TreeNode *const root, int subtotal, const int total)
+static int dfs(const struct TreeNode *const root, int target)
 {
     if (!root) return 0;
 
-    printf("%d %d\n", subtotal, total);
+    target -= root->val;
 
-    subtotal += root->val;
-
-    return (subtotal == total ? 1 : 0)
-            + dfs(root->left, subtotal, total)
-            + dfs(root->left, 0, total)
-            + dfs(root->right, subtotal, total)
-            + dfs(root->right, 0, total);
+    return (target == 0 ? 1 : 0)
+            + dfs(root->left, target)
+            + dfs(root->right, target);
 }
 
-int pathSum(const struct TreeNode *const root, int targetSum)
+int pathSum(struct TreeNode* root, int targetSum)
 {
-    return dfs(root, 0, targetSum);
+    if (!root) return 0;
+
+    return dfs(root, targetSum)
+            + pathSum(root->left, targetSum)
+            + pathSum(root->right, targetSum);
 }
