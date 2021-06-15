@@ -1,5 +1,6 @@
 // LeetCode #437 - Path Sum III
 // https://leetcode.com/problems/path-sum-iii/
+// Naive recursive solution with helper function. Runs in quadratic time.
 
 /**
  * Definition for a binary tree node.
