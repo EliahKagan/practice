@@ -34,6 +34,8 @@ end
 # Adds connections due to edges.
 # Returns the number of edges that improved connectivity.
 def connect(sets, edges)
+  return 0 unless edges
+
   count = 0
 
   edges.each do |(u, v)|
