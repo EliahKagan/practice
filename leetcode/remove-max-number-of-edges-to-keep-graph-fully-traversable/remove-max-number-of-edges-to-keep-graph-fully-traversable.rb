@@ -49,7 +49,7 @@ end
 # Groups type-annotated edges by symbolic type, as unannotated edges.
 def group_edges(edges)
   edges.group_by { |(type, _u, _v)| get_group_symbol(type) }
-       .each { |_, group| group.map! { |(_, u, v)| [u, v] } }
+       .each_value { |group| group.map! { |(_, u, v)| [u, v] } }
 end
 
 def get_group_symbol(type)
