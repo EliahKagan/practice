@@ -1,9 +1,5 @@
-<Query Kind="Program" />
-
-// LeetCode #1896 - Minimum Cost to Change the Final Value of Expression scratchwork
+// LeetCode #1896 - Minimum Cost to Change the Final Value of Expression
 // https://leetcode.com/problems/minimum-cost-to-change-the-final-value-of-expression/
-
-#nullable disable
 
 public class Solution {
     public int MinOperationsToFlip(string expression)
@@ -21,13 +17,6 @@ public class Solution {
         };
     }
 
-    /// <summary>
-    /// Converts a sequence of infix notation tokens to postfix notation.
-    /// </summary>
-    /// <remarks>
-    /// Informally speaking, this is "reverse Polish notation," but I'm not
-    /// using Łukasiewicz's letter symbols (e.g. "K" for "&").
-    /// </remarks>
     private static string ToReversePolish(IEnumerable<char> infixTokens)
     {
         static void Throw(string message)
@@ -131,23 +120,4 @@ public class Solution {
                     paramName: nameof(rpn),
                     message: $"Unrecognized RPN token \"{token}\""),
         };
-
-    /// <summary>Entry point for testing.</summary>
-    private static void Main()
-    {
-        var s = new Solution();
-
-        void Test(string expression)
-            => new {
-                Infix = expression,
-                PRN = ToReversePolish(expression),
-                Result = s.MinOperationsToFlip(expression),
-            }.Dump();
-
-        Test("1&(0|1)");
-        Test("(0&0)&(0&0&0)");
-        Test("(0|(1|0&1))");
-        Test("0&0|0&0|0");
-        Test("0|0&0|0&0");
-    }
 }
