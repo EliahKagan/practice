@@ -4,24 +4,24 @@
 BOOLEAN_VALUES = {
   '0' => 0,
   '1' => 1,
-}
+}.freeze
 
 BOOLEAN_OPERATORS = {
   '&' => ->(p, q) { p & q },
   '|' => ->(p, q) { p | q },
-}
+}.freeze
 
 FALSE_DISTANCE_OPERATORS = {
   '&' => ->(p, q) { [p, q].min },
   '|' => ->(p, q) { [p + q, [p, q].min + 1].min },
-}
+}.freeze
 
 DUALS = {
   '0' => '1',
   '1' => '0',
   '&' => '|',
   '|' => '&',
-}
+}.freeze
 
 # @param {String} expression
 # @return {Integer}
@@ -60,7 +60,7 @@ def shunting_yard(infix)
       raise 'unmatched ")"' if stack.empty?
       stack.pop
     else
-      raise %{unrecognized infix token "#{token}"}
+      raise %(unrecognized infix token "#{token}")
     end
   end
 
@@ -77,16 +77,16 @@ def evaluate(rpn, operators)
   stack = [] # operands
 
   rpn.each_char do |token|
-    if operand = BOOLEAN_VALUES[token]
+    if (operand = BOOLEAN_VALUES[token])
       stack.push(operand)
-    elsif operator = operators[token]
+    elsif (operator = operators[token])
       raise 'too few operands' if stack.size < 2
 
       second = stack.pop
       first = stack.pop
       stack.push(operator.call(first, second))
     else
-      raise %{unrecognied RPN token "#{token}"}
+      raise %(unrecognied RPN token "#{token}")
     end
   end
 
@@ -96,6 +96,6 @@ end
 
 def dual(rpn)
   rpn.chars.map do |token|
-    DUALS[token] or raise %{unrecognied RPN token "#{token}"}
+    DUALS[token] or raise %(unrecognied RPN token "#{token}")
   end.join
 end
