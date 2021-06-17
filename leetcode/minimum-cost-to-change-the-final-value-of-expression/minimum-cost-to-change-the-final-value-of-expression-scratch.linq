@@ -37,7 +37,7 @@ public class Solution {
         {
             var stack = new Stack<char>(); // operators/punctuators
 
-            foreach( var token in infixTokens) {
+            foreach (var token in infixTokens) {
                 if (IsValue(token)) {
                     yield return token;
                 } else if (IsOperator(token)) {
