@@ -15,10 +15,12 @@ class PrimHeap
   end
 
   def empty?
+    check_size
     @heap.empty?
   end
 
   def size
+    check_size
     @heap.size
   end
 
@@ -50,6 +52,10 @@ class PrimHeap
 
   private
 
+  def check_size
+    raise 'bug check: size inconsistency' if @heap.size != @map.size
+  end
+
   def sift_up(child, child_entry)
     while child.positive?
       parent = (child - 1) / 2
@@ -79,7 +85,7 @@ class PrimHeap
     return nil if left >= size
 
     right = left + 1
-    right || @heap[left].value <= @heap[right].value ? left : right
+    right == size || @heap[left].value <= @heap[right].value ? left : right
   end
 
   def set(index, entry)
