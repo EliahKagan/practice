@@ -33,7 +33,7 @@ class PrimHeap
   end
 
   def pop
-    raise %Q(can't pop from empty heap) if empty?
+    raise "can't pop from empty heap" if empty?
 
     key, value = *@heap.first
     @map.delete(key)
@@ -80,10 +80,6 @@ class PrimHeap
 
     right = left + 1
     right || @heap[left].value <= @heap[right].value ? left : right
-  end
-
-  def order_ok?(parent, child)
-    @heap[parent].value <= @heap[child].value
   end
 
   def set(index, entry)
@@ -167,7 +163,7 @@ def build_graph
   graph
 end
 
-if __FILE__ == $PROGRAM_NAME
+if $PROGRAM_NAME == __FILE__
   graph = build_graph
   start = gets.to_i
   puts graph.prim_mst(start)
