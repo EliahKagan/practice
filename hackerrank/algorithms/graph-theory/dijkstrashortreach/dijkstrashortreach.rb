@@ -169,7 +169,9 @@ if $PROGRAM_NAME == __FILE__
   read_value.times do
     graph = build_graph
     start = read_value
+
     costs = graph.dijkstra(start).map { |cost| cost || -1 }
-    puts (costs[1...start] + costs[(start + 1)..-1]).join(' ')
+    display_costs = costs[1...start] + costs[(start + 1)..-1]
+    puts display_costs.join(' ')
   end
 end
