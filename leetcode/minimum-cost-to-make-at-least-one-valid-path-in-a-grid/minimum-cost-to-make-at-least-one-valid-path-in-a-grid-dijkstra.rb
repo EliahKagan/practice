@@ -138,9 +138,9 @@ class GridGraphAdapter
   def each_dest_with_weight(src_i, src_j)
     arrow = @grid[src_i][src_j]
 
-    yield [src_i, src_j + 1, (arrow == RIGHT ? 0 : 1)] unless src_j == @max_j
-    yield [src_i, src_j - 1, (arrow == LEFT ? 0 : 1)] unless src_j.zero?
-    yield [src_i + 1, src_j, (arrow == LOWER ? 0 : 1)] unless src_i == @max_i
-    yield [src_i - 1, src_j, (arrow == UPPER ? 0 : 1)] unless src_i.zero?
+    yield src_i, src_j + 1, (arrow == RIGHT ? 0 : 1) unless src_j == @max_j
+    yield src_i, src_j - 1, (arrow == LEFT ? 0 : 1) unless src_j.zero?
+    yield src_i + 1, src_j, (arrow == LOWER ? 0 : 1) unless src_i == @max_i
+    yield src_i - 1, src_j, (arrow == UPPER ? 0 : 1) unless src_i.zero?
   end
 end
