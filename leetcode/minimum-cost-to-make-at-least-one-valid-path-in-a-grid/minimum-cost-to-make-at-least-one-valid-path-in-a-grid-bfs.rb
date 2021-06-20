@@ -30,7 +30,7 @@ class GridGraphAdapter
     slow = []
     depth = 0
 
-    visit = ->(dest) do
+    visit = lambda do |dest|
       next if vis.include?(dest)
 
       vis << dest
