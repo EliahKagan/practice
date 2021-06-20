@@ -1,6 +1,6 @@
 # LeetCode #1368 - Minimum Cost to Make at Least One Valid Path in a Grid
 # https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/
-# Via Dijkstra's algorithm.
+# Via Dijkstra's algorithm, using a binary minheap + map data structure.
 
 RIGHT = 1
 LEFT = 2
@@ -13,7 +13,7 @@ def min_cost(grid)
   GridGraphAdapter.new(grid).min_cost
 end
 
-# A heap + map data structure for Prim's and Dijkstra's algorithms.
+# A binary minheap + map data structure for Prim's and Dijkstra's algorithms.
 class PrimHeap
   def initialize
     @heap = [] # index -> (key, value)
