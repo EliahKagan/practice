@@ -1,0 +1,46 @@
+Array/hashmap priority queue:
+
+    insert          O(1)
+    decrease-key    O(1)
+    find-min        O(n)
+    extract-min     O(n)
+    merge           O(n)
+
+Binary heap:
+
+    insert          O(log(n))
+    decrease-key    O(log(n))
+    find-min        O(1)
+    extract-min     O(log(n))
+    merge           O(n)
+
+Fibonacci heap:
+
+    insert          O(1)
+    decrease-key    O(1)
+    find-min        O(1)
+    extract-min     O(log(n))
+    merge           O(1)
+
+In Dijkstra's algorithm, we have:
+
+    O(E) insert or decrease-key operations at heap size O(V)
+    O(V) extract-min operations
+
+Runtime of Dijkstra's algorithm with an ARRAY/HASHMAP PRIORITY QUEUE:
+
+    O(E + V^2)          in general
+
+    O(E) = O(V^2)       in a dense graph
+
+Runtime of Dijkstra's algorithm with a BINARY HEAP:
+
+    O(E log V + V log V) = O((E + V) log V)     in general
+
+    O(E log V) = O(V^2 log V)                   in a dense graph
+
+Runtime of Dijkstra's algorithm with a FIBONACCI HEAP:
+
+    O(E + V log V)      in general
+
+    O(E) = O(V^2)       in a dense graph
