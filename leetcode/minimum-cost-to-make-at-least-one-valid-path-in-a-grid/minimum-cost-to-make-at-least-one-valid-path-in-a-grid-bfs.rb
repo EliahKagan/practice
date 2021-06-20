@@ -37,11 +37,12 @@ class GridGraphAdapter
         src_i, src_j = src
         return depth if src_i == @max_i && src_j == @max_j
 
-        dest = gratis_dest?(src_i, src_j)
-        next if dest.nil? || vis.include?(dest)
+        try_gratis_dest(src_i, src_j) do |dest|
+          break if vis.include?(dest)
 
-        vis << dest
-        fast << dest
+          vis << dest
+          fast << dest
+        end
       end
 
       until slow.empty?
@@ -63,20 +64,19 @@ class GridGraphAdapter
 
   private
 
-  def gratis_dest?(src_i, src_j)
+  def try_gratis_dest(src_i, src_j)
     case @grid[src_i][src_j]
     when RIGHT
-      return [src_i, src_j + 1] unless src_j == @max_j
+      yield [src_i, src_j + 1] unless src_j == @max_j
     when LEFT
-      return [src_i, src_j - 1] unless src_j.zero?
+      yield [src_i, src_j - 1] unless src_j.zero?
     when LOWER
-      return [src_i + 1, src_j] unless src_i == @max_i
+      yield [src_i + 1, src_j] unless src_i == @max_i
     when UPPER
-      return [src_i - 1, src_j] unless src_i.zero?
+      yield [src_i - 1, src_j] unless src_i.zero?
     else
       raise "Cell entry can't be interpreted as an arrow"
     end
-    nil
   end
 
   def each_paid_dest(src_i, src_j)
