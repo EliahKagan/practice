@@ -102,6 +102,9 @@ class PrimHeap
   private_constant :Entry
 end
 
+# Treats a rectangular grid of arrows as a weighted directed graph, with edges
+# pointing from every cell to its adjacent cells, where edges corresponding to
+# the direction of grid arrows have weight 0 and all other edges have weight 1.
 class GridGraphAdapter
   def initialize(grid)
     @grid = grid
