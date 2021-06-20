@@ -2,8 +2,6 @@
 # https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/
 # Via Dijkstra's algorithm, using 0-1 BFS.
 
-require 'set'
-
 RIGHT = 1
 LEFT = 2
 LOWER = 3
