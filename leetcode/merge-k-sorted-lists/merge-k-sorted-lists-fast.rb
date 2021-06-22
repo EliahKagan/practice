@@ -29,8 +29,7 @@ end
 # A binary-heap min priority queue comparing list nodes by value.
 class MinNodeHeap
   def initialize(heads)
-    @heap = heads.compact
-    heapify
+    @heap = heads.compact.sort_by(&:val)
   end
 
   def empty?
@@ -59,10 +58,6 @@ class MinNodeHeap
   end
 
   private
-
-  def heapify
-    (size / 2 - 1).downto(0) { |parent| sift_down(parent, @heap[parent]) }
-  end
 
   def sift_up(child, child_node)
     until child.zero?
