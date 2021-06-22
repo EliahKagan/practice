@@ -14,9 +14,7 @@
 # @return {ListNode}
 def merge_k_lists(lists)
   pre = sentinel = ListNode.new
-
-  heap = MinNodeHeap.new
-  lists.each { |head| heap.push(head) if head }
+  heap = MinNodeHeap.new(lists)
 
   until heap.empty?
     head = heap.pop
@@ -30,20 +28,25 @@ end
 
 # A binary-heap min priority queue comparing list nodes by value.
 class MinNodeHeap
-  def initialize
-    @heap = []
+  def initialize(heads)
+    @heap = heads.compact
+    heapify
   end
 
   def empty?
     @heap.empty?
   end
 
+  def size
+    @heap.size
+  end
+
   def push(node)
-    sift_up(@heap.size, node)
+    sift_up(size, node)
   end
 
   def pop
-    case @heap.size
+    case size
     when 0
       raise "can't pop from empty heap"
     when 1
@@ -56,6 +59,10 @@ class MinNodeHeap
   end
 
   private
+
+  def heapify
+    (size / 2 - 1).downto(0) { |parent| sift_down(parent, @heap[parent]) }
+  end
 
   def sift_up(child, child_node)
     until child.zero?
@@ -85,9 +92,9 @@ class MinNodeHeap
 
   def pick_child(parent)
     left = parent * 2 + 1
-    return nil if left >= @heap.size
+    return nil if left >= size
 
     right = left + 1
-    right != @heap.size && @heap[right].val < @heap[left].val ? right : left
+    right != size && @heap[right].val < @heap[left].val ? right : left
   end
 end
