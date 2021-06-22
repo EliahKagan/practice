@@ -46,8 +46,9 @@ class PriorityQueue
   end
 
   def top
-    @elems[0]
-  rescue IndexError
+    ret = @elems[0]
+    return ret if ret
+
     raise PriorityQueueError, "can't read top of empty priority queue"
   end
 
