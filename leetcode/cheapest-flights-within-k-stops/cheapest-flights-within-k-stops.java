@@ -9,7 +9,7 @@ class Solution {
         for (var flight : flights)
             graph.addEdge(flight[0], flight[1], flight[2]);
 
-        return graph.minPathCost(src, dst, k);
+        return graph.minPathCost(src, dst, k + 1);
     }
 }
 
@@ -36,16 +36,18 @@ final class Graph {
         costs[start] = 0;
         queue.add(start);
 
-        for (var depth = 0; depth <= maxDepth; ++depth) {
+        for (var depth = 0; depth < maxDepth; ++depth) {
             if (queue.isEmpty()) break;
 
-            var src = queue.remove();
+            for (var breadth = queue.size(); breadth > 0; --breadth) {
+                var src = queue.remove();
 
-            for (var edge : _adj.get(src)) {
-                if (costs[edge.dest] == null
-                        || costs[src] + edge.weight < costs[edge.dest]) {
-                    costs[edge.dest] = costs[src] + edge.weight;
-                    queue.add(edge.dest);
+                for (var edge : _adj.get(src)) {
+                    if (costs[edge.dest] == null
+                            || costs[src] + edge.weight < costs[edge.dest]) {
+                        costs[edge.dest] = costs[src] + edge.weight;
+                        queue.add(edge.dest);
+                    }
                 }
             }
         }
