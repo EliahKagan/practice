@@ -3,13 +3,15 @@
 // Via BFS with relaxations (compare to Dijkstra's algorithm).
 
 class Solution {
-    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
-        var graph = new Graph(n);
+    public int
+    findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+        return buildGraph(n, flights).minPathCost(src, dst, k + 1);
+    }
 
-        for (var flight : flights)
-            graph.addEdge(flight[0], flight[1], flight[2]);
-
-        return graph.minPathCost(src, dst, k + 1);
+    private static Graph buildGraph(int vertexCount, int[][] edges) {
+        var graph = new Graph(vertexCount);
+        for (var edge : edges) graph.addEdge(edge[0], edge[1], edge[2]);
+        return graph;
     }
 }
 
@@ -31,35 +33,41 @@ final class Graph {
         ensureExists(start);
         ensureExists(finish);
 
-        var costs = new Integer[vertexCount()];
-        Queue<Integer> queue = new ArrayDeque<>();
+        var costs = new int[vertexCount()];
+        Arrays.fill(costs, -1);
         costs[start] = 0;
-        queue.add(start);
 
-        for (var depth = 0; depth < maxDepth; ++depth) {
-            if (queue.isEmpty()) break;
+        Queue<VertexCostPair> queue = new ArrayDeque<>();
+        queue.add(new VertexCostPair(start, 0));
 
+        while (maxDepth-- > 0 && !queue.isEmpty()) {
             for (var breadth = queue.size(); breadth > 0; --breadth) {
                 var src = queue.remove();
 
-                for (var edge : _adj.get(src)) {
-                    if (costs[edge.dest] == null
-                            || costs[src] + edge.weight < costs[edge.dest]) {
-                        costs[edge.dest] = costs[src] + edge.weight;
-                        queue.add(edge.dest);
-                    }
+                for (var edge : _adj.get(src.vertex)) {
+                    // Use the enqueued source cost, since that was the cost to
+                    // get here via BFS; costs[src] may already be lower, but
+                    // using it may take a path that exceeds the depth limit.
+                    var newCost = src.cost + edge.weight;
+
+                    if (costs[edge.dest] != NO_ROUTE
+                            && costs[edge.dest] <= newCost)
+                        continue;
+
+                    costs[edge.dest] = newCost;
+                    queue.add(new VertexCostPair(edge.dest, newCost));
                 }
             }
         }
 
-        return costs[finish] == null ? NO_ROUTE : costs[finish];
+        return costs[finish];
     }
 
-    private int vertexCount() {
+    int vertexCount() {
         return _adj.size();
     }
 
-    private void ensureExists(int vertex) {
+    void ensureExists(int vertex) {
         if (!(0 <= vertex && vertex < vertexCount()))
             throw new IllegalArgumentException("vertex out of range");
     }
@@ -76,4 +84,15 @@ final class OutEdge {
     final int dest;
 
     final int weight;
+}
+
+final class VertexCostPair {
+    VertexCostPair(int vertex, int cost) {
+        this.vertex = vertex;
+        this.cost = cost;
+    }
+
+    final int vertex;
+
+    final int cost;
 }
