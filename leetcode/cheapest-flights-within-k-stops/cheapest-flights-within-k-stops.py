@@ -36,7 +36,6 @@ class Graph:
         self._adj[src].append((dest, weight))
 
     def min_path_cost(self, start, finish, max_depth):
-        print(f'start={start}, finish={finish}')
         self._check(start)
         self._check(finish)
 
@@ -50,7 +49,6 @@ class Graph:
                 break
 
             for _ in range(len(queue)):
-                print(queue)
                 src, src_cost = queue.popleft()
 
                 for dest, weight in self._adj[src]:
