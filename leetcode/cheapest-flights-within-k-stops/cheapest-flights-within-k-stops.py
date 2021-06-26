@@ -9,12 +9,17 @@ class Solution:
                           src: int,
                           dst: int,
                           k: int) -> int:
-        graph = Graph(n)
-        for src, dest, weight in flights:
-            graph.add_edge(src, dest, weight)
-
-        min_cost = graph.min_path_cost(src, dst, k + 1)
+        min_cost = build_graph(n, flights).min_path_cost(src, dst, k + 1)
         return -1 if min_cost == math.inf else min_cost
+
+
+def build_graph(vertex_count, edges):
+    graph = Graph(vertex_count)
+
+    for src, dest, weight in edges:
+        graph.add_edge(src, dest, weight)
+
+    return graph
 
 
 class Graph:
