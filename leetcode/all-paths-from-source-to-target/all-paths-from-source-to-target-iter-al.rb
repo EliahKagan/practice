@@ -1,6 +1,8 @@
 # LeetCode #797 - All Paths From Source to Target
 # https://leetcode.com/problems/all-paths-from-source-to-target/
-# Iteratively implemented backtracking solution.
+# Iteratively implemented backtracking solution. The state machine uses "arm's
+# length" recursion (which is rarely appropriate in actual recursive code, but
+# which sometimes simplifies state machines simulating recursion).
 
 # @param {Integer[][]} graph
 # @return {Integer[][]}
