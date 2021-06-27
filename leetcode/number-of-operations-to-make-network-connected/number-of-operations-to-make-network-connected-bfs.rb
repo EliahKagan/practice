@@ -54,14 +54,14 @@ class Graph
       return false if vis[start]
 
       vis[start] = true
-      stack = [start]
+      queue = [start]
 
-      until stack.empty?
-        @adj[stack.shift].each do |dest|
+      until queue.empty?
+        @adj[queue.shift].each do |dest|
           next if vis[dest]
 
           vis[dest] = true
-          stack << dest
+          queue << dest
         end
       end
 
