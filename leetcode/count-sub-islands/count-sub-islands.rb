@@ -27,9 +27,7 @@ def count_sub_islands(grid1, grid2)
 
   (0...height).sum do |i|
     (0...width).count do |j|
-      found = grid2[i][j] != 0 && maybe_subisland.call(i, j)
-      puts "(#{i}, #{j})" if found
-      found
+      grid2[i][j] != 0 && maybe_subisland.call(i, j)
     end
   end
 end
