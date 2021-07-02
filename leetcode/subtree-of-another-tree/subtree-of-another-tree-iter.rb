@@ -17,7 +17,7 @@
 def is_subtree(root, sub_root)
   table = {} # val, left_id, right_id => id
   traverse(root, table, true)
-  !!traverse(sub_root, table, false)
+  traverse(sub_root, table, false)
 end
 
 def traverse(root, table, add_if_absent)
@@ -53,7 +53,7 @@ def traverse(root, table, add_if_absent)
       last_id = table[key]
 
       unless last_id
-        return nil unless add_if_absent
+        return false unless add_if_absent
         table[key] = last_id = table.size + 1
       end
 
@@ -61,7 +61,7 @@ def traverse(root, table, add_if_absent)
     end
   end
 
-  last_id
+  true
 end
 
 # A stack frame for iteratively implemented recursive binary tree traversal.
