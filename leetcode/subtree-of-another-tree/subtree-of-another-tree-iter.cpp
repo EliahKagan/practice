@@ -84,13 +84,6 @@ namespace {
 
         auto last_id = -1; // "return" cell
 
-        const auto visit = [&](const TreeNode* const node) noexcept {
-            if (node)
-                stack.emplace(node);
-            else
-                last_id = 0;
-        };
-
         while (!empty(stack)) {
             auto& frame = stack.top();
 
