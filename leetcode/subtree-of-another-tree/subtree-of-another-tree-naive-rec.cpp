@@ -15,7 +15,7 @@
  */
 class Solution {
 public:
-    [[nodiscard]] static bool
+    [[nodiscard]] static constexpr bool
     isSubtree(const TreeNode* root, const TreeNode* subRoot) noexcept;
 };
 
@@ -32,8 +32,8 @@ namespace {
     }
 }
 
-bool Solution::isSubtree(const TreeNode* const root,
-                         const TreeNode* const subRoot) noexcept
+constexpr bool Solution::isSubtree(const TreeNode* const root,
+                                   const TreeNode* const subRoot) noexcept
 {
     if (equal_trees(root, subRoot)) return true;
 
