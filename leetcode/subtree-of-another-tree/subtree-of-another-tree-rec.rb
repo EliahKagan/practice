@@ -27,7 +27,13 @@ def is_subtree(root, sub_root)
   find = lambda do |node|
     return 0 unless node
 
-    table[[node.val, find.call(node.left), find.call(node.right)]]
+    left = find.call(node.left)
+    return nil unless left
+
+    right = find.call(node.right)
+    return nil unless right
+
+    table[[node.val, left, right]]
   end
 
   add.call(root)
