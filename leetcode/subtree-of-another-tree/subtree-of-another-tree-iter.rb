@@ -1,7 +1,7 @@
 # LeetCode #572 - Subtree of Another Tree
 # https://leetcode.com/problems/subtree-of-another-tree/
 # By hashing, linear O(M + N) runtime, implemented iteratively. The state
-# machine implements the same logic as in subtree-of-another-tree.rb.
+# machine implements the same logic as in subtree-of-another-tree-rec.rb.
 
 # Definition for a binary tree node.
 # class TreeNode
