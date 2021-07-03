@@ -1,6 +1,9 @@
 # LeetCode #572 - Subtree of Another Tree
 # https://leetcode.com/problems/subtree-of-another-tree/
-# By hashing, linear O(M + N) runtime, implemented iteratively.
+# By hashing, linear O(M + N) runtime, implemented iteratively. The state
+# machine uses "arm's length" recursion (which is rarely appropriate in actual
+# recursive code, but which sometimes simplifies or improves the performance
+# state machines simulating recursion).
 
 # Definition for a binary tree node.
 # class TreeNode
