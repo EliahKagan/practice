@@ -79,12 +79,10 @@ namespace {
     bool traverse(conditional_t<AddIfAbsent, Table&, const Table&> table,
                   const TreeNode* const root) noexcept
     {
-        auto stack = std::stack<Frame>{};
-        if (root) stack.emplace(root);
-
         auto last_id = -1; // "return" cell
+        auto stack = std::stack<Frame>{};
 
-        while (!empty(stack)) {
+        for (stack.emplace(root); !empty(stack); ) {
             auto& frame = stack.top();
 
             switch (frame.state) {

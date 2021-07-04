@@ -83,52 +83,50 @@ namespace {
     using Table = unordered_map<Key, int>;
 
     enum class State { go_left, go_right, retreat };
-    
+
     struct Frame {
         explicit constexpr Frame(const TreeNode* const node_) noexcept
             : node{node_} { }
-        
+
         const TreeNode* node;
-        
+
         int left_id {-1};
-        
+
         State state {State::go_left};
     };
-    
+
     template<bool AddIfAbsent>
     bool traverse(conditional_t<AddIfAbsent, Table&, const Table&> table,
                   const TreeNode* const root) noexcept
     {
-        auto stack = std::stack<Frame>{};
-        if (root) stack.emplace(root);
-        
         auto last_id = -1; // "return" cell
-        
+        auto stack = std::stack<Frame>{};
+
         const auto visit = [&](const TreeNode* const node) noexcept {
             if (node)
                 stack.emplace(node);
             else
                 last_id = 0;
         };
-        
-        while (!empty(stack)) {
+
+        for (visit(root); !empty(stack); ) {
             auto& frame = stack.top();
-            
+
             switch (frame.state) {
             case State::go_left:
                 frame.state = State::go_right;
                 visit(frame.node->left);
                 break;
-                    
+
             case State::go_right:
                 frame.left_id = last_id;
                 frame.state = State::retreat;
                 visit(frame.node->right);
                 break;
-                    
+
             case State::retreat:
                 const auto key = Key{frame.node->val, frame.left_id, last_id};
-                    
+
                 if (const auto it = table.find(key); it != end(table)) {
                     last_id = it->second;
                 } else if constexpr (AddIfAbsent) {
@@ -137,11 +135,11 @@ namespace {
                 } else {
                     return false;
                 }
-                    
+
                 stack.pop();
             }
         }
-        
+
         return true;
     }
 }
