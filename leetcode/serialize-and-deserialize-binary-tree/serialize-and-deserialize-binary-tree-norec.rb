@@ -31,7 +31,11 @@ def serialize(root)
     end
 
     cur = stack.last
-    tokens << '.' unless cur.left
+
+    unless cur.right && cur.right == post
+       # We have not gone right. Do the inorder action.
+      tokens << '.' unless cur.left
+    end
 
     if cur.right && cur.right != post
       # We can go right, but haven't. Do that next.
