@@ -30,7 +30,7 @@ def is_valid_bst(root)
     return false unless acc < cur.val
     acc = cur.val
 
-    # If there's a left subtree from here, traverse there next.
+    # If there's a right subtree from here, traverse there next.
     root = cur.right
   end
 
