@@ -64,6 +64,9 @@ def longest_increasing_path(matrix)
         frame.acc = ret if frame.acc < ret
         dp[[i, j]] = ret = frame.acc + 1
         stack.pop
+
+      else
+        raise "unrecognized state: #{frame.state}"
       end
     end
 
