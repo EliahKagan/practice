@@ -15,12 +15,13 @@ def longest_increasing_path(matrix)
     end
   end
 
-  dp = {} # maximum forward path lengths
+  dp = Array.new(height) { [nil] * width } # maximum forward path lengths
 
   dfs = lambda do |i, j|
-    dp[[i, j]] ||=
+    dp[i][j] ||=
       (neighbors.call(i, j).map { |h, k| dfs.call(h, k) }.max || 0) + 1
   end
 
-  (0...height).map { |i| (0...width).map { |j| dfs.call(i, j) }.max }.max
+  (0...height).each { |i| (0...width).each { |j| dfs.call(i, j) } }
+  dp.map(&:max).max
 end

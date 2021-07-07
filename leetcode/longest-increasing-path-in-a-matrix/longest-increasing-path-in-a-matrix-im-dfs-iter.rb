@@ -7,10 +7,10 @@
 def longest_increasing_path(matrix)
   height = matrix.size
   width = matrix.first.size
-  dp = {} # maximum forward path lengths
+  dp = Array.new(height) { [nil] * width } # maximum forward path lengths
 
   dfs = lambda do |start_i, start_j|
-    ret = dp[[start_i, start_j]]
+    ret = dp[start_i][start_j]
     return ret unless ret.nil?
 
     stack = [Frame.new(start_i, start_j)]
@@ -26,7 +26,7 @@ def longest_increasing_path(matrix)
 
         if j.zero? || matrix[i][j] >= matrix[i][j - 1]
           ret = 0
-        elsif (ret = dp[[i, j - 1]]).nil?
+        elsif (ret = dp[i][j - 1]).nil?
           stack << Frame.new(i, j - 1)
         end
 
@@ -36,7 +36,7 @@ def longest_increasing_path(matrix)
 
         if j + 1 == width || matrix[i][j] >= matrix[i][j + 1]
           ret = 0
-        elsif (ret = dp[[i, j + 1]]).nil?
+        elsif (ret = dp[i][j + 1]).nil?
           stack << Frame.new(i, j + 1)
         end
 
@@ -46,7 +46,7 @@ def longest_increasing_path(matrix)
 
         if i.zero? || matrix[i][j] >= matrix[i - 1][j]
           ret = 0
-        elsif (ret = dp[[i - 1, j]]).nil?
+        elsif (ret = dp[i - 1][j]).nil?
           stack << Frame.new(i - 1, j)
         end
 
@@ -56,13 +56,13 @@ def longest_increasing_path(matrix)
 
         if i + 1 == height || matrix[i][j] >= matrix[i + 1][j]
           ret = 0
-        elsif (ret = dp[[i + 1, j]]).nil?
+        elsif (ret = dp[i + 1][j]).nil?
           stack << Frame.new(i + 1, j)
         end
 
       when :retreat
         frame.acc = ret if frame.acc < ret
-        dp[[i, j]] = ret = frame.acc + 1
+        dp[i][j] = ret = frame.acc + 1
         stack.pop
 
       else
@@ -73,7 +73,8 @@ def longest_increasing_path(matrix)
     ret
   end
 
-  (0...height).map { |i| (0...width).map { |j| dfs.call(i, j) }.max }.max
+  (0...height).each { |i| (0...width).each { |j| dfs.call(i, j) } }
+  dp.map(&:max).max
 end
 
 # A stack frame for iteratively implemented recursive implicit-graph DFS.
