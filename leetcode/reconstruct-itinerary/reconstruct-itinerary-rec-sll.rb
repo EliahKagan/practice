@@ -9,10 +9,9 @@ def find_itinerary(tickets)
   start = Node.new(nil, 'JFK')
 
   dfs = lambda do |node|
-    neighbors = adj[node.value]
-    next unless neighbors
-
-    dfs.call(Node.new(node, neighbors.shift)) until neighbors.empty?
+    while (dest = adj[node.value]&.shift)
+      dfs.call(Node.new(node, dest))
+    end
   end
 
   dfs.call(start)
