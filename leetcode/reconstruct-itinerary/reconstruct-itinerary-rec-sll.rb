@@ -26,7 +26,7 @@ def build_adjacency_list(tickets)
   adj
 end
 
-# A doubly linked list node.
+# A singly linked list node.
 class Node
   include Enumerable
 
