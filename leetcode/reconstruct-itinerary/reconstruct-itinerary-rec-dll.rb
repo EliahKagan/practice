@@ -28,6 +28,8 @@ end
 
 # A doubly linked list node.
 class Node
+  include Enumerable
+
   attr_reader :prev, :next, :value
 
   def initialize(prev, value)
@@ -44,19 +46,7 @@ class Node
     @value = value
   end
 
-  def to_a
-    values = []
-    each_from_here_forward { |value| values << value }
-    values
-  end
-
-  protected
-
-  attr_writer :prev, :next
-
-  private
-
-  def each_from_here_forward
+  def each
     node = self
 
     while node
@@ -64,4 +54,8 @@ class Node
       node = node.next
     end
   end
+
+  protected
+
+  attr_writer :prev, :next
 end
