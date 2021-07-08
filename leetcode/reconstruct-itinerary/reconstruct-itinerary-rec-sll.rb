@@ -10,7 +10,7 @@ def find_itinerary(tickets)
 
   dfs = lambda do |node|
     neighbors = adj[node.value]
-    next unless neighbors
+    return unless neighbors
 
     dfs.call(Node.new(node, neighbors.shift)) until neighbors.empty?
   end
