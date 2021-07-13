@@ -17,10 +17,10 @@
 # @return {Boolean}
 def is_cousins(root, x, y)
   x_path = parent_path(root, x)
-  return false if x_path&.empty?
+  return false if x_path.nil? || x_path.empty?
 
   y_path = parent_path(root, y)
-  return false if y_path&.empty?
+  return false if y_path.nil? || y_path.empty?
 
   x_path.size == y_path.size && x_path.last != y_path.last
 end
