@@ -16,10 +16,9 @@
 # @return {TreeNode}
 def sufficient_subset(root, limit)
   if root.left || root.right
-    ret = nil
-    ret = root if root.left &&= sufficient_subset(root.left, limit - root.val)
-    ret = root if root.right &&= sufficient_subset(root.right, limit - root.val)
-    ret
+    root.left &&= sufficient_subset(root.left, limit - root.val)
+    root.right &&= sufficient_subset(root.right, limit - root.val)
+    root.left || root.right ? root : nil
   elsif root.val < limit
     nil
   else
