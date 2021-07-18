@@ -6,6 +6,7 @@
 
 $VERBOSE = 1
 
+# A vertex-weighted (edge-unweighted) undirected graph.
 class Graph
   def initialize(weights)
     @weights = [nil, *weights]
@@ -17,6 +18,7 @@ class Graph
 
   def add_edge(u, v)
     raise 'vertex out of range' unless exists?(u) && exists?(v)
+
     @adj[u] << v
     @adj[v] << u
     @degrees[u] += 1
@@ -24,6 +26,9 @@ class Graph
     nil
   end
 
+  # Assumes the graph is a tree (or forest) and computes the minimum absolute
+  # difference between total weights of components separated by the removal of
+  # a single edge.
   def min_cut_difference
     weights = @weights.dup
     degrees = @degrees.dup
