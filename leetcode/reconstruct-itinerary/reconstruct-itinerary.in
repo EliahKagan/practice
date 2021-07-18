@@ -1,0 +1,4 @@
+[["MUC","LHR"],["JFK","MUC"],["SFO","SJC"],["LHR","SFO"]]
+[["JFK","SFO"],["JFK","ATL"],["SFO","ATL"],["ATL","JFK"],["ATL","SFO"]]
+[["JFK","SFO"],["JFK","ZTL"],["SFO","ZTL"],["ZTL","JFK"],["ZTL","SFO"]]
+[["JFK","AAA"],["JFK","BBB"],["BBB","JFK"]]
