@@ -59,7 +59,7 @@ class Graph
         when :black
           next
         else
-          raise 'unrecognized vistation state'
+          raise 'unrecognized visitation state'
         end
       end
     end
