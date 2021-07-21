@@ -23,5 +23,7 @@ def watched_videos_by_friends(watched_videos, friends, id, level)
     end
   end
 
-  queue.flat_map { |i| watched_videos[i] }.uniq.sort!
+  freqs = Hash.new(0)
+  queue.each { |i| watched_videos[i].each { |vid| freqs[vid] += 1 } }
+  freqs.sort_by { |vid, freq| [freq, vid] }.map { |vid, _| vid }
 end
