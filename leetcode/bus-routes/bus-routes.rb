@@ -2,6 +2,8 @@
 # https://leetcode.com/problems/bus-routes/
 # By BFS on the undirected bipartite graph of buses and bus stops.
 
+NO_ROUTE = -1
+
 # @param {Integer[][]} routes
 # @param {Integer} source
 # @param {Integer} target
@@ -9,13 +11,13 @@
 def num_buses_to_destination(routes, source, target)
   graph = build_graph(routes)
 
-  bus_bias = graph.order - routes.size
-  STDERR.puts "bus_bias=#{bus_bias}, source=#{source}, target=#{target}"
-  raise 'source stop is out of range' unless source.between?(0, bus_bias - 1)
-  raise 'target stop is out of range' unless target.between?(0, bus_bias - 1)
+  stops = 0...(graph.order - routes.size)
+  unless stops.include?(source) && stops.include?(target)
+    return source == target ? 0 : NO_ROUTE
+  end
 
   bi_distance = graph.bfs(source, target)
-  return -1 unless bi_distance
+  return NO_ROUTE unless bi_distance
 
   raise 'bug: even-length route expected, got odd' if bi_distance.odd?
   bi_distance / 2
