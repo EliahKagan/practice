@@ -52,6 +52,8 @@ class Graph
 
     @adj[u] << v
     @adj[v] << u
+
+    nil
   end
 
   # Searches breadth-first from start to finish, returning the minimum
