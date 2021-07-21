@@ -1,3 +1,7 @@
+// LeetCode 1311 - Get Watched Videos by Your Friends
+// https://leetcode.com/problems/get-watched-videos-by-your-friends/
+// By BFS.
+
 class Solution {
 public:
     [[nodiscard]] static vector<string>
@@ -13,6 +17,8 @@ namespace {
                                         int level) noexcept
     {
         auto vis = vector<char>(size(adj));
+        vis[start] = true;
+
         auto cur = vector{start};
         auto nxt = vector<int>{};
 
@@ -72,8 +78,5 @@ Solution::watchedVideosByFriends(const vector<vector<string>>& watchedVideos,
                                  const int level) noexcept
 {
     const auto level_ids = bfs_level(friends, id, level);
-
-    copy(cbegin(level_ids), cend(level_ids), ostream_iterator<int>{cout, "\n"});
-
     return consolidate_sort(concat_indexed_bins(watchedVideos, level_ids));
 }
