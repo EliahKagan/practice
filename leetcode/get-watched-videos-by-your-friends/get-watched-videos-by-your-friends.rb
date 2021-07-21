@@ -8,13 +8,18 @@
 # @param {Integer} level
 # @return {String[]}
 def watched_videos_by_friends(watched_videos, friends, id, level)
-  vis = [false] * friends.size
-  vis[id] = true
-  queue = [id]
+  vids = bfs_level(friends, id, level).flat_map { |i| watched_videos[i] }
+  consolidate_sort(vids)
+end
+
+def bfs_level(adj, start, level)
+  vis = [false] * adj.size
+  vis[start] = true
+  queue = [start]
 
   level.times do
     queue.size.times do
-      friends[queue.shift].each do |dest|
+      adj[queue.shift].each do |dest|
         next if vis[dest]
 
         vis[dest] = true
@@ -23,7 +28,11 @@ def watched_videos_by_friends(watched_videos, friends, id, level)
     end
   end
 
+  queue
+end
+
+def consolidate_sort(videos)
   freqs = Hash.new(0)
-  queue.each { |i| watched_videos[i].each { |vid| freqs[vid] += 1 } }
+  videos.each { |vid| freqs[vid] += 1 }
   freqs.sort_by { |vid, freq| [freq, vid] }.map { |vid, _| vid }
 end
