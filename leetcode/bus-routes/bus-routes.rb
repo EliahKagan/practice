@@ -10,6 +10,7 @@ def num_buses_to_destination(routes, source, target)
   graph = build_graph(routes)
 
   bus_bias = graph.order - routes.size
+  STDERR.puts "bus_bias=#{bus_bias}, source=#{source}, target=#{target}"
   raise 'source stop is out of range' unless source.between?(0, bus_bias - 1)
   raise 'target stop is out of range' unless target.between?(0, bus_bias - 1)
 
