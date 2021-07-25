@@ -13,19 +13,13 @@ def closed_island(grid)
 
     return true unless grid[i][j].zero?
 
-    grid[i][j] = 2
+    grid[i][j] = 1
 
     dfs.call(i, j - 1) & dfs.call(i, j + 1) &
         dfs.call(i - 1, j) & dfs.call(i + 1, j)
   end
 
   (0...height).sum do |i|
-    (0...width).count do |j|
-      next unless grid[i][j].zero?
-
-      res = dfs.call(i, j)
-      puts "(#{i}, #{j}) -> #{res}"
-      res
-    end
+    (0...width).count { |j| grid[i][j].zero? && dfs.call(i, j) }
   end
 end
