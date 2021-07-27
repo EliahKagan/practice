@@ -1,6 +1,6 @@
 # LeetCode #15 - 3Sum
 # https://leetcode.com/problems/3sum/
-# By two pointers, repeated for each suffix, with hash-based duplicate removal.
+# By two pointers, repeated for each suffix, avoiding duplicates.
 
 # @param {Integer[]} nums
 # @return {Integer[][]}
@@ -12,9 +12,11 @@ def three_sum(nums)
     first = nums.shift
     pairs = two_sum(nums, -first)
     triplets.concat(pairs.each { |pair| pair.unshift(first) })
+
+    nums.shift while nums.first == first
   end
 
-  triplets.uniq
+  triplets
 end
 
 def two_sum(nums, target)
@@ -24,11 +26,19 @@ def two_sum(nums, target)
   right = nums.size - 1
 
   while left < right
-    sum = nums[left] + nums[right]
+    first = nums[left]
+    second = nums[right]
+    sum = first + second
 
-    pairs << [nums[left], nums[right]] if sum == target
-    left += 1 if sum <= target
-    right -= 1 if sum >= target
+    pairs << [first, second] if sum == target
+
+    if sum <= target
+      left += 1 while left < right && nums[left] == first
+    end
+
+    if sum >= target
+      right -= 1 while left < right && nums[right] == second
+    end
   end
 
   pairs
