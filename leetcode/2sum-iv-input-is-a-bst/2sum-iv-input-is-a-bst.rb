@@ -31,8 +31,8 @@ end
 
 def bst_has?(root, val)
   while root
-    return true if root.val == val
-    root = (root.val < val ? root.left : root.right)
+    return true if val == root.val
+    root = (val < root.val ? root.left : root.right)
   end
 
   false
