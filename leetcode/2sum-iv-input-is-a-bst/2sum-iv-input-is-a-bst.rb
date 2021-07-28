@@ -15,25 +15,29 @@
 # @param {Integer} target
 # @return {Boolean}
 def find_target(root, target)
-  each_val(root) { |val| return true if bst_has?(root, target - val) }
+  each_node(root) do |cur|
+    other = find(root, target - cur.val)
+    return true if other && other != cur
+  end
+
   false
 end
 
-def each_val(root)
+def each_node(root)
   return unless root
 
-  each_val(root.left) { |val| yield val }
-  yield root.val
-  each_val(root.right) { |val| yield val }
+  each_node(root.left) { |node| yield node }
+  yield root
+  each_node(root.right) { |node| yield node }
 
   nil
 end
 
-def bst_has?(root, val)
+def find(root, val)
   while root
-    return true if val == root.val
+    return root if val == root.val
     root = (val < root.val ? root.left : root.right)
   end
 
-  false
+  nil
 end
