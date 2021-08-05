@@ -1,0 +1,8 @@
+#!/bin/sh
+
+find . -iname '*readme*' \
+       ! -name 'readmes' \
+       -printf '%p:\n\n' \
+       -execdir sed 's/^/   /' {} \; \
+       -printf '\n' |
+    less
