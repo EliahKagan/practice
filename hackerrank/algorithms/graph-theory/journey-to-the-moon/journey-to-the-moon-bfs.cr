@@ -26,10 +26,10 @@ class Graph
     (0...@adj.size)
       .each
       .reject { |start| vis[start] }
-      .map { |start| dfs(vis, start) }
+      .map { |start| bfs(vis, start) }
   end
 
-  private def dfs(vis, start)
+  private def bfs(vis, start)
     raise "Bug: start vertex already visited" if vis[start]
     vis[start] = true
     queue = Deque{start}

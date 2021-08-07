@@ -1,4 +1,5 @@
 #!/bin/sh
+# readmes - shows readme files' names and contents
 
 find . -iname '*readme*' \
        ! -name 'readmes' \

@@ -1,0 +1,4 @@
+#!/bin/sh
+# bfs-called-dfs - find files that *might* mistakenly call a bfs routine "dfs"
+
+grep -rFi --include '*bfs*' --exclude bfs-called-dfs dfs .

@@ -27,12 +27,12 @@ class Graph
     (0...@adj.size)
       .lazy
       .reject { |start| vis[start] }
-      .map { |start| dfs(vis, start) }
+      .map { |start| bfs(vis, start) }
   end
 
   private
 
-  def dfs(vis, start)
+  def bfs(vis, start)
     raise 'Bug: start vertex already visited' if vis[start]
 
     vis[start] = true
