@@ -9,7 +9,7 @@ def contains_cycle(grid)
   width = grid.first.size
   vis = Array.new(height) { [false] * width }
 
-  dfs = proc do |start_i, start_j|
+  bfs = proc do |start_i, start_j|
     vis[start_i][start_j] = true
     queue = [[start_i, start_j, start_i, start_j]]
 
@@ -33,7 +33,7 @@ def contains_cycle(grid)
 
   0.upto(height - 1) do |start_i|
     0.upto(width - 1) do |start_j|
-      dfs.call(start_i, start_j) unless vis[start_i][start_j]
+      bfs.call(start_i, start_j) unless vis[start_i][start_j]
     end
   end
 

@@ -11,7 +11,7 @@ def contains_cycle(grid)
 
   vertex_count = neighbor_count = component_count = 0
 
-  dfs = lambda do |i, j|
+  bfs = lambda do |i, j|
     raise 'component already visited' if vis[i][j]
 
     vis[i][j] = true
@@ -40,7 +40,7 @@ def contains_cycle(grid)
       next if vis[i][j]
 
       component_count += 1
-      dfs.call(i, j)
+      bfs.call(i, j)
     end
   end
 
