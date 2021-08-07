@@ -1,4 +1,4 @@
-# LeetCde #1254 - Number of Closed Islands
+# LeetCode #1254 - Number of Closed Islands
 # https://leetcode.com/problems/number-of-closed-islands/
 # By BFS.
 
@@ -8,7 +8,7 @@ def closed_island(grid)
   height = grid.size
   width = grid.first.size
 
-  dfs = lambda do |i, j|
+  bfs = lambda do |i, j|
     closed = true
     queue = [[i, j]]
 
@@ -30,6 +30,6 @@ def closed_island(grid)
   end
 
   (0...height).sum do |i|
-    (0...width).count { |j| grid[i][j].zero? && dfs.call(i, j) }
+    (0...width).count { |j| grid[i][j].zero? && bfs.call(i, j) }
   end
 end
