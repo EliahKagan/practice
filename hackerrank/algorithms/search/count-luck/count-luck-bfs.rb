@@ -15,7 +15,7 @@ class Board
 
   # Counts the number of junctions on the correct path. Fills in the path.
   def fill_count_branches
-    dfs(*start)
+    bfs(*start)
   end
 
   private
@@ -48,7 +48,7 @@ class Board
     raise 'start location not found'
   end
 
-  def dfs(i, j)
+  def bfs(i, j)
     queue = [[i, j, 0]]
 
     until queue.empty?
