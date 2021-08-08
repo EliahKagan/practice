@@ -57,6 +57,8 @@ class Graph
   def minimize_max_edge_weight(start, finish)
     raise 'vertex out of range' unless exists?(start) && exists?(finish)
 
+    return 0 if start == finish
+
     ret = @weights.sort.bsearch { |weight| bfs(start, finish, weight) }
     raise 'destination vertex not reachable' unless ret
 
@@ -70,7 +72,7 @@ class Graph
   end
 
   def bfs(start, finish, max_weight)
-    return true if start == finish
+    raise "bfs helper expects start and finish to differ" if start == finish
 
     vis = [false] * order
     vis[start] = true
