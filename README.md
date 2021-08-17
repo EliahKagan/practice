@@ -1,7 +1,7 @@
 # practice - current repository of my solutions to coding exercises/challenges
 
 These are my solutions to coding and algorithms exercises (practice problems /
-competitive programming problems) since mid-2020.
+competitive programming problems) since April 2020.
 
 ## License
 
