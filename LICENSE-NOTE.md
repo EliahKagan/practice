@@ -7,11 +7,11 @@ also the license under which this repository, as a whole, is offered. See
 However, a small amount of code and other content in this repository is not
 written by me. I believe the doctrine of fair use permits to me to include it,
 where I have done so. When I have doubted that fair use permits this, I have
-tried always to omit such code and other content, even when doing so would
-make my own work less clear or useful. I believe it is possible to discern,
-with minimal effort, which content I am claiming to have written. In cases
-where I have doubted this, I have tried either to omit any content not written
-by me, or I have included an explicit statement explaining the situation.
+tried always to omit such code and other content, even when doing so would make
+my own work less clear or useful. I believe it is possible to discern, with
+minimal effort, which content I am claiming to have written. In cases where I
+have doubted this, I have tried either to omit any content not written by me,
+or I have included an explicit statement explaining the situation.
 
 The reason this repository contains some (though it is a small amount) of
 content not written by me relates to the nature of practice and competitive
@@ -41,7 +41,7 @@ docstrings) containing at least one of the following:
    problem setter, not me.
 
 5. Directions, written imperatively, instructing people solving the problem (in
-   the context of this repository, that's me) on how to write code. Such
+   the context of this repository, that&rsquo;s me) on how to write code. Such
    comments are written by problem setters, not me. Their content may sometimes
    provide contextual information to indicate what parts of a file are written
    by the problem setter.
@@ -57,7 +57,7 @@ Furthermore, in problems where the purpose is to implement a function, the
 problem setter will often have included information accompanying the top-level
 function (the one that scaffolding code, which may or may not be included in
 the solution but usually is not included, will call--this may or may not be
-"top level" in a language-technical sense), which I have retained:
+&ldquo;top level&rdquo; in a language-technical sense), which I have retained:
 
 1. A comment or docstring at the top of the function may have been written by
    the problem setter, especially if the solution is in a dynamically typed
@@ -77,15 +77,15 @@ calls them), may likewise be retained.
 
 ## 2. Short example test cases
 
-I've included some short example test cases. Their filenames end in `.in`
+I&rsquo;ve included some short example test cases. Their filenames end in `.in`
 followed by zero or more digits. For example, in a competitive programming
-problem titled "Overthink Licensing," a C++ solution might be titled
-`overthink-licensing.cpp`, in which case example test cases are likely to be
-named `overthink-licensing.in`, `overthink-licensing.in2`, and so forth.
+problem titled &ldquo;Overthink Licensing,&rdquo; a C++ solution might be
+titled `overthink-licensing.cpp`, in which case example test cases are likely
+to be named `overthink-licensing.in`, `overthink-licensing.in2`, and so forth.
 
-The reason I've sometimes included these is that I think they make it easier to
-try out or test my solutions, as well as to understand them, both for me and
-for anyone else using this repository.
+The reason I&rsquo;ve sometimes included these is that I think they make it
+easier to try out or test my solutions, as well as to understand them, both for
+me and for anyone else using this repository.
 
 Sometimes these example test cases are the examples given in, or accompanying,
 the problem, and thus written by the problem setter rather than me. That is the
@@ -96,7 +96,7 @@ I have tried to omit such files from this repository in all cases except those
 when they are short such that I believe fair use permits me to include them and
 also that my inclusion of them is otherwise unobjectionable. Since such test
 cases, while beneficial to understanding, do not need to be present for my code
-to work or make sense, I've tried to err on the side of omitting anything
+to work or make sense, I&rsquo;ve tried to err on the side of omitting anything
 substantial or that I otherwise guess a problem setter would not wish to be
 distributed. Still, it is possible that I have made mistakes. I hope not.
 
@@ -112,5 +112,5 @@ them). By this I mean test cases that are supplied directly alongside a problem
 in such a way as to be understood as, in effect, part of the problem
 description. For example, I have tried never to include any test cases that are
 not publicly available, require an account, or that are otherwise even
-partially hidden or obscured. I think I've succeeded at avoiding this. If I
-have not, that is a bug.
+partially hidden or obscured. I think I&rsquo;ve succeeded at avoiding this. If
+I have not, that is a bug.
