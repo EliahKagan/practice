@@ -57,6 +57,8 @@ class Fraction:
         """Checks if this fraction is larger than another."""
         return other.__lt__(self)
 
+    # FIXME: I should probably not be using "or" like this with NotImplemented.
+
     def __le__(self, other):
         """Checks if this fraction is no larger than another."""
         return self.__lt__(other) or self.__eq__(other)
