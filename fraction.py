@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 fraction.py - Fractional calculations. Even though fractions.Fraction exists.
 """
