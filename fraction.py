@@ -24,7 +24,7 @@ class Fraction:
         self._numerator = numerator // gcd
         self._denominator = denominator // gcd
 
-        if self._numerator < 0:
+        if self._denominator < 0:
             self._numerator = -self._numerator
             self._denominator = -self._denominator
 
@@ -67,7 +67,7 @@ class Fraction:
 
     def __abs__(self):
         """Returns the absolute value."""
-        return Fraction(math.abs(self._numerator), self._denominator)
+        return Fraction(abs(self._numerator), self._denominator)
 
     def __add__(self, other):
         """Computes the sum of this and another fraction."""
