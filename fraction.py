@@ -4,9 +4,15 @@ fraction.py - Fractional calculations. Even though fractions.Fraction exists.
 """
 
 import functools
-import math
 
 __all__ = ['Fraction']
+
+
+def _gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+
+    return a
 
 
 @functools.total_ordering
@@ -20,7 +26,7 @@ class Fraction:
         if denominator == 0:
             raise ZeroDivisionError('denominator cannot be zero')
 
-        gcd = math.gcd(numerator, denominator)
+        gcd = _gcd(numerator, denominator)
         self._numerator = numerator // gcd
         self._denominator = denominator // gcd
 
