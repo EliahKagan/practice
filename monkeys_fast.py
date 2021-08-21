@@ -6,7 +6,7 @@ import random
 import string
 import sys
 
-REPORT_INTERVAL = 1000
+REPORT_INTERVAL = 100
 CHARS = string.ascii_lowercase + ' '
 GOAL = 'methinks it is like a weasel'
 
