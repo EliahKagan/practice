@@ -25,6 +25,10 @@ class Box:
 
         return Box(self._value + other)
 
+    def __radd__(self, other):
+        """Takes the sum of this Widget with a bare value on the left."""
+        return Box(other + self._value)
+
 
 def run():
     """Show the relationship between binary + and the __add__ method."""
