@@ -20,7 +20,7 @@ def check_length(guess):
 def generate(guess):
     """Randomly changes the guess at one character position."""
     check_length(guess)
-    index = random.randint(0, len(GOAL) - 1)
+    index = random.randrange(len(GOAL))
     return guess[:index] + random.choice(CHARS) + guess[(index + 1):]
 
 
