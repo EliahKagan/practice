@@ -54,11 +54,32 @@ class Rectangle:
         extent = f'width={self._width}, height={self._height}'
         return f'Rectangle({vertex}, {extent})'
 
+    @property
+    def x(self):
+        """The x-coordinate."""
+        return self._x
+
+    @property
+    def y(self):
+        """The y-coordinate."""
+        return self._y
+
+    @property
+    def width(self):
+        """The width of the rectangle."""
+        return self._width
+
+    @property
+    def height(self):
+        """The height of the rectangle."""
+        return self._height
+
 
 def run():
     """Tries out the Rectangle class."""
     r = Rectangle(Point(4, 5), 6, 5)
     print(r)
+    print(f'{r.x}, {r.y}, {r.width}, {r.height}')
 
 
 if __name__ == '__main__':
