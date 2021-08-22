@@ -16,6 +16,10 @@ class Point:
         """String representation. Can be passed to eval()."""
         return f'Point(x={self._x}, y={self._y})'
 
+    def __str__(self):
+        """String representation. Suitable for user interfaces."""
+        return f'(x={self._x}, y={self._y})'
+
     def __eq__(self, other):
         """Checks if two points are equal."""
         return (isinstance(other, Point)
@@ -53,6 +57,12 @@ class Rectangle:
         vertex = repr(Point(self._x, self._y))
         extent = f'width={self._width}, height={self._height}'
         return f'Rectangle({vertex}, {extent})'
+
+    def __str__(self):
+        """String representation. Suitable for user interfaces."""
+        vertex = f'x={self._x}, y={self._y}'
+        extent = f'width={self._width}, height={self._height}'
+        return f'({vertex}, {extent})'
 
     @property
     def x(self):
