@@ -84,12 +84,20 @@ class Rectangle:
         """The height of the rectangle."""
         return self._height
 
+    def getWidth(self):
+        """Same as reading the width property."""
+        return self.width
+
+    def getHeight(self):
+        """Same as reading the height property."""
+        return self.height
+
 
 def run():
     """Tries out the Rectangle class."""
     r = Rectangle(Point(4, 5), 6, 5)
     print(r)
-    print(f'{r.x}, {r.y}, {r.width}, {r.height}')
+    print(f'{r.x}, {r.y}, {r.getWidth()}, {r.getHeight()}')
 
 
 if __name__ == '__main__':
