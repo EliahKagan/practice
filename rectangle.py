@@ -96,6 +96,10 @@ class Rectangle:
         """Computes the area of the rectangle."""
         return self._width * self._height
 
+    def perimeter(self):
+        """Computes the perimeter of the rectangle."""
+        return (self._width + self._height) * 2
+
 
 def run():
     """Tries out the Rectangle class."""
@@ -103,6 +107,7 @@ def run():
     print(r)
     print(f'{r.x}, {r.y}, {r.getWidth()}, {r.getHeight()}')
     print(f'area={r.area()}')
+    print(f'perimeter={r.perimeter()}')
 
 
 if __name__ == '__main__':
