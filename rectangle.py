@@ -123,13 +123,13 @@ class Rectangle:
         """
         Checks if two rectangles overlap.
 
+        Edges not adjacent to the vertex given to construct the rectangle are
+        considered not to be in the rectangle.
+
         This regards the rectangles as solid. That is, rectangles overlap not
         only when their overlapping area is greater than zero but less than the
         area of either rectangle, but also when one rectangle is completely
         contained inside another.
-
-        Edges not adjacent to the vertex given to construct the rectangle are
-        considered not to be in the rectangle.
         """
         if self.x + self.width <= other.x or other.x + other.width <= self.x:
             return False # The rectangles are too far apart horizontally.
