@@ -100,6 +100,20 @@ class Rectangle:
         """Computes the perimeter of the rectangle."""
         return (self._width + self._height) * 2
 
+    def transpose(self):
+        """Mutates the rectangle to swap its width and height."""
+        self._width, self._height = self._height, self._width
+
+    def contains(self, point):
+        """
+        Checks if the point is in this rectangle.
+
+        Edges not adjacent to the vertex given to construct the rectangle
+        are considered not to be in the rectangle.
+        """
+        return (self._x <= point.x < self._x + self._width
+                and self._y <= point.y < self._y + self._height)
+
 
 def run():
     """Tries out the Rectangle class."""
@@ -108,6 +122,17 @@ def run():
     print(f'{r.x}, {r.y}, {r.getWidth()}, {r.getHeight()}')
     print(f'area={r.area()}')
     print(f'perimeter={r.perimeter()}')
+    r.transpose()
+    print(r)
+    print()
+
+    s = Rectangle(Point(0, 0), 10, 5)
+    print(s.contains(Point(0, 0)), True)
+    print(s.contains(Point(3, 3)), True)
+    print(s.contains(Point(3, 7)), False)
+    print(s.contains(Point(3, 5)), False)
+    print(s.contains(Point(3, 4.99999)), True)
+    print(s.contains(Point(-3, -3)), False)
 
 
 if __name__ == '__main__':
