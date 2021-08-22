@@ -92,12 +92,17 @@ class Rectangle:
         """Same as reading the height property."""
         return self.height
 
+    def area(self):
+        """Computes the area of the rectangle."""
+        return self._width * self._height
+
 
 def run():
     """Tries out the Rectangle class."""
     r = Rectangle(Point(4, 5), 6, 5)
     print(r)
     print(f'{r.x}, {r.y}, {r.getWidth()}, {r.getHeight()}')
+    print(f'area={r.area()}')
 
 
 if __name__ == '__main__':
