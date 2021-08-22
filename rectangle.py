@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """rectangle.py - Axis-aligned rectangles."""
 
+import math
 
 class Point:
     """A 2D point class."""
@@ -114,6 +115,10 @@ class Rectangle:
         return (self._x <= point.x < self._x + self._width
                 and self._y <= point.y < self._y + self._height)
 
+    def diagonal(self):
+        """Computes the length of the diagonal."""
+        return math.sqrt(self._width**2 + self._height**2)
+
 
 def run():
     """Tries out the Rectangle class."""
@@ -122,6 +127,7 @@ def run():
     print(f'{r.x}, {r.y}, {r.getWidth()}, {r.getHeight()}')
     print(f'area={r.area()}')
     print(f'perimeter={r.perimeter()}')
+    print(r.diagonal())
     r.transpose()
     print(r)
     print()
@@ -133,6 +139,7 @@ def run():
     print(s.contains(Point(3, 5)), False)
     print(s.contains(Point(3, 4.99999)), True)
     print(s.contains(Point(-3, -3)), False)
+    print(s.diagonal())
 
 
 if __name__ == '__main__':
