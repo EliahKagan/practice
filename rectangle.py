@@ -119,6 +119,26 @@ class Rectangle:
         """Computes the length of the diagonal."""
         return math.sqrt(self._width**2 + self._height**2)
 
+    def overlaps(self, other):
+        """
+        Checks if two rectangles overlap.
+
+        This regards the rectangles as solid. That is, rectangles overlap not
+        only when their overlapping area is greater than zero but less than the
+        area of either rectangle, but also when one rectangle is completely
+        contained inside another.
+
+        Edges not adjacent to the vertex given to construct the rectangle are
+        considered not to be in the rectangle.
+        """
+        if self.x + self.width <= other.x or other.x + other.width <= self.x:
+            return False # The rectangles are too far apart horizontally.
+
+        if self.y + self.height <= other.y or other.y + other.height <= self.y:
+            return False # The rectangles are too far apart vertically.
+
+        return True
+
 
 def run():
     """Tries out the Rectangle class."""
@@ -140,6 +160,12 @@ def run():
     print(s.contains(Point(3, 4.99999)), True)
     print(s.contains(Point(-3, -3)), False)
     print(s.diagonal())
+    print()
+
+    t = Rectangle(Point(0, 0), 10, 20)
+    print(r.overlaps(s)) # r is just above s on the right side, no overlap.
+    print(r.overlaps(t))
+    print(s.overlaps(t))
 
 
 if __name__ == '__main__':
