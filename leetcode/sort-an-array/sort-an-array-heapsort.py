@@ -8,6 +8,7 @@ class Solution:
         heapsort(nums)
         return nums
 
+
 def heapsort(nums):
     if len(nums) < 2:
         return
