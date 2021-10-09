@@ -12,7 +12,7 @@ Some material in this repository is not written by me; for example, problems
 sometimes contain scaffolding code written by problem setters, and I&rsquo;ve
 included some small input test cases. I&rsquo;ve only included any material not
 written by me when I believe it is clearly fair use. See
-[`LICENSE-NOTE.md`](LICENSE-NOTE.md) for details.
+[`FAIR-USE.md`](FAIR-USE.md) for details.
 
 ## Older Practice Solutions
 
