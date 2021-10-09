@@ -10,41 +10,30 @@ def find_words(board, words) # Note: Temporarily mutates board.
   matches = []
   height, width = dimensions(board)
 
-  # Returns the number of trie words under the node that were found.
   dfs = lambda do |i, j, parent|
-    return 0 unless i.between?(0, height - 1) && j.between?(0, width - 1) &&
-                    (ch = board[i][j]) && (child = parent[ch])
-
-    count = 0
+    return unless i.between?(0, height - 1) && j.between?(0, width - 1) &&
+                  (ch = board[i][j]) && (child = parent[ch])
 
     if (word = child[:word])
       matches << word
       child.delete(:word)
-      count += 1
-
-      if (child[:population] -= 1).zero?
+      if child.empty?
         parent.delete(ch)
-        return count
+        return
       end
     end
 
     board[i][j] = nil
 
     [[i, j - 1], [i, j + 1], [i - 1, j], [i + 1, j]].each do |h, k|
-      subcount = dfs.call(h, k, child)
-      next if subcount.zero? # A simple optimization.
-
-      count += subcount
-
-      if (child[:population] -= subcount).zero?
+      dfs.call(h, k, child)
+      if child.empty?
         parent.delete(ch)
         break
       end
     end
 
     board[i][j] = ch
-
-    count
   end
 
   0.upto(height - 1) do |i|
@@ -68,20 +57,9 @@ def build_trie(words)
   root = {}
 
   words.each do |word|
-    parent = root
-
-    word.each_char do |ch|
-      if (child = parent[ch])
-        child[:population] += 1
-      else
-        child = {population: 1}
-        parent[ch] = child
-      end
-
-      parent = child
-    end
-
-    parent[:word] = word
+    node = root
+    word.each_char { |ch| node = node[ch] ||= {} }
+    node[:word] = word
   end
 
   root
