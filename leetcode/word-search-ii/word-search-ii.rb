@@ -10,9 +10,8 @@ def find_words(board, words) # Note: Temporarily mutates board.
   puts "#{possible.size} possible word(s)."
   root = build_trie(possible_words(board, words))
   #p root.values.map { |node| node.key?(:population) }
-  pp root
   #pp root
-  #puts "Trie population of #{root.each_value.sum { |node| node[:population] || 0 }}."
+  puts "Trie population of #{root.each_value.sum { |node| node[:population] || 0 }}."
   matches = []
   height, width = dimensions(board)
 
