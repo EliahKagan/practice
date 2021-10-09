@@ -5,6 +5,8 @@
 # @param {String} word
 # @return {Boolean}
 def exist(board, word) # Note: Temporarily mutates board.
+  return false unless has_all_letters?(board, word)
+
   height, width = dimensions(board)
 
   dfs = lambda do |i, j, word_index|
@@ -33,6 +35,11 @@ def exist(board, word) # Note: Temporarily mutates board.
   end
 
   false
+end
+
+def has_all_letters?(board, word)
+  board_letters = board.flatten(1).to_set()
+  word.each_char.all? { |ch| board_letters.include?(ch) }
 end
 
 def dimensions(board)
