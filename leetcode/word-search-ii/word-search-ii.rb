@@ -1,3 +1,7 @@
+# LeetCode #212 - Word Search II
+# https://leetcode.com/problems/word-search-ii/
+# By recursive DFS.
+
 # @param {Character[][]} board
 # @param {String[]} words
 # @return {String[]}
@@ -7,17 +11,21 @@ def find_words(board, words) # Note: Temporarily mutates board.
   height, width = dimensions(board)
 
   dfs = lambda do |i, j, node|
-    word = node[:word]
-    matches << word if word
+    return unless i.between?(0, height - 1) && j.between?(0, width - 1) &&
+                  (ch = board[i][j]) && (node = node[ch])
 
-    [[i, j - 1], [i, j + 1], [i - 1, j], [i + 1, j]].each do |h, k|
-      if h.between?(0, height - 1) && k.between?(0, width - 1) &&
-          (ch = board[h][k]) && (child = node[ch])
-        board[h][k] = nil
-        dfs.call(h, k, child)
-        board[h][k] = ch
-      end
+    if (word = node[:word])
+      matches << word
     end
+
+    board[i][j] = nil
+
+    dfs.call(i, j - 1, node)
+    dfs.call(i, j + 1, node)
+    dfs.call(i - 1, j, node)
+    dfs.call(i + 1, j, node)
+
+    board[i][j] = ch
   end
 
   0.upto(height - 1) do |i|
