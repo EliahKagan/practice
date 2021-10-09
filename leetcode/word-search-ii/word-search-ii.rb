@@ -6,12 +6,7 @@
 # @param {String[]} words
 # @return {String[]}
 def find_words(board, words) # Note: Temporarily mutates board.
-  possible = possible_words(board, words)
-  puts "#{possible.size} possible word(s)."
   root = build_trie(possible_words(board, words))
-  #p root.values.map { |node| node.key?(:population) }
-  #pp root
-  puts "Trie population of #{root.each_value.sum { |node| node[:population] || 0 }}."
   matches = []
   height, width = dimensions(board)
 
@@ -28,8 +23,6 @@ def find_words(board, words) # Note: Temporarily mutates board.
       count += 1
 
       if (child[:population] -= 1).zero?
-        #puts "Found last word, deleting '#{ch}' node. Parent was:"
-        #puts parent
         parent.delete(ch)
         return count
       end
