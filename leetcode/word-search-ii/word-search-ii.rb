@@ -6,8 +6,8 @@
 # @param {String[]} words
 # @return {String[]}
 def find_words(board, words) # Note: Temporarily mutates board.
-  root = build_trie(words)
-  matches = Set.new
+  root = build_trie(p possible_words(board, words))
+  matches = []
   height, width = dimensions(board)
 
   dfs = lambda do |i, j, node|
@@ -15,6 +15,7 @@ def find_words(board, words) # Note: Temporarily mutates board.
                   (ch = board[i][j]) && (node = node[ch])
 
     if (word = node[:word])
+      node.delete(:word)
       matches << word
     end
 
@@ -34,7 +35,15 @@ def find_words(board, words) # Note: Temporarily mutates board.
     end
   end
 
-  matches.to_a
+  matches
+end
+
+def possible_words(board, words)
+  board_letters = board.flatten(1).to_set()
+
+  words.filter do |word|
+    word.each_char.all? { |ch| board_letters.include?(ch) }
+  end
 end
 
 def build_trie(words)
