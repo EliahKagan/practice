@@ -17,23 +17,18 @@ def find_words(board, words) # Note: Temporarily mutates board.
     if (word = child[:word])
       matches << word
       child.delete(:word)
-      if child.empty?
-        parent.delete(ch)
-        return
-      end
     end
 
     board[i][j] = nil
 
-    [[i, j - 1], [i, j + 1], [i - 1, j], [i + 1, j]].each do |h, k|
-      dfs.call(h, k, child)
-      if child.empty?
-        parent.delete(ch)
-        break
-      end
-    end
+    dfs.call(i, j - 1, child)
+    dfs.call(i, j + 1, child)
+    dfs.call(i - 1, j, child)
+    dfs.call(i + 1, j, child)
 
     board[i][j] = ch
+
+    parent.delete(ch) if child.empty?
   end
 
   0.upto(height - 1) do |i|
