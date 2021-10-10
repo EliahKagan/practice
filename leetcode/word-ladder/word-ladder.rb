@@ -57,15 +57,7 @@ class WordGraph
 
           vis << dest
           parents[dest] = src
-          if dest == finish
-            word = dest
-            while word
-              puts word
-              word = parents[word]
-            end
-            return depth
-          end
-          #return depth if dest == finish
+          return depth if dest == finish
 
           queue << dest
         end
