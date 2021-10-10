@@ -45,17 +45,27 @@ class WordGraph
   # finish words in the word graph. Returns nil if there is no path.
   def bfs(start, finish)
     vis = Set.new([start])
+    parents = {}
     queue = [start]
 
     (1..).each do |depth|
       break if queue.empty?
 
       queue.size.times do
-        each_neighbor(queue.shift) do |dest|
+        each_neighbor(src = queue.shift) do |dest|
           next if vis.include?(dest)
 
           vis << dest
-          return depth if dest == finish
+          parents[dest] = src
+          if dest == finish
+            word = dest
+            while word
+              puts word
+              word = parents[word]
+            end
+            return depth
+          end
+          #return depth if dest == finish
 
           queue << dest
         end
