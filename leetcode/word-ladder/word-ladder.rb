@@ -18,10 +18,10 @@ def ladder_length(begin_word, end_word, word_list)
   depth ? depth + 1 : NO_PATH
 end
 
-# Single-character deletion extensions for strings.
+# Extension to mask out single characters in a string.
 class String
-  def each_one_shorter
-    0.upto(size - 1) { |i| yield self[...i] + self[(i + 1)..] }
+  def each_masked
+    0.upto(size - 1) { |i| yield "#{self[...i]}\0#{self[(i + 1)..]}" }
   end
   nil
 end
@@ -38,7 +38,7 @@ class WordGraph
   def add(word)
     raise 'wrong length word' if word.size != @width
 
-    word.each_one_shorter { |shorter| @groups[shorter] << word }
+    word.each_masked { |masked| @groups[masked] << word }
   end
 
   # Uses breadth-first search to find the distance between distinct start and
@@ -78,9 +78,6 @@ class WordGraph
   private
 
   def each_neighbor(src)
-    src.each_one_shorter do |shorter|
-      @groups[shorter].each { |dest| yield dest }
-    end
-    nil
+    src.each_masked { |masked| @groups[masked].each { |dest| yield dest } }
   end
 end
