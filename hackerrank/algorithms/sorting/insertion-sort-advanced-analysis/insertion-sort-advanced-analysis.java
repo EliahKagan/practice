@@ -13,27 +13,27 @@ enum Algo {
      * @return  The number of inversions originally present. This is the same
      *          as the number of swaps/shifts insertion sort would do.
      * */
-    static int mergesort(int[] values) {
+    static long mergesort(int[] values) {
         var aux = new int[values.length];
         return mergesortSubarray(values, 0, values.length, aux);
     }
 
-    private static int
+    private static long
     mergesortSubarray(int[] values, int low, int high, int[] aux) {
         if (high - low < 2) return 0;
 
         var mid = low + (high - low) / 2;
 
-        var count = 0;
+        var count = 0L;
         count += mergesortSubarray(values, low, mid, aux);
         count += mergesortSubarray(values, mid, high, aux);
         count += merge(values, low, mid, high, aux);
         return count;
     }
 
-    private static int
+    private static long
     merge(int[] values, int low, int mid, int high, int[] aux) {
-        var count = 0;
+        var count = 0L;
         var left = low;
         var right = mid;
         var out = 0;
