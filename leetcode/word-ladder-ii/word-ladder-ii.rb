@@ -42,48 +42,53 @@ class WordGraph
   end
 
   def each_shortest_path(start, finish)
-    if (distance = compute_distance(start, finish))
-      each_equidistant_path(start, finish, distance) { |path| yield path }
+    if (depths = compute_depths(start, finish))
+      each_path(start, finish, depths) { |path| yield path }
     end
   end
 
   private
 
-  # Finds distance from start to finish by BFS.
-  # Returns nil if there is no path.
-  def compute_distance(start, finish)
-    vis = Set.new([start])
+  # Finds distances to vertices by BFS, except those farther than the target.
+  # If the target (finish) vertex is not found, returns nil.
+  def compute_depths(start, finish)
+    finish_depth = nil
+    depths = {start => 0}
     queue = [start]
 
-    (1..).each do |depth|
-      break if queue.empty?
+    until queue.empty?
+      src = queue.shift
+      break if depths[src] == finish_depth
 
-      queue.size.times do
-        each_neighbor(queue.shift) do |dest|
-          next if vis.include?(dest)
+      next_depth = depths[src] + 1
 
-          vis << dest
-          return depth if dest == finish
+      each_neighbor(src) do |dest|
+        next if depths.key?(dest)
 
-          queue << dest
-        end
+        depths[dest] = next_depth
+        finish_depth = depths[dest] if dest == finish
+        queue << dest
       end
     end
 
-    nil
+    finish_depth ? depths : nil
   end
 
-  # Yields each path from start to finish of exactly a particular distance.
-  def each_equidistant_path(start, finish, distance)
+  # Using the results of BFS, does DFS to find each shortest path to a target.
+  def each_path(start, finish, depths)
     path = []
 
     dfs = lambda do |src|
       path << src
 
-      if path.size == distance + 1
-        yield path.dup if src == finish
+      if src == finish
+        yield path.dup
       else
-        each_neighbor(src, &dfs)
+        next_depth = depths[src] + 1
+
+        each_neighbor(src) do |dest|
+          dfs.call(dest) if depths[dest] == next_depth
+        end
       end
 
       path.pop
