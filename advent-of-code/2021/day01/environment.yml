@@ -1,0 +1,8 @@
+name: aoc2021-day01
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.10
+  - more-itertools
