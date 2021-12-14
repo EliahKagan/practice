@@ -1,0 +1,9 @@
+name: aoc2021-day08
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.10
+  - pycodestyle
+  - pylint
