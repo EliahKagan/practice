@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Advent of Code 2021, day 8, part A"""
+"""Advent of Code 2021, day 8, both parts"""
 
 import argparse
 import fileinput
@@ -88,19 +88,24 @@ EASY_DIGITS = (1, 4, 7, 8)
 def run():
     """Reads input from stdin or a file an decode the messages."""
     options = parse_options()
-    easy_digit_count = 0
+    easy_count = 0
+    quad_sum = 0
 
     for line in fileinput.input():
         shuffled_digits, message = (text.split() for text in line.split('|'))
         decrypted_message = crack(shuffled_digits, message)
+
         if options.verbose:
             print(*decrypted_message, sep=', ')
-        delta = sum(digit in EASY_DIGITS for digit in decrypted_message)
-        easy_digit_count += delta
+
+        easy_count += sum(digit in EASY_DIGITS for digit in decrypted_message)
+        quad_sum += int(''.join(map(str, decrypted_message)))
 
     if options.verbose:
         print()
-    print(f'Total count of "easy digits":  {easy_digit_count}')
+
+    print(f'[A]  Total count of "easy digits":  {easy_count}')
+    print(f'[B]  Total sum of all digit quads:  {quad_sum}')
 
 
 if __name__ == '__main__':
