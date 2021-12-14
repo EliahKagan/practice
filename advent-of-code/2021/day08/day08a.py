@@ -2,8 +2,10 @@
 
 """Advent of Code 2021, day 8, part A"""
 
+import argparse
 import fileinput
 import itertools
+import sys
 
 
 UNSCRAMBLED_DIGITS = (
@@ -65,11 +67,40 @@ def crack(shuffled_digits, message):
         raise ValueError("scrambling can't decode message") from error
 
 
+def parse_options():
+    """Parses command-line options."""
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-v', '--verbose',
+                        help='print the decrypted messages',
+                        action='store_true')
+
+    options, remaining_args = parser.parse_known_intermixed_args()
+    sys.argv[1:] = remaining_args
+    return options
+
+
+# All digits are equally hard/easy with the brute-force method I'm usning, but
+# these are the digits to look for, to answer part A of the problem.
+EASY_DIGITS = (1, 4, 7, 8)
+
+
 def run():
     """Reads input from stdin or a file an decode the messages."""
+    options = parse_options()
+    easy_digit_count = 0
+
     for line in fileinput.input():
         shuffled_digits, message = (text.split() for text in line.split('|'))
-        print(*crack(shuffled_digits, message), sep=', ')
+        decrypted_message = crack(shuffled_digits, message)
+        if options.verbose:
+            print(*decrypted_message, sep=', ')
+        delta = sum(digit in EASY_DIGITS for digit in decrypted_message)
+        easy_digit_count += delta
+
+    if options.verbose:
+        print()
+    print(f'Total count of "easy digits":  {easy_digit_count}')
 
 
 if __name__ == '__main__':
