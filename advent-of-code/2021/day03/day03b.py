@@ -8,8 +8,11 @@ from typing import Callable
 from typeguard import typechecked
 
 
+Table = list[list[int]]
+
+
 @typechecked
-def majority(rows: list[list[int]], col_index: int) -> int:
+def majority(rows: Table, col_index: int) -> int:
     """
     Gets the majority bit of a column.
 
@@ -20,7 +23,7 @@ def majority(rows: list[list[int]], col_index: int) -> int:
 
 
 @typechecked
-def minority(rows: list[list[int]], col_index: int) -> int:
+def minority(rows: Table, col_index: int) -> int:
     """
     Gets the minority bit of a column.
 
@@ -30,8 +33,8 @@ def minority(rows: list[list[int]], col_index: int) -> int:
 
 
 @typechecked
-def positional_filter(rows: list[list[int]],
-                      selector: Callable[[list[int], int], int]) -> list[int]:
+def positional_filter(rows: Table,
+                      selector: Callable[[Table, int], int]) -> list[int]:
     """Finds a row by eliminating non-matching rows per bit position."""
     if not rows:
         raise ValueError('no rows to filter')
@@ -53,8 +56,7 @@ def positional_filter(rows: list[list[int]],
 
 
 @typechecked
-def rate(rows: list[list[int]],
-         selector: Callable[[list[int], int], int]) -> int:
+def rate(rows: Table, selector: Callable[[Table, int], int]) -> int:
     """Eliminates non-matching rows. Converts the surviving row to an int."""
     return int(''.join(map(str, positional_filter(rows, selector))), base=2)
 
