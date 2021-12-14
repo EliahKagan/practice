@@ -1,7 +1,9 @@
 {
     "cSpell.words": [
         "conda",
+        "mypy",
         "pycodestyle",
-        "pylint"
+        "pylint",
+        "typeguard"
     ]
 }

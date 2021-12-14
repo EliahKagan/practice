@@ -80,7 +80,7 @@ def parse_options():
     return options
 
 
-# All digits are equally hard/easy with the brute-force method I'm usning, but
+# All digits are equally hard/easy with the brute-force method I'm using, but
 # these are the digits to look for, to answer part A of the problem.
 EASY_DIGITS = (1, 4, 7, 8)
 
