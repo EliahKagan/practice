@@ -4,6 +4,9 @@ input
 # CMake build files
 build/
 
+# Cached Python bytecode
+__pycache__/
+
 # Compiled executables in "top-level" directories
 day[[:digit:]][[:digit:]]
 !day[[:digit:]][[:digit:]]/
