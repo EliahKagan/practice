@@ -4,23 +4,30 @@
 
 import collections
 import fileinput
-from typing import Mapping, Sequence
+from typing import Mapping, MutableSequence
+
+from typeguard import typechecked
 
 
 def big(vertex: str):
-    """Checks if the first letter of a vertex name is capitalized."""
+    """
+    Checks if the first letter of a vertex name is capitalized.
+
+    This is not @typechecked, since that had a noticeable performance impact.
+    """
     try:
         return vertex[0].isupper()
     except IndexError as error:
         raise ValueError('empty vertex name not supported') from error
 
 
+@typechecked
 class Maze:
     """A custom undirected graph for the maze traversal problem."""
 
     __slots__ = ('_adj',)
 
-    _adj: Mapping[str, Sequence[str]]
+    _adj: Mapping[str, MutableSequence[str]]
 
     def __init__(self):
         """Creates a new, initially empty maze."""
@@ -59,6 +66,7 @@ class Maze:
         return dfs(start)
 
 
+@typechecked
 def run() -> None:
     """Reads a maze from stdin or a file and reports a permitted path count."""
     maze = Maze()
