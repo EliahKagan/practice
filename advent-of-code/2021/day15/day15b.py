@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Advent of Code, day 15, part A"""
+"""Advent of Code, day 15, part B"""
 
 import collections
 import fileinput
@@ -17,25 +17,36 @@ A path given as a sequence of vertices, and the cost to traverse it.
 """
 
 
+MAX_DIGIT = 9
+
+
 class Grid:
     """A game board for the path-finding puzzle."""
 
-    __slots__ = ('_rows', '_height', '_width')
+    __slots__ = (
+        '_rows',
+        '_height_multiplier',
+        '_width_multiplier',
+        '_tile_height',
+        '_tile_width',
+    )
 
     def __init__(self, rows):
         """Creates a grid with the given rows."""
-        self._rows = tuple(tuple(map(int, row)) for row in rows)
-        self._height = len(self._rows)
+        self._height_multiplier = self._width_multiplier = 1
 
-        if self._height == 0:
+        self._rows = tuple(tuple(map(int, row)) for row in rows)
+        self._tile_height = len(self._rows)
+
+        if self._tile_height == 0:
             raise ValueError('empty board (no rows) not supported')
 
-        self._width = len(self._rows[0])
+        self._tile_width = len(self._rows[0])
 
-        if any(len(row) != self._width for row in self._rows):
+        if any(len(row) != self._tile_width for row in self._rows):
             raise ValueError('jagged board not supported')
 
-        if self._width == 0:
+        if self._tile_width == 0:
             raise ValueError('empty rows not supported')
 
     def __getitem__(self, ij_pair):
@@ -45,17 +56,54 @@ class Grid:
         if not self._cell_exists(i, j):
             raise ValueError(f'cell coordinates ({i}, {j}) out of range')
 
-        return self._rows[i][j]
+        i_major, i_minor = divmod(i, self._tile_height)
+        j_major, j_minor = divmod(j, self._tile_width)
+        base_value = self._rows[i_minor][j_minor]
+        return (base_value - 1 + i_major + j_major) % (MAX_DIGIT - 1) + 1
 
     @property
     def height(self):
         """The height of (number of rows in) the board."""
-        return self._height
+        return self._tile_height * self._height_multiplier
 
     @property
     def width(self):
         """The width of (number of columns in) the board."""
-        return self._width
+        return self._tile_width * self._width_multiplier
+
+    @property
+    def tile_height(self):
+        """The height of (number of rows in) a single tile."""
+        return self._tile_height
+
+    @property
+    def tile_width(self):
+        """The width of (number of columns in) a single tile."""
+        return self._tile_width
+
+    @property
+    def height_multiplier(self):
+        """The number of rows of tiles."""
+        return self._height_multiplier
+
+    @height_multiplier.setter
+    def height_multiplier(self, height):
+        """Sets the number of rows of tiles."""
+        if height < 1:
+            raise ValueError('height multiplier must be positive')
+        self._height_multiplier = height
+
+    @property
+    def width_multiplier(self):
+        """The number of columns of tiles."""
+        return self._width_multiplier
+
+    @width_multiplier.setter
+    def width_multiplier(self, width):
+        """Sets the number of columns of tiles."""
+        if width < 1:
+            raise ValueError('width multiplier must be positive')
+        self._width_multiplier = width
 
     def find_min_cost_path(self):
         """
@@ -64,8 +112,8 @@ class Grid:
         The cost is the sum of the values of all vertices (cells) except the
         starting cell.
         """
-        i = self._height - 1
-        j = self._width - 1
+        i = self.height - 1
+        j = self.width - 1
         parents, costs = self._dijkstra((0, 0), (i, j))
         path = [(i, j)]
         cost = costs[(i, j)]
@@ -111,7 +159,7 @@ class Grid:
         return parents, costs
 
     def _cell_exists(self, i, j):
-        return 0 <= i < self._height and 0 <= j < self._width
+        return 0 <= i < self.height and 0 <= j < self.width
 
 
 BRIGHT_GREEN = colorama.Style.BRIGHT + colorama.Fore.GREEN
@@ -125,6 +173,7 @@ def run():
     print(RESET_ALL, end='')
 
     grid = Grid(map(str.strip, fileinput.input()))
+    grid.height_multiplier = grid.width_multiplier = 5
     result = grid.find_min_cost_path()
     path_coords = set(result.path)
 
