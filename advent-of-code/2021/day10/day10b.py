@@ -56,9 +56,8 @@ def run() -> None:
     scores = []
     for line in map(str.strip, fileinput.input()):
         unmatched_openers = get_unmatched_openers(line)
-        if unmatched_openers is None:
-            continue
-        scores.append(compute_score(unmatched_openers))
+        if unmatched_openers is not None:
+            scores.append(compute_score(unmatched_openers))
 
     if len(scores) % 2 == 0:
         raise ValueError(f"even number of scores ({len(scores)})")
