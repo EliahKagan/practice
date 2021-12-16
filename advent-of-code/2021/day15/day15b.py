@@ -59,7 +59,7 @@ class Grid:
         i_major, i_minor = divmod(i, self._tile_height)
         j_major, j_minor = divmod(j, self._tile_width)
         base_value = self._rows[i_minor][j_minor]
-        return (base_value - 1 + i_major + j_major) % (MAX_DIGIT - 1) + 1
+        return (base_value - 1 + i_major + j_major) % MAX_DIGIT + 1
 
     @property
     def height(self):
