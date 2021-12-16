@@ -46,18 +46,24 @@ class Maze:
         vertex at most once.
         """
         vis = collections.Counter(start=1)
+        path = []
 
         def dfs(src: str) -> int:
-            if src == end:
-                return 1
-            if vis[src] == MAX_SMALL_VISITS:
-                return 0
-            if not big(src):
-                vis[src] += 1
-            count = sum(map(dfs, self._adj[src]))
-            if not big(src):
-                vis[src] -= 1
-            return count
+            path.append(src)
+            try:
+                if src == end:
+                    print(*path, sep=',')
+                    return 1
+                if vis[src] == MAX_SMALL_VISITS:
+                    return 0
+                if not big(src):
+                    vis[src] += 1
+                count = sum(map(dfs, self._adj[src]))
+                if not big(src):
+                    vis[src] -= 1
+                return count
+            finally:
+                del path[-1]
 
         return dfs(start)
 
