@@ -7,28 +7,31 @@ When run as a script, this solves part A. But part B is solved with the same
 logic, just more repetitions. See day14b.py.
 """
 
-import collections
+from collections import Counter
 import fileinput
 import itertools
 import re
+from typing import Iterable, NamedTuple
 
 
 RULE_PARSER = re.compile(r'^\s*(\w)(\w)\s+->\s+(\w)\s*$')
 
 
-PolymerSummary = collections.namedtuple('PolymerSummary',
-                                        ('elem_counts', 'pair_counts'))
+class PolymerSummary(NamedTuple):
+    """Element and pair counts of a "polymer"."""
+    elem_counts: Counter[str]
+    pair_counts: Counter[tuple[str, str]]
 
-PolymerSummary.__doc__ = """Element and pair counts of a "polymer"."""
 
-
-def polymerize(template_text, rules, reps):
+def polymerize(template_text: str,
+               rules: dict[tuple[str, str], str],
+               reps: int) -> PolymerSummary:
     """Transforms element and pair counts according to pair insertion rules."""
-    elem_counts = collections.Counter(template_text)
-    pair_counts = collections.Counter(itertools.pairwise(template_text))
+    elem_counts = Counter(template_text)
+    pair_counts = Counter(itertools.pairwise(template_text))
 
     for _ in range(reps):
-        next_pair_counts = collections.Counter()
+        next_pair_counts = Counter[tuple[str, str]]()
 
         for pair, count in pair_counts.items():
             try:
@@ -46,7 +49,7 @@ def polymerize(template_text, rules, reps):
     return PolymerSummary(elem_counts, pair_counts)
 
 
-def read_rules(lines):
+def read_rules(lines: Iterable[str]) -> dict[tuple[str, str], str]:
     """Reads transformation rules from lines of text."""
     rules = {}
 
@@ -67,7 +70,7 @@ def read_rules(lines):
     return rules
 
 
-def run(reps):
+def run(reps: int) -> None:
     """Reads input from stdin or a file and outputs a solution."""
     line_iterator = fileinput.input()
 
