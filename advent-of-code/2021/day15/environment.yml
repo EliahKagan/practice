@@ -1,0 +1,12 @@
+name: aoc2021-day15
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.10
+  - colorama
+
+  # dev
+  - pycodestyle
+  - pylint
