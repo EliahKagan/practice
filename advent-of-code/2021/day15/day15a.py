@@ -2,12 +2,54 @@
 
 """Advent of Code, day 15, part A"""
 
+import argparse
 import collections
 import fileinput
 import heapq
 import math
+import sys
 
 import colorama
+
+
+class _PathTree:
+    """
+    Parents and costs tables for reconstructing paths from a single source.
+    """
+
+    __slots__ = ('_start', '_parents', '_costs')
+
+    def __init__(self, start, parents, costs):
+        """Creates a path tree."""
+        self._start = start
+        self._parents = parents
+        self._costs = costs
+
+    @property
+    def start(self):
+        """The start (source) vertex that paths in this tree are from."""
+        return self._start
+
+    def path_to(self, finish):
+        """Returns the path from the shared start to this finish vertex."""
+        path = []
+
+        dest = finish
+        while dest != self._start:
+            path.append(dest)
+            try:
+                dest = self._parents[dest]
+            except KeyError as error:
+                message = f'no path to {finish!r} ({dest!r} has no parent)'
+                raise KeyError(message) from error
+
+        path.append(self._start)
+        path.reverse()
+        return path
+
+    def cost_to(self, finish):
+        """The cost to get from the hared start to this finish vertex."""
+        return self._costs[finish]
 
 
 PathCostPair = collections.namedtuple('PathCostPair', ('path', 'cost'))
@@ -66,18 +108,50 @@ class Grid:
         """
         i = self._height - 1
         j = self._width - 1
-        parents, costs = self._dijkstra((0, 0), (i, j))
-        path = [(i, j)]
-        cost = costs[(i, j)]
+        result = self._dijkstra((0, 0), (i, j))
+        return PathCostPair(result.path_to((i, j)), result.cost_to((i, j)))
 
-        while (i, j) != (0, 0):
-            i, j = parents[(i, j)]
-            path.append((i, j))
+    def find_min_cost_down_right_path(self):
+        """
+        Finds the minimum cost path from upper-left to lower right that only
+        goes downward and rightward.
 
-        path.reverse()
-        return PathCostPair(path, cost)
+        The cost is the sum of the values of all vertices (cells) except the
+        starting cell.
+        """
+        parents = {}
+        costs = collections.defaultdict(lambda: math.inf)
+
+        costs[0, 0] = 0
+
+        for j in range(1, self._width):
+            costs[0, j] = costs[0, j - 1] + self[0, j]
+            parents[0, j] = (0, j - 1)
+
+        for i in range(1, self._height):
+            costs[i, 0] = costs[i - 1, 0] + self[i, 0]
+            parents[i, 0] = (i - 1, 0)
+
+            for j in range(1, self._height):
+                if costs[i - 1, j] < costs[i, j - 1]:
+                    costs[i, j] = costs[i - 1, j] + self[i, j]
+                    parents[i, j] = (i - 1, j)
+                else:
+                    costs[i, j] = costs[i, j - 1] = self[i, j]
+                    parents[i, j] = (i, j - 1)
+
+        tree = _PathTree((0, 0), parents, costs)
+        finish = (self._height - 1, self._width - 1)
+        return PathCostPair(tree.path_to(finish), tree.cost_to(finish))
 
     def _dijkstra(self, start, finish=None):
+        """
+        Runs Dijkstra's algorithm to find shortest paths from the start vertex.
+
+        If a finish vertex is supplied, stops when the shortest path to it has
+        been found, even if shortest paths to some other reachable vertices
+        have not yet been determined.
+        """
         parents = {}
         costs = collections.defaultdict(lambda: math.inf)
         done = set()
@@ -108,35 +182,62 @@ class Grid:
                     parents[dest] = src
                     heapq.heappush(heap, (new_dest_cost, dest))
 
-        return parents, costs
+        return _PathTree(start, parents, costs)
 
     def _cell_exists(self, i, j):
+        """Checks if the cell coordinates are in range."""
         return 0 <= i < self._height and 0 <= j < self._width
 
 
-BRIGHT_GREEN = colorama.Style.BRIGHT + colorama.Fore.GREEN
+_BRIGHT_GREEN = colorama.Style.BRIGHT + colorama.Fore.GREEN
 
-RESET_ALL = colorama.Style.RESET_ALL
+_RESET_ALL = colorama.Style.RESET_ALL
+
+
+def _parse_options():
+    """Parses command-line options."""
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-v', '--verbose',
+                        help='show the grid, with the path in green',
+                        action='store_true')
+
+    parser.add_argument('-a', '--acyclic',
+                        help='use the DAG allowing only right and down moves',
+                        action='store_true')
+
+    options, remaining_args = parser.parse_known_intermixed_args()
+    sys.argv[1:] = remaining_args
+    return options
 
 
 def run():
     """Reads input, finds the path, and shows it and its cost."""
-    colorama.init()
-    print(RESET_ALL, end='')
-
+    options = _parse_options()
     grid = Grid(map(str.strip, fileinput.input()))
-    result = grid.find_min_cost_path()
-    path_coords = set(result.path)
 
-    for i in range(grid.height):
-        for j in range(grid.width):
-            if (i, j) in path_coords:
-                print(f'{BRIGHT_GREEN}{grid[i, j]}{RESET_ALL}', end='')
-            else:
-                print(grid[i, j], end='')
+    if options.acyclic:
+        result = grid.find_min_cost_down_right_path()
+    else:
+        result = grid.find_min_cost_path()
+
+    if options.verbose:
+        path_coords = set(result.path)
+
+        colorama.init()
+        print(_RESET_ALL, end='')
+
+        for i in range(grid.height):
+            for j in range(grid.width):
+                if (i, j) in path_coords:
+                    print(f'{_BRIGHT_GREEN}{grid[i, j]}{_RESET_ALL}', end='')
+                else:
+                    print(grid[i, j], end='')
+            print()
+
         print()
 
-    print(f'\ncost = {result.cost}')
+    print(f'cost = {result.cost}')
 
 
 __all__ = [thing.__name__ for thing in (PathCostPair, Grid, run)]
