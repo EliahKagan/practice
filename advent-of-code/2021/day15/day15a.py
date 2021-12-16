@@ -122,7 +122,7 @@ class Grid:
         parents = {}
         costs = collections.defaultdict(lambda: math.inf)
 
-        costs[0, 0] = self[0, 0]  # FIXME
+        costs[0, 0] = 0
 
         for j in range(1, self._width):
             costs[0, j] = costs[0, j - 1] + self[0, j]
