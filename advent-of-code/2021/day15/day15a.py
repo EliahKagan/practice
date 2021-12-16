@@ -122,7 +122,7 @@ class Grid:
         parents = {}
         costs = collections.defaultdict(lambda: math.inf)
 
-        costs[0, 0] = 0
+        costs[0, 0] = self[0, 0]  # FIXME
 
         for j in range(1, self._width):
             costs[0, j] = costs[0, j - 1] + self[0, j]
@@ -132,12 +132,12 @@ class Grid:
             costs[i, 0] = costs[i - 1, 0] + self[i, 0]
             parents[i, 0] = (i - 1, 0)
 
-            for j in range(1, self._height):
+            for j in range(1, self._width):
                 if costs[i - 1, j] < costs[i, j - 1]:
                     costs[i, j] = costs[i - 1, j] + self[i, j]
                     parents[i, j] = (i - 1, j)
                 else:
-                    costs[i, j] = costs[i, j - 1] = self[i, j]
+                    costs[i, j] = costs[i, j - 1] + self[i, j]
                     parents[i, j] = (i, j - 1)
 
         tree = _PathTree((0, 0), parents, costs)
