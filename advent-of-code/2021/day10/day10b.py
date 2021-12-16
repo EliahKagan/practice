@@ -42,15 +42,8 @@ def get_unmatched_openers(text: str) -> list[str] | None:
 
 
 @typechecked
-def compute_score(unmatched_openers: Reversible[str] | None):
-    """
-    Computes the "completion" score for the given unmatched prefix.
-
-    Permits None, indicating a syntax error. This scores zero.
-    """
-    if unmatched_openers is None:
-        return 0
-
+def compute_score(unmatched_openers: Reversible[str]) -> int:
+    """Computes the "completion" score for the given unmatched prefix."""
     score = 0
     for ch in reversed(unmatched_openers):  # pylint: disable=invalid-name
         score = score * 5 + WEIGHTS[ch]
@@ -60,8 +53,18 @@ def compute_score(unmatched_openers: Reversible[str] | None):
 @typechecked
 def run() -> None:
     """Reads the input and outputs the total completion score."""
-    lines = map(str.strip, fileinput.input())
-    print(sum(compute_score(get_unmatched_openers(line)) for line in lines))
+    scores = []
+    for line in map(str.strip, fileinput.input()):
+        unmatched_openers = get_unmatched_openers(line)
+        if unmatched_openers is None:
+            continue
+        scores.append(compute_score(unmatched_openers))
+
+    if len(scores) % 2 == 0:
+        raise ValueError(f"even number of scores ({len(scores)})")
+
+    scores.sort()
+    print(f'middle score = {scores[len(scores) // 2]}')
 
 
 if __name__ == '__main__':
