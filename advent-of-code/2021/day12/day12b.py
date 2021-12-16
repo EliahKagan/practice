@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Advent of Code, day 12, part B"""
+"""Advent of Code 2021, day 12, part B"""
 
 import collections
 import fileinput

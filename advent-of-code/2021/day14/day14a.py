@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Advent of Code, day 14
+Advent of Code 2021, day 14
 
 When run as a script, this solves part A. But part B is solved with the same
 logic, just more repetitions. See day14b.py.

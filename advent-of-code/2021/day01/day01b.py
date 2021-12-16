@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Advent of Code, day 1, part B"""
+"""Advent of Code 2021, day 1, part B"""
 
 import fileinput
 import itertools

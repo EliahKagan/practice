@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Advent of Code, day 15, part B"""
+"""Advent of Code 2021, day 15, part B"""
 
 import argparse
 import collections

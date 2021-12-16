@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Advent of Code, day 3, part B"""
+"""Advent of Code 2021, day 3, part B"""
 
 import fileinput
 from typing import Callable
