@@ -2,10 +2,12 @@
 
 """Advent of Code, day 15, part B"""
 
+import argparse
 import collections
 import fileinput
 import heapq
 import math
+import sys
 
 import colorama
 
@@ -162,30 +164,48 @@ class Grid:
         return 0 <= i < self.height and 0 <= j < self.width
 
 
-BRIGHT_GREEN = colorama.Style.BRIGHT + colorama.Fore.GREEN
+_BRIGHT_GREEN = colorama.Style.BRIGHT + colorama.Fore.GREEN
 
-RESET_ALL = colorama.Style.RESET_ALL
+_RESET_ALL = colorama.Style.RESET_ALL
+
+
+def _parse_options():
+    """Parses command-line options."""
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-v', '--verbose',
+                        help='show the grid, with the path in green',
+                        action='store_true')
+
+    options, remaining_args = parser.parse_known_intermixed_args()
+    sys.argv[1:] = remaining_args
+    return options
 
 
 def run():
     """Reads input, finds the path, and shows it and its cost."""
-    colorama.init()
-    print(RESET_ALL, end='')
-
+    options = _parse_options()
     grid = Grid(map(str.strip, fileinput.input()))
     grid.height_multiplier = grid.width_multiplier = 5
     result = grid.find_min_cost_path()
-    path_coords = set(result.path)
 
-    for i in range(grid.height):
-        for j in range(grid.width):
-            if (i, j) in path_coords:
-                print(f'{BRIGHT_GREEN}{grid[i, j]}{RESET_ALL}', end='')
-            else:
-                print(grid[i, j], end='')
+    if options.verbose:
+        path_coords = set(result.path)
+
+        colorama.init()
+        print(_RESET_ALL, end='')
+
+        for i in range(grid.height):
+            for j in range(grid.width):
+                if (i, j) in path_coords:
+                    print(f'{_BRIGHT_GREEN}{grid[i, j]}{_RESET_ALL}', end='')
+                else:
+                    print(grid[i, j], end='')
+            print()
+
         print()
 
-    print(f'\ncost = {result.cost}')
+    print(f'cost = {result.cost}')
 
 
 __all__ = [thing.__name__ for thing in (PathCostPair, Grid, run)]
