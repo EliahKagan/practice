@@ -7,9 +7,6 @@ import fileinput
 from typing import Mapping, Sequence
 
 
-MAX_SMALL_VISITS = 2
-
-
 def big(vertex: str):
     """Checks if the first letter of a vertex name is capitalized."""
     try:
@@ -45,18 +42,31 @@ class Maze:
         These paths are permitted to visit each "big" (initially capitalized)
         vertex at most once.
         """
-        vis = collections.Counter(start=1)
+        vis = set()
+        revis = None
 
         def dfs(src: str) -> int:
+            nonlocal revis
+
             if src == end:
                 return 1
-            if vis[src] == MAX_SMALL_VISITS:
-                return 0
+
             if not big(src):
-                vis[src] += 1
+                if src not in vis:
+                    vis.add(src)
+                elif revis is None and src != start:
+                    revis = src
+                else:
+                    return 0
+
             count = sum(map(dfs, self._adj[src]))
+
             if not big(src):
-                vis[src] -= 1
+                if src == revis:
+                    revis = None
+                else:
+                    vis.remove(src)
+
             return count
 
         return dfs(start)
