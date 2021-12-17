@@ -54,7 +54,7 @@ class Grid:
 
     def __call__(self) -> int:
         """Simulates one step. Returns the number of flashes."""
-        self._set_flashers_to_none()
+        self._simulate()
 
         count = 0
         for i, j in self._all_coordinates:
@@ -74,7 +74,7 @@ class Grid:
         """The number of columns in the grid."""
         return self._width
 
-    def _set_flashers_to_none(self) -> None:
+    def _simulate(self) -> None:
         """
         Simulates one step, except sets flashers to None instead of 0.
 
