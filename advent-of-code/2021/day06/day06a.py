@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
-"""Advent of Code 2021, day 6, part A"""
+"""
+Advent of Code 2021, day 6, part A
+
+This same logic (with a different number of iterations) solves part B. See
+day06b.py, which import this module.
+"""
 
 import fileinput
 import re
@@ -19,7 +24,7 @@ RESET = 6
 """Timers that would go negative are reset to RESET."""
 
 _PERIOD = 80
-"""The number of days to run the simulation for."""
+"""The number of days to run the part A simulation for."""
 
 
 @typechecked
