@@ -2,6 +2,7 @@
     "cSpell.words": [
         "conda",
         "mypy",
+        "nlargest",
         "pycodestyle",
         "pylint",
         "typeguard"

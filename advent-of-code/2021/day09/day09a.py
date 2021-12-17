@@ -15,6 +15,10 @@ class Grid:
 
     __slots__ = ('_rows', '_height', '_width')
 
+    _rows: list[list[int]]
+    _height: int
+    _width: int
+
     def __init__(self, rows: Iterable[Iterable[Any]]):
         """Creates a new grid by copying height values from the given rows."""
         self._rows = [list(map(int, row)) for row in rows]
