@@ -6,6 +6,7 @@ import fileinput
 import re
 from typing import NamedTuple
 
+import colorama
 from typeguard import typechecked
 
 
@@ -33,6 +34,11 @@ def _fold_one_y(y_fold: int, dot: Dot) -> Dot:
     raise ValueError(f'{dot!r} on vertical crease at y={y_fold!r}')
 
 
+_DOT_SYMBOL = f'{colorama.Fore.RED}#{colorama.Style.RESET_ALL}'
+
+_EMPTY_SYMBOL = '.'
+
+
 @typechecked
 class Dots:
     """Collection of dots on foldable paper."""
@@ -51,10 +57,12 @@ class Dots:
         width = max(x for x, _ in self._dots) + 1
 
         def make_row(y):  # pylint: disable=invalid-name
-            return ''.join(('#' if (x, y) in self._dots else '.')
-                           for x in range(width))
+            symbols = ((_DOT_SYMBOL if (x, y) in self._dots else _EMPTY_SYMBOL)
+                       for x in range(width))
+            return ''.join(symbols)
 
-        return '\n'.join(make_row(y) for y in range(height))
+        joined = '\n'.join(make_row(y) for y in range(height))
+        return colorama.Style.RESET_ALL + joined
 
     def __bool__(self) -> bool:
         """Tells if there are any dots in this collection."""
@@ -105,6 +113,7 @@ def run() -> None:
             variable, position = fold_match.groups()
             FOLDERS[variable](dots, int(position))
 
+    colorama.init()
     print(dots)
 
 
