@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
-"""Advent of Code, day 11, part A"""
+"""
+Advent of Code 2021, day 11, part A
+
+Most of the implementation of part B is also here, in that it uses the Grid
+class.
+"""
 
 import fileinput
 from itertools import product
@@ -9,7 +14,7 @@ from typing import Any, Iterable
 from typeguard import typechecked
 
 
-__all__ = ['MIN_ENERGY', 'MAX_ENERGY', 'Grid', 'run']
+__all__ = ['MIN_ENERGY', 'MAX_ENERGY', 'Grid', 'read_grid', 'run']
 
 
 MIN_ENERGY = 0
@@ -108,10 +113,15 @@ class Grid:
         return 0 <= i < self._height and 0 <= j < self._width
 
 
+def read_grid() -> Grid:
+    """Reads a grid of octopuses from stdin or a file."""
+    return Grid(map(str.strip, fileinput.input()))
+
+
 @typechecked
 def run() -> None:
-    """Reads a grid of octopuses from stdin or a file. Reports flash total."""
-    grid = Grid(map(str.strip, fileinput.input()))
+    """Reads a grid of octopuses and reports the 100-iterations flash total."""
+    grid = read_grid()
     print(sum(grid() for _ in range(_STEP_COUNT)))
 
 
