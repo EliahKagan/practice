@@ -14,7 +14,7 @@ import functools
 import heapq
 import itertools
 import operator
-from typing import Any, Iterable
+from typing import Any, Iterable, Sequence
 
 from typeguard import typechecked
 
@@ -28,14 +28,13 @@ class Grid:
 
     __slots__ = ('_rows', '_height', '_width')
 
-    _rows: tuple[tuple[int]]
+    _rows: Sequence[Sequence[int]]
     _height: int
     _width: int
 
     def __init__(self, rows: Iterable[Iterable[Any]]):
         """Creates a new grid by copying height values from the given rows."""
-        my_rows = tuple(tuple(map(int, row)) for row in rows)
-        self._rows = my_rows  # type: ignore  # Not tracking tuple *length*.
+        self._rows = tuple(tuple(map(int, row)) for row in rows)
 
         self._height = len(self._rows)
         if self._height == 0:
