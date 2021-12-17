@@ -31,6 +31,8 @@ class Grid:
     __slots__ = ('_rows', '_height', '_width')
 
     _rows: list[list[int | None]]
+    _height: int
+    _width: int
 
     def __init__(self, rows: Iterable[Iterable[Any]]):
         """Creates a new grid by copying energy levels from the given rows."""
