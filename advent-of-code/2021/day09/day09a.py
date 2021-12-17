@@ -30,7 +30,7 @@ class Grid:
             raise ValueError('empty rows not allowed')
 
     @property
-    def low_points(self) -> Iterable[int]:
+    def low_point_values(self) -> Iterable[int]:
         """
         Yields the heights surrounded all by strictly lower heights.
 
@@ -63,7 +63,7 @@ class Grid:
 def run() -> None:
     """Reads a grid from stdin or a file. Prints the sum of its risk levels."""
     grid = Grid(map(str.strip, fileinput.input()))
-    print(sum(1 + height for height in grid.low_points))
+    print(sum(1 + height for height in grid.low_point_values))
 
 
 if __name__ == '__main__':
