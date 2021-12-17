@@ -9,11 +9,14 @@ from typing import Any, Iterable
 from typeguard import typechecked
 
 
+__all__ = ['MIN_ENERGY', 'MAX_ENERGY', 'Grid', 'run']
+
+
 MIN_ENERGY = 0
 
 MAX_ENERGY = 9
 
-STEP_COUNT = 100
+_STEP_COUNT = 100
 
 
 @typechecked
@@ -26,22 +29,23 @@ class Grid:
 
     def __init__(self, rows: Iterable[Iterable[Any]]):
         """Creates a new grid by copying energy levels from the given rows."""
-        self._rows = [list(map(int, row)) for row in rows]
+        my_rows = [list(map(int, row)) for row in rows]
 
-        self._height = len(self._rows)
+        self._height = len(my_rows)
         if self._height == 0:
             raise ValueError('empty grid not allowed (no rows)')
 
-        self._width = len(self._rows[0])
-        if any(len(row) != self._width for row in self._rows):
+        self._width = len(my_rows[0])
+        if any(len(row) != self._width for row in my_rows):
             raise ValueError('jagged grid not allowed')
         if self._width == 0:
             raise ValueError('empty rows not allowed')
 
-        # FIXME: Do something more elegant than just telling mypy to shut up.
-        if not all(MIN_ENERGY <= energy <= MAX_ENERGY  # type: ignore
-                   for row in self._rows for energy in row):
+        if not all(MIN_ENERGY <= energy <= MAX_ENERGY
+                   for row in my_rows for energy in row):
             raise ValueError('not all input energies are in range')
+
+        self._rows = my_rows  # type: ignore
 
     def __call__(self) -> int:
         """Simulates one step. Returns the number of flashes."""
@@ -106,9 +110,9 @@ class Grid:
 
 @typechecked
 def run() -> None:
-    """Reads a grid of octopodes from stdin or a file. Reports flash total."""
+    """Reads a grid of octopuses from stdin or a file. Reports flash total."""
     grid = Grid(map(str.strip, fileinput.input()))
-    print(sum(grid() for _ in range(STEP_COUNT)))
+    print(sum(grid() for _ in range(_STEP_COUNT)))
 
 
 if __name__ == '__main__':
