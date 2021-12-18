@@ -4,20 +4,28 @@
 
 import fileinput
 import operator
+from typing import Callable, Iterable, NoReturn, Sequence
 
 
 MASK = 2**16 - 1
+"""Bits retained by the unary and binary operators in this program."""
 
-UNARY_OPERATORS = {
+UNARY_OPERATORS : dict[str, Callable[[int], int]] = {
     'NOT': lambda arg: ~arg & MASK,
 }
+"""Table mapping names to one-parameter (arity 1) operations."""
 
-BINARY_OPERATORS = {
+BINARY_OPERATORS : dict[str, Callable[[int, int], int]] = {
     'AND': operator.and_,
     'OR': operator.or_,
     'LSHIFT': lambda arg1, arg2: (arg1 << arg2) & MASK,
     'RSHIFT': operator.rshift,
 }
+"""Table mapping names to two-parameter (arity 2) operations."""
+
+
+Thunk = Callable[[], int]
+"""Represents a deferred computation of an integer."""
 
 
 class CyclicDependencyError(RuntimeError):
@@ -30,27 +38,27 @@ class CyclicDependencyError(RuntimeError):
         super().__init__(f'''cyclic dependency, can't solve for "{name}"''')
 
 
-thunks = {}
+thunks = dict[str, Thunk]()
 
-def make_term(name_or_value):
+def make_term(name_or_value: str) -> Thunk:
     try:
         value = int(name_or_value)
     except ValueError:
         return lambda: thunks[name_or_value]()
     return lambda: value
 
-def make_unary(unary_symbol, arg):
+def make_unary(unary_symbol: str, arg: str) -> Thunk:
     unary_op = UNARY_OPERATORS[unary_symbol]
     term = make_term(arg)
     return lambda: unary_op(term())
 
-def make_binary(binary_symbol, arg1, arg2):
+def make_binary(binary_symbol: str, arg1: str, arg2: str) -> Thunk:
     binary_op = BINARY_OPERATORS[binary_symbol]
     term1 = make_term(arg1)
     term2 = make_term(arg2)
     return lambda: binary_op(term1(), term2())
 
-def make_rule(tokens):
+def make_rule(tokens: Sequence[str]) -> Thunk:
     match len(tokens):
         case 1:
             return make_term(tokens[0])
@@ -61,13 +69,13 @@ def make_rule(tokens):
         case n:
             raise ValueError(f'malformed rule ({n} tokens)')
 
-def make_cycle_canary(name):
-    def canary():
+def make_cycle_canary(name: str) -> Callable[[], NoReturn]:
+    def canary() -> NoReturn:
         raise CyclicDependencyError(name)
 
     return canary
 
-def add_rule(name, code):
+def add_rule(name: str, code: Thunk) -> None:
     def thunk():
         thunks[name] = make_cycle_canary(name)
         value = code()
@@ -76,9 +84,11 @@ def add_rule(name, code):
 
     thunks[name] = thunk
 
-for rule, name in (map(str.strip, line.split('->'))
-                   for line in fileinput.input()):
-    add_rule(name, make_rule(rule.split()))
+
+lines: Iterable[str] = fileinput.input()
+
+for expression, name in (map(str.strip, line.split('->')) for line in lines):
+    add_rule(name, make_rule(expression.split()))
 
 for name in sorted(thunks):
     print(f'{name}: {thunks[name]()}')
