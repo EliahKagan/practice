@@ -27,7 +27,7 @@ class CyclicDependencyError(RuntimeError):
 
     def __init__(self, name):
         """Creates a new error with the variable that can't be solved for."""
-        super.__init__(f"cyclic dependency, can't solve for \"name\"")
+        super().__init__(f'''cyclic dependency, can't solve for "{name}"''')
 
 
 thunks = {}
