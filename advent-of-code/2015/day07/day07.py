@@ -4,18 +4,18 @@
 
 import fileinput
 import operator
-from typing import Callable, Iterable, NoReturn, Sequence
+from typing import Callable, Iterable, Mapping, NamedTuple, NoReturn, Sequence
 
 
 MASK = 2**16 - 1
 """Bits retained by the unary and binary operators in this program."""
 
-UNARY_OPERATORS : dict[str, Callable[[int], int]] = {
+UNARY_OPERATORS: dict[str, Callable[[int], int]] = {
     'NOT': lambda arg: ~arg & MASK,
 }
 """Table mapping names to one-parameter (arity 1) operations."""
 
-BINARY_OPERATORS : dict[str, Callable[[int, int], int]] = {
+BINARY_OPERATORS: dict[str, Callable[[int, int], int]] = {
     'AND': operator.and_,
     'OR': operator.or_,
     'LSHIFT': lambda arg1, arg2: (arg1 << arg2) & MASK,
@@ -33,62 +33,97 @@ class CyclicDependencyError(RuntimeError):
 
     __slots__ = ()
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         """Creates a new error with the variable that can't be solved for."""
         super().__init__(f'''cyclic dependency, can't solve for "{name}"''')
 
 
-thunks = dict[str, Thunk]()
+class Binding(NamedTuple):
+    """A "variable" name and the expression that will give it its value."""
 
-def make_term(name_or_value: str) -> Thunk:
-    try:
-        value = int(name_or_value)
-    except ValueError:
-        return lambda: thunks[name_or_value]()
-    return lambda: value
+    name: str
+    """The variable name."""
 
-def make_unary(unary_symbol: str, arg: str) -> Thunk:
-    unary_op = UNARY_OPERATORS[unary_symbol]
-    term = make_term(arg)
-    return lambda: unary_op(term())
-
-def make_binary(binary_symbol: str, arg1: str, arg2: str) -> Thunk:
-    binary_op = BINARY_OPERATORS[binary_symbol]
-    term1 = make_term(arg1)
-    term2 = make_term(arg2)
-    return lambda: binary_op(term1(), term2())
-
-def make_rule(tokens: Sequence[str]) -> Thunk:
-    match len(tokens):
-        case 1:
-            return make_term(tokens[0])
-        case 2:
-            return make_unary(tokens[0], tokens[1])
-        case 3:
-            return make_binary(tokens[1], tokens[0], tokens[2])
-        case n:
-            raise ValueError(f'malformed rule ({n} tokens)')
-
-def make_cycle_canary(name: str) -> Callable[[], NoReturn]:
-    def canary() -> NoReturn:
-        raise CyclicDependencyError(name)
-
-    return canary
-
-def add_rule(name: str, code: Thunk) -> None:
-    def thunk():
-        thunks[name] = make_cycle_canary(name)
-        value = code()
-        thunks[name] = lambda: value
-        return value
-
-    thunks[name] = thunk
+    expression_tokens: Sequence[str]
+    """The expression to eventually be evaluated to assign the variable."""
 
 
-lines: Iterable[str] = fileinput.input()
+def build_thunk_table(bindings: Iterable[Binding]) -> Mapping[str, Thunk]:
+    """Builds a thunk table from the given bindings."""
+    thunks = dict[str, Thunk]()
 
-for expression, name in (map(str.strip, line.split('->')) for line in lines):
-    add_rule(name, make_rule(expression.split()))
+    def make_term(name_or_value: str) -> Thunk:
+        try:
+            value = int(name_or_value)
+        except ValueError:
+            # The thunk table may not have the final (or any) value set for
+            # this name, yet, so we have to defer the read. But Pylint doesn't
+            # know that and wrongly thinks we can return thunks[name_or_value].
+            # pylint: disable=unnecessary-lambda
+            return lambda: thunks[name_or_value]()
+        return lambda: value
 
-for name in sorted(thunks):
-    print(f'{name}: {thunks[name]()}')
+    def make_unary(unary_symbol: str, arg: str) -> Thunk:
+        unary_op = UNARY_OPERATORS[unary_symbol]
+        term = make_term(arg)
+        return lambda: unary_op(term())
+
+    def make_binary(binary_symbol: str, arg1: str, arg2: str) -> Thunk:
+        binary_op = BINARY_OPERATORS[binary_symbol]
+        term1 = make_term(arg1)
+        term2 = make_term(arg2)
+        return lambda: binary_op(term1(), term2())
+
+    def make_thunk(tokens: Sequence[str]) -> Thunk:
+        match len(tokens):
+            case 1:
+                return make_term(tokens[0])
+            case 2:
+                return make_unary(tokens[0], tokens[1])
+            case 3:
+                return make_binary(tokens[1], tokens[0], tokens[2])
+            case _:
+                raise ValueError(f'malformed rule ({len(tokens)} tokens)')
+
+        raise AssertionError('unreachable')  # ...but mypy doesn't know it.
+
+    def make_cycle_canary(name: str) -> Callable[[], NoReturn]:
+        def canary() -> NoReturn:
+            raise CyclicDependencyError(name)
+
+        return canary
+
+    def add_rule(name: str, code: Thunk) -> None:
+        def thunk():
+            thunks[name] = make_cycle_canary(name)
+            value = code()
+            thunks[name] = lambda: value
+            return value
+
+        thunks[name] = thunk
+
+    for name, expression_tokens in bindings:
+        add_rule(name, make_thunk(expression_tokens))
+
+    return thunks
+
+
+def read_bindings() -> Sequence[Binding]:
+    """Reads bindings (names and expression tokens) from stdin or a file."""
+    lines: Iterable[str] = fileinput.input()
+
+    return [Binding(name=right.strip(), expression_tokens=left.split())
+            for left, right in (line.split('->') for line in lines)]
+
+
+def run() -> None:
+    """Reads bindings from stdin or a file and solves for all variables."""
+    bindings = read_bindings()
+    thunks = build_thunk_table(bindings)
+
+    for name in sorted(thunks):
+        print(f'{name}: {thunks[name]()}')
+
+
+if __name__ == '__main__':
+    run()
