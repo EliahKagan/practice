@@ -12,46 +12,47 @@ from __future__ import annotations
 import fileinput
 import heapq
 import re
-from typing import Any, Iterable, Mapping, NamedTuple, TypeVar
+from typing import Any, Generic, Iterable, Mapping, TypeVar
 
+import attr
 from typeguard import typechecked
 
 
-_T = TypeVar('_T')
+T = TypeVar('T')  # pylint: disable=invalid-name
 
 
 @typechecked
-def _get_zeros(mapping: Mapping[_T, Any]) -> list[_T]:
+def _get_zeros(mapping: Mapping[T, Any]) -> list[T]:
     """Returns the keys that are mapped to falsy values in the mapping."""
     return [key for key, value in mapping.items() if not value]
 
 
-@typechecked
-class Edge(NamedTuple):
-    """A directed edge whose vertices are strings."""
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class Edge(Generic[T]):
+    """A directed edge."""
 
-    src: str
+    src: T
     """The source (tail) vertex."""
 
-    dest: str
+    dest: T
     """The destination (head) vertex."""
 
 
 @typechecked
-class Graph:
+class Graph(Generic[T]):
     """An unweighted directed graph, representing dependencies."""
 
     __slots__ = ('_adj', '_indegrees')
 
-    _adj: dict[str, list[str]]
-    _indegrees: dict[str, int]
+    _adj: dict[T, list[T]]
+    _indegrees: dict[T, int]
 
     @classmethod
-    def from_edges(cls, edges: Iterable[Edge]) -> Graph:
+    def from_edges(cls, edges: Iterable[Edge[T]]) -> Graph[T]:
         """Creates a directed graph from an iterable of edges."""
         graph = cls()
-        for src, dest in edges:
-            graph.add_edge(src, dest)
+        for edge in edges:
+            graph.add_edge(edge.src, edge.dest)
         return graph
 
     def __init__(self):
@@ -64,13 +65,13 @@ class Graph:
         """The number of vertices in the graph."""
         return len(self._adj)
 
-    def add_vertex(self, vertex: str) -> None:
+    def add_vertex(self, vertex: T) -> None:
         """Adds a vertex to the graph, if it is not already present."""
         if vertex not in self._adj:
             self._adj[vertex] = []
             self._indegrees[vertex] = 0
 
-    def add_edge(self, src: str, dest: str) -> None:
+    def add_edge(self, src: T, dest: T) -> None:
         """
         Adds a directed edge to the graph.
 
@@ -82,7 +83,7 @@ class Graph:
         self._adj[src].append(dest)
         self._indegrees[dest] += 1
 
-    def toposort(self) -> list[str]:
+    def toposort(self) -> list[T]:
         """
         Emits a lexicographically minimal topological sort.
 
@@ -112,7 +113,7 @@ _STEP_PARSER = re.compile(
 
 
 @typechecked
-def read_edges() -> Iterable[Edge]:
+def read_edges() -> Iterable[Edge[str]]:
     """Reads steps from stdin or a file as directed edges."""
     raw_lines: Iterable[str] = fileinput.input()
 
@@ -124,7 +125,7 @@ def read_edges() -> Iterable[Edge]:
         if match is None:
             raise ValueError(f'malformed line: {line}')
 
-        yield Edge._make(match.groups())
+        yield Edge[str](*match.groups())
 
 
 @typechecked
