@@ -1,0 +1,15 @@
+### Runtime dependencies: ###
+
+attrs
+typeguard
+
+
+### Development-only dependencies: ###
+
+# Experimental mypy with support for the match statement.
+git+https://github.com/freundTech/mypy.git@feature-match-stmt#egg=mypy
+
+# Other linting tools.
+pycodestyle
+pylint
+pyright
