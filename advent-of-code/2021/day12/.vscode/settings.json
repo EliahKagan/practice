@@ -4,6 +4,7 @@
         "mypy",
         "pycodestyle",
         "pylint",
+        "pyright",
         "revis",
         "typeguard"
     ]

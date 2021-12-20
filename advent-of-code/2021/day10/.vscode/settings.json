@@ -5,6 +5,7 @@
         "mypy",
         "pycodestyle",
         "pylint",
+        "pyright",
         "typeguard",
         "unsubscriptable"
     ]

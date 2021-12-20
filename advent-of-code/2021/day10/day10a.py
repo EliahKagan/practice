@@ -3,6 +3,7 @@
 """Advent of Code 2021, day 10, part A"""
 
 import fileinput
+from typing import Iterable
 
 from bidict import bidict
 from typeguard import typechecked
@@ -43,7 +44,8 @@ def find_unmatched_closer(text: str) -> str | None:
 @typechecked
 def run() -> None:
     """Reads the input and outputs the total syntax-error score."""
-    lines = map(str.strip, fileinput.input())
+    raw_lines: Iterable[str] = fileinput.input()
+    lines = map(str.strip, raw_lines)
     print(sum(WEIGHTS[find_unmatched_closer(line)] for line in lines))
 
 

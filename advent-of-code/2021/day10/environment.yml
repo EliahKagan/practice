@@ -12,3 +12,4 @@ dependencies:
   - mypy
   - pycodestyle
   - pylint
+  - pyright

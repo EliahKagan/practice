@@ -32,7 +32,7 @@ class Grid:
     _height: int
     _width: int
 
-    def __init__(self, rows: Iterable[Iterable[Any]]):
+    def __init__(self, rows: Iterable[Iterable[Any]]) -> None:
         """Creates a new grid by copying height values from the given rows."""
         self._rows = tuple(tuple(map(int, row)) for row in rows)
 
@@ -79,7 +79,8 @@ class Grid:
 @typechecked
 def run() -> None:
     """Reads a grid. Prints the product of its three largest basin areas."""
-    grid = Grid(map(str.strip, fileinput.input()))
+    lines: Iterable[str] = fileinput.input()
+    grid = Grid(map(str.strip, lines))
     largest = heapq.nlargest(3, grid.component_areas)
     print(functools.reduce(operator.mul, largest))
 

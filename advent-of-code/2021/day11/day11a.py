@@ -34,7 +34,7 @@ class Grid:
     _height: int
     _width: int
 
-    def __init__(self, rows: Iterable[Iterable[Any]]):
+    def __init__(self, rows: Iterable[Iterable[Any]]) -> None:
         """Creates a new grid by copying energy levels from the given rows."""
         my_rows = [list(map(int, row)) for row in rows]
 
@@ -117,7 +117,8 @@ class Grid:
 
 def read_grid() -> Grid:
     """Reads a grid of octopuses from stdin or a file."""
-    return Grid(map(str.strip, fileinput.input()))
+    lines: Iterable[str] = fileinput.input()
+    return Grid(map(str.strip, lines))
 
 
 @typechecked

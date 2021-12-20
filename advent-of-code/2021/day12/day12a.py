@@ -4,7 +4,7 @@
 
 import collections
 import fileinput
-from typing import Mapping, MutableSequence
+from typing import Iterable, Mapping, MutableSequence
 
 from typeguard import typechecked
 
@@ -29,11 +29,11 @@ class Maze:
 
     _adj: Mapping[str, MutableSequence[str]]
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Creates a new, initially empty maze."""
         self._adj = collections.defaultdict(list)
 
-    def add_edge(self, u: str, v: str) -> None:
+    def add_edge(self, u: str, v: str) -> None:  # pylint: disable=invalid-name
         """Adds an edge (a maze passage) between u and v."""
         if big(u) and big(v):
             raise ValueError(f'adjacent "big" vertices {u!r}, {v!r} produce '
@@ -71,7 +71,10 @@ def run() -> None:
     """Reads a maze from stdin or a file and reports a permitted path count."""
     maze = Maze()
 
-    for u, v in (line.strip().split('-') for line in fileinput.input()):
+    lines: Iterable[str] = fileinput.input()
+
+    # pylint: disable=invalid-name
+    for u, v in (line.strip().split('-') for line in lines):
         maze.add_edge(u, v)
 
     print(maze.count_paths())

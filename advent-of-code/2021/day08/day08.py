@@ -6,6 +6,9 @@ import argparse
 import fileinput
 import itertools
 import sys
+from typing import Iterable, Sequence
+
+from typeguard import typechecked
 
 
 UNSCRAMBLED_DIGITS = (
@@ -22,18 +25,20 @@ UNSCRAMBLED_DIGITS = (
 )
 
 
-def normalize(digit):
+def normalize(digit: Iterable[str]) -> str:
     """Normalize (the representation of a) digit by sorting it internally."""
     return ''.join(sorted(digit))
 
 
-def scramble(digit, permutation):
+def scramble(digit, permutation: tuple[int, ...]) -> str:
     """Scrambles a digit representation, using a permutation of range(7)."""
     return normalize(chr(ord('a') + permutation[ord(letter) - ord('a')])
                      for letter in digit)
 
 
-def scramble_all_digits_by_permutation(permutation):
+@typechecked
+def scramble_all_digits_by_permutation(permutation: tuple[int, ...]) \
+        -> tuple[str, ...]:
     """Scrambles each digit (0 through 9) using the permutation of range(7)."""
     return tuple(scramble(digit, permutation) for digit in UNSCRAMBLED_DIGITS)
 
@@ -42,7 +47,8 @@ ALL_SCRAMBLINGS = tuple(map(scramble_all_digits_by_permutation,
                             itertools.permutations(range(7))))
 
 
-def crack(shuffled_digits, message):
+@typechecked
+def crack(shuffled_digits: Sequence[str], message: Sequence[str]) -> list[int]:
     """Decrypts a message, based on shuffled (unordered) scrambled digits."""
     if len(shuffled_digits) != len(UNSCRAMBLED_DIGITS):
         raise ValueError('wrong number of digits in input')
@@ -67,7 +73,8 @@ def crack(shuffled_digits, message):
         raise ValueError("scrambling can't decode message") from error
 
 
-def parse_options():
+@typechecked
+def parse_options() -> argparse.Namespace:
     """Parses command-line options."""
     parser = argparse.ArgumentParser()
 
@@ -85,13 +92,15 @@ def parse_options():
 EASY_DIGITS = (1, 4, 7, 8)
 
 
-def run():
+@typechecked
+def run() -> None:
     """Reads input from stdin or a file an decode the messages."""
     options = parse_options()
     easy_count = 0
     quad_sum = 0
+    lines: Iterable[str] = fileinput.input()
 
-    for line in fileinput.input():
+    for line in lines:
         shuffled_digits, message = (text.split() for text in line.split('|'))
         decrypted_message = crack(shuffled_digits, message)
 

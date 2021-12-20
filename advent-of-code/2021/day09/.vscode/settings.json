@@ -5,6 +5,7 @@
         "nlargest",
         "pycodestyle",
         "pylint",
+        "pyright",
         "typeguard"
     ]
 }

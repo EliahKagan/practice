@@ -3,9 +3,13 @@
 """Advent of Code 2021, day 3, part A"""
 
 import fileinput
+from typing import Sequence
+
+from typeguard import typechecked
 
 
-def majority(col):
+@typechecked
+def majority(col: Sequence[int]) -> int:
     """Gets the majority bit of a column."""
     double_pop = sum(col) * 2
     if double_pop == len(col):
@@ -13,12 +17,14 @@ def majority(col):
     return int(double_pop > len(col))
 
 
-def binary(bits):
+@typechecked
+def binary(bits: Sequence[int]) -> int:
     """Converts a sequence of ones and zeros to a binary number."""
     return int(''.join(map(str, bits)), base=2)
 
 
-def run():
+@typechecked
+def run() -> None:
     """Solves the problem as described in input on stdin or a file."""
     rows = (map(int, line.strip()) for line in fileinput.input())
     cols = list(zip(*rows))

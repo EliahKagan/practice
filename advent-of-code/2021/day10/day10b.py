@@ -3,7 +3,7 @@
 """Advent of Code 2021, day 10, part B"""
 
 import fileinput
-from typing import Reversible
+from typing import Iterable, Reversible
 
 from bidict import bidict
 from typeguard import typechecked
@@ -54,7 +54,9 @@ def compute_score(unmatched_openers: Reversible[str]) -> int:
 def run() -> None:
     """Reads the input and outputs the total completion score."""
     scores = []
-    for line in map(str.strip, fileinput.input()):
+    raw_lines: Iterable[str] = fileinput.input()
+
+    for line in map(str.strip, raw_lines):
         unmatched_openers = get_unmatched_openers(line)
         if unmatched_openers is not None:
             scores.append(compute_score(unmatched_openers))
