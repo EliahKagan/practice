@@ -55,7 +55,7 @@ class Graph(Generic[T]):
             graph.add_edge(edge.src, edge.dest)
         return graph
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Creates an initially empty directed graph."""
         self._adj = {}
         self._indegrees = {}

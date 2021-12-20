@@ -44,7 +44,7 @@ class CyclicDependencyError(RuntimeError):
 
     __slots__ = ()
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         """Creates a new error with the variable that can't be solved for."""
         super().__init__(f'''cyclic dependency, can't solve for "{name}"''')
 
