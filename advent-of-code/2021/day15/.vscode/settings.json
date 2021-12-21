@@ -2,7 +2,10 @@
     "cSpell.words": [
         "colorama",
         "conda",
+        "mypy",
         "pycodestyle",
-        "pylint"
+        "pylint",
+        "pyright",
+        "typeguard"
     ]
 }

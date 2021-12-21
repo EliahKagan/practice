@@ -11,18 +11,22 @@ from collections import Counter
 import fileinput
 import itertools
 import re
-from typing import Iterable, NamedTuple
+from typing import Iterable, Iterator, Mapping, NamedTuple
+
+from typeguard import typechecked
 
 
 RULE_PARSER = re.compile(r'^\s*(\w)(\w)\s+->\s+(\w)\s*$')
 
 
+@typechecked
 class PolymerSummary(NamedTuple):
     """Element and pair counts of a "polymer"."""
-    elem_counts: Counter[str]
-    pair_counts: Counter[tuple[str, str]]
+    elem_counts: Mapping[str, int]
+    pair_counts: Mapping[tuple[str, str], int]
 
 
+@typechecked
 def polymerize(template_text: str,
                rules: dict[tuple[str, str], str],
                reps: int) -> PolymerSummary:
@@ -49,6 +53,7 @@ def polymerize(template_text: str,
     return PolymerSummary(elem_counts, pair_counts)
 
 
+@typechecked
 def read_rules(lines: Iterable[str]) -> dict[tuple[str, str], str]:
     """Reads transformation rules from lines of text."""
     rules = {}
@@ -70,9 +75,10 @@ def read_rules(lines: Iterable[str]) -> dict[tuple[str, str], str]:
     return rules
 
 
+@typechecked
 def run(reps: int) -> None:
     """Reads input from stdin or a file and outputs a solution."""
-    line_iterator = fileinput.input()
+    line_iterator: Iterator[str] = fileinput.input()
 
     template_text = next(line_iterator).strip()
     if not template_text:

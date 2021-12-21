@@ -5,8 +5,13 @@ channels:
 
 dependencies:
   - python=3.10
+  - attrs
   - colorama
+  - typeguard
 
   # dev
+  - mypy
   - pycodestyle
   - pylint
+  - pyright
+  - types-colorama
