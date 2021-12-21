@@ -11,7 +11,7 @@ slightly dated versions of Python 3, as in HackerRank's environment).
 
 import collections
 import itertools
-from typing import Iterable, MutableSequence, Sequence, TypeVar
+from typing import Iterable, Optional, MutableSequence, Sequence, TypeVar
 
 
 T = TypeVar('T')  # pylint: disable=invalid-name
@@ -41,12 +41,12 @@ class Graph:
         self._adj[u].append(v)
         self._adj[v].append(u)
 
-    def bfs(self, start: int) -> list[int | None]:
+    def bfs(self, start: int) -> list[Optional[int]]:
         """Finds distances to all vertices from a start vertex."""
         if not self._exists(start):
             raise ValueError('start vertex out of range')
 
-        distances: list[int | None] = [None] * (self.order + 1)
+        distances: list[Optional[int]] = [None] * (self.order + 1)
         distances[start] = 0
         queue = collections.deque((start,))
 
@@ -93,7 +93,7 @@ def without_indices(values: Sequence[T], indices: Sequence[int]) \
             if index not in indices)
 
 
-def get_output_distance(depth: int | None) -> int:
+def get_output_distance(depth: Optional[int]) -> int:
     """Processes a BFS depth into a distance value, for output."""
     return UNREACHABLE_DISTANCE if depth is None else depth * EDGE_WEIGHT
 
