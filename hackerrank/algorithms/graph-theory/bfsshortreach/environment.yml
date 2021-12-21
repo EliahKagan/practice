@@ -1,0 +1,11 @@
+name: practice-hackerrank-bfsshortreach
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.10  # TODO: Change to 3.9.4 (as in HackerRank's environment).
+  - mypy
+  - pycodestyle
+  - pylint
+  - pyright
