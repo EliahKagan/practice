@@ -30,7 +30,6 @@ class PathCostPair(Generic[TVertex, TCost]):
 MAX_DIGIT = 9
 
 
-# @typechecked  # Too slow.
 class Grid:
     """A game board for the path-finding puzzle."""
 
@@ -48,6 +47,7 @@ class Grid:
     _tile_height: int
     _tile_width: int
 
+    @typechecked
     def __init__(self, rows: Iterable[Iterable[Any]]) -> None:
         """Creates a grid with the given rows."""
         self._height_multiplier = self._width_multiplier = 1
@@ -122,6 +122,7 @@ class Grid:
             raise ValueError('width multiplier must be positive')
         self._width_multiplier = new_width_multiplier
 
+    @typechecked
     def find_min_cost_path(self) -> PathCostPair[tuple[int, int], int]:
         """
         Finds the minimum-cost path from upper-left to lower right.
@@ -142,6 +143,7 @@ class Grid:
         path.reverse()
         return PathCostPair(path, cost)
 
+    @typechecked
     def _dijkstra(self,
                   start: tuple[int, int],
                   finish: tuple[int, int] | None = None) \
@@ -149,13 +151,14 @@ class Grid:
                      Mapping[tuple[int, int], int]]:
         parents = dict[tuple[int, int], tuple[int, int]]()
         costs = dict[tuple[int, int], int]()
-        done = set[tuple[int, int]]()  # FIXME: Actually use this properly!
+        done = set[tuple[int, int]]()
         heap: list[tuple[int, tuple[int, int]]] = [(0, start)]
 
         while heap:
             src_cost, src = heapq.heappop(heap)
             if src in done:  # For multiple inserts (in lieu of decrease-key).
                 continue
+            done.add(src)
 
             costs[src] = src_cost
             if src == finish:

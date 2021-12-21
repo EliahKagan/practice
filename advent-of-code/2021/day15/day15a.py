@@ -180,13 +180,14 @@ class Grid:
         """
         parents = dict[tuple[int, int], tuple[int, int]]()
         costs = dict[tuple[int, int], int]()
-        done = set[tuple[int, int]]()  # FIXME: Actually use this properly!
+        done = set[tuple[int, int]]()
         heap: list[tuple[int, tuple[int, int]]] = [(0, start)]
 
         while heap:
             src_cost, src = heapq.heappop(heap)
             if src in done:  # For multiple inserts (in lieu of decrease-key).
                 continue
+            done.add(src)
 
             costs[src] = src_cost
             if src == finish:
