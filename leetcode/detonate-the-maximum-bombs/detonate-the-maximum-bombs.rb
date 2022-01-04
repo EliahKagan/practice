@@ -123,14 +123,48 @@ class Metagraph
   # Creates a metagraph from a graph and groups of vertices in it.
   # The metagraph's vertices are 0, ..., groups.size - 1.
   def initialize(graph, groups)
-    @out_adj = Array.new(group.size) { [] }
-    @indegrees = Array.new(group.size, 0)
+    @adj = Array.new(group.size) { [] }
     @weights = groups.map(&:size)
 
     populate_from(graph)
   end
 
+  def order
+    @adj.size
+  end
+
+  # Finds total weights reachable from each vertex.
+  # Assumes the graph is acyclic. If there is a cycle, the results are invalid.
+  def dag_reachable_total_weights
+    reachable_weight = Array.new(order, nil)
+
+    each_vertex_reverse_toposort do |src|
+      # FIXME: This will sometimes count weights multiple times.
+      #        Is this idea even workable at all??
+      @weights[src] + @adj[src].sum { |dest| reachable_weight[dest] }
+    end
+
+    reachable_weight
+  end
+
   private
+
+  # Yields vertices in reverse topological order via DFS.
+  # The graph is assumed to be acyclic. Cycle-checking is not performed.
+  def each_vertex_reverse_toposort
+    vis = Set.new
+
+    dfs = lambda do |src|
+      return if vis.include?(src)
+
+      vis << src
+      @adj[src].each(&dfs)
+      yield src
+    end
+
+    (0...order).each(&dfs)
+    nil
+  end
 
   # Adds meta-edges based on the original graph's edges.
   def populate_from(graph)
@@ -146,8 +180,7 @@ class Metagraph
       next if seen.include?(metaedge)
 
       seen << metaedge
-      @out_adj[metasrc] << metadest
-      @indegrees[metadest] += 1
+      @adj[metasrc] << metadest
     end
 
     nil
@@ -155,7 +188,7 @@ class Metagraph
 
   # Creates an array that maps original vertices to metagraph vertices.
   def make_meta_lookup(graph)
-    lookup = Array.new(graph.size, nil)
+    lookup = Array.new(graph.order, nil)
 
     groups.each_with_index do |group, metavertex|
       group.each { |vertex| lookup[vertex] = metavertex }
