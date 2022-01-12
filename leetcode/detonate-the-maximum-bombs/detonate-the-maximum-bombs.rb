@@ -13,14 +13,15 @@
 #     connected component it represents.
 #
 # (4) This metagraph is a DAG. Linearize it and update each of its vertices
-#     with weight sums of all reachable vertices, in topological order.
-#     This is similar to finding shortest paths in a DAG.
+#     with sets of reachable vertices in topological order (similar to finding
+#     shortest paths in a DAG, but with bitsets and bitwise OR), thereby
+#     computing metagraph's transitive closure. Sum total reachable weights.
 
 # @param {Integer[][]} bombs
 # @return {Integer}
 def maximum_detonation(bombs)
   graph = build_graph(bombs)
-  (0...graph.order).map { |start| graph.count_reachable(start) }.max
+  Metagraph.new(graph, graph.kosaraju).dag_reachable_total_weights.max
 end
 
 def build_graph(bombs)
@@ -38,21 +39,23 @@ def build_graph(bombs)
   graph
 end
 
-# Extensions to Integer to support counting population of "1" bits.
+# Extensions to Integer to support using it as a bitfield.
 class Integer
-  # Number of bits that are 1 (population count). Value must be nonnegative.
-  def popcount
-    raise ArgumentError(%q{negative integer has no popcount}) if self.negative?
+  # The indices of bits that are 1 rather than 0. Invalid on negative values.
+  def bit_support
+    raise ArgumentError('set bits undefined for negatives') if self.negative?
 
-    count = 0
+    support = []
 
     value = self
+    index = 0
     until value.zero?
-      count += value & 1
+      support << index if value & 1
       value >>= 1
+      index += 1
     end
 
-    count
+    support
   end
 end
 
@@ -127,11 +130,17 @@ class Graph
 
     until stack.empty?
       group = []
-      populate_component.call(group, stack.pop)
+      populate_group.call(group, stack.pop)
       groups << group
     end
 
     groups
+  end
+
+  private
+
+  def exists?(vertex)
+    vertex.between?(0, order - 1)
   end
 end
 
@@ -141,32 +150,34 @@ class Metagraph
   # Creates a metagraph from a graph and groups of vertices in it.
   # The metagraph's vertices are 0, ..., groups.size - 1.
   def initialize(graph, groups)
-    @adj = Array.new(group.size) { [] }
+    @adj = Array.new(groups.size) { [] }
     @weights = groups.map(&:size)
 
-    populate_from(graph)
+    populate_from(graph, groups)
   end
 
   def order
     @adj.size
   end
 
-  # Computes an array of nonnegative integers used as bit arrays, where the jth
-  # bit of the ith element is 1 if j is reachable from i (and 0 otherwise). The
-  # graph must be acyclic. If it has a cycles, the results are invalid.
-  def dag_reachable
-    reach = Array.new(order, 0)
-
-    each_vertex_reverse_toposort do |src|
-      # FIXME: This will sometimes count weights multiple times.
-      #        Is this idea even workable at all??
-      @weights[src] + @adj[src].sum { |dest| reachable_weight[dest] }
-    end
-
-    reachable_weight
+  # Finds total weights reachable from each vertex. Invalid on cyclic graphs.
+  def dag_reachable_total_weights
+    dag_reachable.map { |reach| reach.reduce(0) { |a, e| a + @weights[e] } }
   end
 
   private
+
+  # Computes the transitive closure of this graph as an adjacency list. The
+  # ith row contains j iff j is reachable from i. Assumes the graph is acyclic.
+  def dag_reachable
+    reaches = Array.new(order, 0)
+
+    each_vertex_reverse_toposort do |src|
+      reaches[src] = @adj[src].map { |dest| reaches[dest] }.reduce(0, :|)
+    end
+
+    reaches.map(&:bit_support)
+  end
 
   # Yields vertices in reverse topological order via DFS.
   # The graph is assumed to be acyclic. Cycle-checking is not performed.
@@ -186,8 +197,8 @@ class Metagraph
   end
 
   # Adds meta-edges based on the original graph's edges.
-  def populate_from(graph)
-    lookup = make_meta_lookup(graph)
+  def populate_from(graph, groups)
+    lookup = make_meta_lookup(graph, groups)
     seen = Set.new
 
     graph.each_edge do |src, dest|
@@ -206,7 +217,7 @@ class Metagraph
   end
 
   # Creates an array that maps original vertices to metagraph vertices.
-  def make_meta_lookup(graph)
+  def make_meta_lookup(graph, groups)
     lookup = Array.new(graph.order, nil)
 
     groups.each_with_index do |group, metavertex|
