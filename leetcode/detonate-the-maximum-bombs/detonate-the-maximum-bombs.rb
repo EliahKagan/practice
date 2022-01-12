@@ -170,10 +170,12 @@ class Metagraph
   # Computes the transitive closure of this graph as an adjacency list. The
   # ith row contains j iff j is reachable from i. Assumes the graph is acyclic.
   def dag_reachable
-    reaches = Array.new(order, 0)
+    reaches = Array.new(order, nil)
 
     each_vertex_reverse_toposort do |src|
-      reaches[src] = @adj[src].map { |dest| reaches[dest] }.reduce(0, :|)
+      reaches[src] = @adj[src]
+        .map { |dest| reaches[dest] }
+        .reduce(1 << src, :|)
     end
 
     reaches.map(&:bit_support)
