@@ -38,6 +38,24 @@ def build_graph(bombs)
   graph
 end
 
+# Extensions to Integer to support counting population of "1" bits.
+class Integer
+  # Number of bits that are 1 (population count). Value must be nonnegative.
+  def popcount
+    raise ArgumentError(%q{negative integer has no popcount}) if self.negative?
+
+    count = 0
+
+    value = self
+    until value.zero?
+      count += value & 1
+      value >>= 1
+    end
+
+    count
+  end
+end
+
 # An unweighted directed graph.
 # Supports finding strongly connected components.
 class Graph
@@ -133,10 +151,11 @@ class Metagraph
     @adj.size
   end
 
-  # Finds total weights reachable from each vertex.
-  # Assumes the graph is acyclic. If there is a cycle, the results are invalid.
-  def dag_reachable_total_weights
-    reachable_weight = Array.new(order, nil)
+  # Computes an array of nonnegative integers used as bit arrays, where the jth
+  # bit of the ith element is 1 if j is reachable from i (and 0 otherwise). The
+  # graph must be acyclic. If it has a cycles, the results are invalid.
+  def dag_reachable
+    reach = Array.new(order, 0)
 
     each_vertex_reverse_toposort do |src|
       # FIXME: This will sometimes count weights multiple times.
