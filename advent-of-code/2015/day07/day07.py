@@ -13,16 +13,11 @@ To use for solving (where "input" is the problem input):
 """
 
 import argparse
+from collections.abc import Callable, Iterable, MutableMapping, Sequence
 import fileinput
 import operator
 import sys
-
-from typing import (Callable,
-                    Iterable,
-                    MutableMapping,
-                    NamedTuple,
-                    NoReturn,
-                    Sequence)
+from typing import NamedTuple, NoReturn
 
 from typeguard import typechecked
 
