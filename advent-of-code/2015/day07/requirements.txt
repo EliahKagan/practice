@@ -9,6 +9,6 @@ typeguard
 git+https://github.com/freundTech/mypy.git@feature-match-stmt#egg=mypy
 
 # Other linting tools.
-pycodestyle
+flake8
 pylint
 pyright

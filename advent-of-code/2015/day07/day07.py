@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 
-"""Advent of Code 2015, day 7"""
+"""
+Advent of Code 2015, day 7, parts A and B - using a thunk table
+
+To test (where "example" is the test input):
+
+    ./day07.py -t example
+
+To use for solving (where "input" is the problem input):
+
+    ./day07.py input
+"""
 
 import argparse
 import fileinput
