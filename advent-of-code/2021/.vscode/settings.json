@@ -1,0 +1,24 @@
+{
+    "cSpell.words": [
+        "bidict",
+        "colorama",
+        "conda",
+        "itertools",
+        "mypy",
+        "pycodestyle",
+        "pylint",
+        "revis",
+        "SCRAMBLINGS",
+        "typeguard",
+        "unsubscriptable"
+    ],
+    "cSpell.ignoreWords": [
+        "abcdfg",
+        "abcefg",
+        "abdefg",
+        "abdfg",
+        "acdeg",
+        "acdfg",
+        "bcdf"
+    ]
+}

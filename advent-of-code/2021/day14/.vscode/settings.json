@@ -1,0 +1,13 @@
+{
+    "cSpell.words": [
+        "conda",
+        "mypy",
+        "pycodestyle",
+        "pylint",
+        "pyright",
+        "typeguard"
+    ],
+    "cSpell.ignoreWords": [
+        "NNCB"
+    ]
+}

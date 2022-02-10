@@ -1,0 +1,20 @@
+{
+    "cSpell.words": [
+        "conda",
+        "mypy",
+        "pycodestyle",
+        "pylint",
+        "pyright",
+        "SCRAMBLINGS",
+        "typeguard"
+    ],
+    "cSpell.ignoreWords": [
+        "abcdfg",
+        "abcefg",
+        "abdefg",
+        "abdfg",
+        "acdeg",
+        "acdfg",
+        "bcdf"
+    ]
+}

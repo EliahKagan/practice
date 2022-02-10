@@ -1,0 +1,14 @@
+name: aoc2021-day09
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.10
+  - typeguard
+
+  # dev
+  - mypy
+  - pycodestyle
+  - pylint
+  - pyright

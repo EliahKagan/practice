@@ -1,0 +1,11 @@
+{
+    "cSpell.words": [
+        "conda",
+        "mypy",
+        "pycodestyle",
+        "pylint",
+        "pyright",
+        "revis",
+        "typeguard"
+    ]
+}
