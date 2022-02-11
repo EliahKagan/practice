@@ -10,8 +10,9 @@ slightly dated versions of Python 3, as in HackerRank's environment).
 """
 
 import collections
+from collections.abc import Iterable, MutableSequence, Sequence
 import itertools
-from typing import Iterable, Optional, MutableSequence, Sequence, TypeVar
+from typing import Optional, TypeVar
 
 
 T = TypeVar('T')  # pylint: disable=invalid-name
