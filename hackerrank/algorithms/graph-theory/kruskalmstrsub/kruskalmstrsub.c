@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Allocates num elements of size size. Abort the program on failure.
+// Allocates num elements of size size. Aborts the program on failure.
 static void *xcalloc(const size_t num, const size_t size)
 {
     void *const ptr = calloc(num, size);
@@ -16,8 +16,8 @@ static void *xcalloc(const size_t num, const size_t size)
 
 // Disjoint-set data structure for union-find.
 struct uf {
-    int *parents;
-    int *ranks;
+    int *restrict parents;
+    int *restrict ranks;
     int element_count;
 };
 
