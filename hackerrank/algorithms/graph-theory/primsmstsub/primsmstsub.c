@@ -122,7 +122,8 @@ static void pq_detail_sift_down(const struct pq *const pqp, int parent,
 {
     for (; ; ) {
         const int child = pq_detail_pick_child(pqp, parent);
-        if (child == pq_detail_absent) break;
+        if (child == pq_detail_absent || value <= pqp->heap[child].value)
+            break;
 
         pqp->heap[parent] = pqp->heap[child];
         pq_detail_update_map(pqp, parent);
