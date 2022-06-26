@@ -196,14 +196,14 @@ static void row_destroy(struct row *const rp)
     rp->capacity = rp->size = 0;
 }
 
-// Increase the capacity of this row. Implementation detail of row.
+// Increases the capacity of this row. Implementation detail of row.
 static void row_detail_grow(struct row *const rp)
 {
     rp->capacity *= 2;
     rp->elems = xrealloc(rp->elems, (size_t)rp->capacity * sizeof *rp->elems);
 }
 
-// Append a new item to the end of this row.
+// Appends a new item to the end of this row.
 static void row_push_back(struct row *const rp,
                           const int dest, const int weight)
 {
@@ -214,13 +214,13 @@ static void row_push_back(struct row *const rp,
     ep->weight = weight;
 }
 
-// Get a const pointer to the first element of a row.
+// Gets a const pointer to the first element of a row.
 static inline const struct out_edge *row_cbegin(const struct row *const rp)
 {
     return rp->elems;
 }
 
-// Get a const pointer one past the last element of row.
+// Gets a const pointer one past the last element of row.
 static inline const struct out_edge *row_cend(const struct row *const rp)
 {
     return rp->elems + rp->size;
@@ -232,7 +232,7 @@ struct graph {
     int vertex_count;
 };
 
-// Create a weighted undirected graph with vertices 0, ..., vertex_count - 1.
+// Creates a weighted undirected graph with vertices 0, ..., vertex_count - 1.
 // No vertices can be added or removed. The graph starts with no edges.
 // To clean up, a graph_create call should be paired with a graph_destroy call.
 static void graph_create(struct graph *const gp, const int vertex_count)
@@ -244,14 +244,14 @@ static void graph_create(struct graph *const gp, const int vertex_count)
     gp->vertex_count = vertex_count;
 }
 
-// Destroy a graph, cleanup up resources.
+// Destroys a graph, cleanup up resources.
 static void graph_destroy(struct graph *const gp)
 {
     while (gp->vertex_count != 0) row_destroy(&gp->adj[--gp->vertex_count]);
     DESTROY(gp->adj);
 }
 
-// Add a weighted undirected edge to a graph.
+// Adds a weighted undirected edge to a graph.
 static void graph_add_edge(const struct graph *const gp,
                            const int u, const int v, const int weight)
 {
@@ -262,7 +262,7 @@ static void graph_add_edge(const struct graph *const gp,
     row_push_back(&gp->adj[v], u, weight);
 }
 
-// Run the major loop of Prim's algorithm. Implementation detail of graph.
+// Runs the major loop of Prim's algorithm. Implementation detail of graph.
 static int graph_detail_prim_loop(const struct graph *restrict const gp,
                                   struct pq *restrict const pqp,
                                   bool *restrict const vis)
@@ -286,8 +286,9 @@ static int graph_detail_prim_loop(const struct graph *restrict const gp,
     return total_weight;
 }
 
-// Find the total weight of an MST by Prim's algorithm, traversing from start.
-static int graph_mst_total_weight(const struct graph *const gp, const int start)
+// Finds the total weight of an MST by Prim's algorithm, traversing from start.
+static int graph_mst_total_weight(const struct graph *const gp,
+                                  const int start)
 {
     assert(0 <= start && start < gp->vertex_count);
 
