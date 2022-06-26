@@ -1,4 +1,4 @@
-// "Prim's (MST) : Special Subtree" on HackerRank
+// "Prim's (MST): Special Subtree" on HackerRank
 // https://www.hackerrank.com/challenges/primsmstsub
 // Using a binary minheap + direct-address table data structure.
 
@@ -170,7 +170,7 @@ struct out_edge {
 };
 
 // The starting capacity of a row.
-enum { row_detail_min_capacity = 1 }; // FIXME: After testing, increase this.
+enum { row_detail_min_capacity = 8 };
 
 // A row in an adjacency list of a weighted graph.
 // This is a vector (dynamically expanding array) of out_edge objects.
