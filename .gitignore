@@ -2,6 +2,7 @@
 *.class
 *.exe
 *.obj
+/out/
 
 # Static analysis output.
 *.plist
