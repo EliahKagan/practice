@@ -2,20 +2,9 @@
 # https://leetcode.com/problems/sort-colors/
 # This is an O(1) auxiliary space solution to the Dutch national flag problem.
 
-# Add checking color to integers.
-class Integer
-  def red?
-    self == 0
-  end
-
-  def white?
-    self == 1
-  end
-
-  def blue?
-    self == 2
-  end
-end
+RED = 0
+WHITE = 1
+BLUE = 2
 
 # @param {Integer[]} nums
 # @return {Void} Do not return anything, modify nums in-place instead.
@@ -28,12 +17,13 @@ def sort_colors(nums)
   j = k = nums.size
 
   while i < j
-    if nums[i].red?
+    case nums[i]
+    when RED
       i += 1
-    elsif nums[i].white?
+    when WHITE
       j -= 1
       nums[i], nums[j] = nums[j], nums[i]
-    elsif nums[i].blue?
+    when BLUE
       j -= 1
       nums[i], nums[j] = nums[j], nums[i]
       k -= 1
