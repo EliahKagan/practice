@@ -1,0 +1,9 @@
+name: aoc2015-day01
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.11
+  - ipykernel
+  - pytest
