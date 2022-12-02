@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Advent of Code, day 2, part A
+# Advent of Code 2022, day 2, part A
 
 $VERBOSE = true
 
@@ -16,13 +16,13 @@ DECODE = {
 
 OUTCOME = {
   %i[rock rock] => :draw,
-  %i[rock paper] => :lose,
-  %i[rock scissors] => :win,
-  %i[paper rock] => :win,
+  %i[rock paper] => :win,
+  %i[rock scissors] => :lose,
+  %i[paper rock] => :lose,
   %i[paper paper] => :draw,
-  %i[paper scissors] => :lose,
-  %i[scissors rock] => :lose,
-  %i[scissors paper] => :win,
+  %i[paper scissors] => :win,
+  %i[scissors rock] => :win,
+  %i[scissors paper] => :lose,
   %i[scissors scissors] => :draw
 }.freeze
 
@@ -41,7 +41,7 @@ OUTCOME_SCORE = {
 # Compute the score for a round of rock-paper-scissors.
 def score_round(encoded_plays)
   plays = encoded_plays.map { |play| DECODE[play] }
-  PLAY_SCORE[plays.first] + OUTCOME_SCORE[OUTCOME[plays]]
+  PLAY_SCORE[plays[1]] + OUTCOME_SCORE[OUTCOME[plays]]
 end
 
 def run

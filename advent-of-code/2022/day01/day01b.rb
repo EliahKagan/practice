@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Advent of Code, day 1, part B
+# Advent of Code 2022, day 1, part B
 
 $VERBOSE = true
 
