@@ -19,15 +19,15 @@ DECODE_OUTCOME = {
 
 # (opponent play, desired outcome) -> our play
 COUNTER_PLAY = {
-  %i[rock lose] => :scissors,
-  %i[rock draw] => :rock,
-  %i[rock win] => :paper,
-  %i[paper lose] => :rock,
-  %i[paper draw] => :paper,
-  %i[paper win] => :scissors,
-  %i[scissors lose] => :paper,
-  %i[scissors draw] => :scissors,
-  %i[scissors win] => :rock
+  %i[rock lose].freeze => :scissors,
+  %i[rock draw].freeze => :rock,
+  %i[rock win].freeze => :paper,
+  %i[paper lose].freeze => :rock,
+  %i[paper draw].freeze => :paper,
+  %i[paper win].freeze => :scissors,
+  %i[scissors lose].freeze => :paper,
+  %i[scissors draw].freeze => :scissors,
+  %i[scissors win].freeze => :rock
 }.freeze
 
 PLAY_SCORE = {

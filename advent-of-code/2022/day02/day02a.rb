@@ -15,15 +15,15 @@ DECODE = {
 }.freeze
 
 OUTCOME = {
-  %i[rock rock] => :draw,
-  %i[rock paper] => :win,
-  %i[rock scissors] => :lose,
-  %i[paper rock] => :lose,
-  %i[paper paper] => :draw,
-  %i[paper scissors] => :win,
-  %i[scissors rock] => :win,
-  %i[scissors paper] => :lose,
-  %i[scissors scissors] => :draw
+  %i[rock rock].freeze => :draw,
+  %i[rock paper].freeze => :win,
+  %i[rock scissors].freeze => :lose,
+  %i[paper rock].freeze => :lose,
+  %i[paper paper].freeze => :draw,
+  %i[paper scissors].freeze => :win,
+  %i[scissors rock].freeze => :win,
+  %i[scissors paper].freeze => :lose,
+  %i[scissors scissors].freeze => :draw
 }.freeze
 
 PLAY_SCORE = {
