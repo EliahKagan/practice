@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Advent of Code 2022, day 3, part A
+# Advent of Code 2022, day 3, part B
 
 $VERBOSE = true
 
@@ -9,6 +9,7 @@ require 'set'
 
 LOWER_A_PRIORITY = 1
 UPPER_A_PRIORITY = 27
+GROUP_SIZE = 3
 
 # Extensions for String, to form sets of characters.
 class String
@@ -28,11 +29,8 @@ def item_priority(item)
   end
 end
 
-def intersection_priority(items)
-  raise %(item "#{item}" does not have even length) if items.size.odd?
-
-  mid = items.size / 2
-  intersect = items[...mid].to_set & items[mid..].to_set
+def group_priority(group)
+  intersect = group.map(&:to_set).reduce(:&)
   raise "#{intersect} is not size-1" unless intersect.size == 1
 
   item_priority(intersect.first)
@@ -42,7 +40,8 @@ def run
   puts ARGF.each_line
            .map(&:strip)
            .reject(&:empty?)
-           .map { |items| intersection_priority(items) }
+           .each_slice(GROUP_SIZE)
+           .map { |group| group_priority(group) }
            .sum
 end
 
