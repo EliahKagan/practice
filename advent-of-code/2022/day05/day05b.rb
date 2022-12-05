@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Advent of Code 2022, day 5, part A
+# Advent of Code 2022, day 5, part B
 
 $VERBOSE = true
 
@@ -41,7 +41,7 @@ class Stacks
       raise IndexError, message
     end
 
-    @stacks[to_index].concat(@stacks[from_index].pop(count).reverse!)
+    @stacks[to_index].concat(@stacks[from_index].pop(count))
   end
 
   def tops
