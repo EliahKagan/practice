@@ -45,12 +45,12 @@ def score_round(encoded_plays)
 end
 
 def run
-  puts ARGF.each_line
-           .map(&:strip)
-           .reject(&:empty?)
-           .map(&:split)
-           .map { |encoded_plays| score_round(encoded_plays) }
-           .sum
+  total = ARGF.map(&:strip)
+              .reject(&:empty?)
+              .map(&:split)
+              .sum { |encoded_plays| score_round(encoded_plays) }
+
+  puts total
 end
 
 run if $PROGRAM_NAME == __FILE__

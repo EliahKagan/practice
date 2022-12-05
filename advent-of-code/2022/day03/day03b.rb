@@ -37,12 +37,12 @@ def group_priority(group)
 end
 
 def run
-  puts ARGF.each_line
-           .map(&:strip)
-           .reject(&:empty?)
-           .each_slice(GROUP_SIZE)
-           .map { |group| group_priority(group) }
-           .sum
+  total = ARGF.map(&:strip)
+              .reject(&:empty?)
+              .each_slice(GROUP_SIZE)
+              .sum { |group| group_priority(group) }
+
+  puts total
 end
 
 run if $PROGRAM_NAME == __FILE__

@@ -19,8 +19,7 @@ def fully_redundant?(range1, range2)
 end
 
 def run
-  count = ARGF.each_line
-              .map(&:strip)
+  count = ARGF.map(&:strip)
               .reject(&:empty?)
               .map { |line| parse_line(line) }
               .count { |ranges| fully_redundant?(*ranges) }

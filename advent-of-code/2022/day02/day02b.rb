@@ -51,12 +51,12 @@ def score_round(opponent_play_code, outcome_code)
 end
 
 def run
-  puts ARGF.each_line
-           .map(&:strip)
-           .reject(&:empty?)
-           .map(&:split)
-           .map { |codes| score_round(*codes) }
-           .sum
+  total = ARGF.map(&:strip)
+              .reject(&:empty?)
+              .map(&:split)
+              .sum { |codes| score_round(*codes) }
+
+  puts total
 end
 
 run if $PROGRAM_NAME == __FILE__

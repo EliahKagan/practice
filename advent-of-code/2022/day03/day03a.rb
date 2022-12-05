@@ -39,11 +39,11 @@ def intersection_priority(items)
 end
 
 def run
-  puts ARGF.each_line
-           .map(&:strip)
-           .reject(&:empty?)
-           .map { |items| intersection_priority(items) }
-           .sum
+  total = ARGF.map(&:strip)
+              .reject(&:empty?)
+              .sum { |items| intersection_priority(items) }
+
+  puts total
 end
 
 run if $PROGRAM_NAME == __FILE__
