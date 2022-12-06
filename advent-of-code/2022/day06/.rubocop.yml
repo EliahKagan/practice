@@ -1,3 +1,9 @@
 AllCops:
   NewCops: enable
   TargetRubyVersion: 3.1
+
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
+Metrics/MethodLength:
+  Max: 25
