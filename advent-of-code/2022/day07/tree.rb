@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# A namespace of closely related classes for simulating a filesystem hierarchy.
+# Some closely related classes for simulating a filesystem hierarchy.
 module Tree
   # A leaf node in a simulated directory tree representing a regular file.
   class FileNode
