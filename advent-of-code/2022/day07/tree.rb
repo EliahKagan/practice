@@ -7,7 +7,6 @@ module Tree
     attr_reader :parent, :name, :path, :size
 
     def initialize(parent, name, size)
-      # FIXME: Extract shared initialization code to a module.
       raise %(file name can't contain "/") if name.include?('/')
 
       @parent = parent
@@ -26,7 +25,6 @@ module Tree
     attr_reader :parent, :name, :path
 
     def initialize(parent, name)
-      # FIXME: Extract shared initialization code to a module.
       raise %(directory name can't contain "/") if name.include?('/')
 
       @parent = parent
