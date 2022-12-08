@@ -63,10 +63,18 @@ class DirNode
     nil
   end
 
+  def find_root
+    node = self
+    node = node.parent while node.parent
+    node
+  end
+
   # Recurses directories here and below, yielding each with its total size.
   # Returns the total size of *this* directory.
   def total_sizes(&)
-    size = @files.sum(&:size) + @dirs.each_value { |dir| dir.total_sizes(&) }
+    files_size = @files.each_value.sum(&:size)
+    subdirs_size = @dirs.each_value.sum { |dir| dir.total_sizes(&) }
+    size = files_size + subdirs_size
     yield self, size
     size
   end
@@ -82,8 +90,7 @@ end
 def resolve(node, target)
   case target
   when '/'
-    parent = node.parent while node.parent
-    parent
+    node.find_root
   when '..'
     # "cd .." from the root would stay here, but that may be unintended.
     raise 'ambiguous "cd .." from the root directory' unless node.parent
