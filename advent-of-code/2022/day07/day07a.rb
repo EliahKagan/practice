@@ -44,11 +44,11 @@ class DirNode
   end
 
   def get_file(name)
-    @files[name]
+    @files.fetch(name)
   end
 
   def get_dir(name)
-    @dirs[name]
+    @dirs.fetch(name)
   end
 
   def make_file(name:, size:)
@@ -79,6 +79,21 @@ class DirNode
   end
 end
 
+def resolve(node, target)
+  case target
+  when '/'
+    parent = node.parent while node.parent
+    parent
+  when '..'
+    # "cd .." from the root would stay here, but that may be unintended.
+    raise 'ambiguous "cd .." from the root directory' unless node.parent
+
+    node.parent
+  else
+    node.get_dir(target)
+  end
+end
+
 def build_tree(lines)
   node = root = DirNode.new_root
 
@@ -88,11 +103,10 @@ def build_tree(lines)
     case lede
     when '$'
       next if command_or_name == 'ls'
-      raise "unrecognized command #{command_or_name}" if command_or_name != 'cd'
+      raise "unknown command #{command_or_name}" if command_or_name != 'cd'
       raise "cd needs exactly 1 argument, got #{rest.size}" if rest.size != 1
 
-      name = rest[0]
-      node = (name == '..' ? node.parent : node.get_dir(name))
+      node = resolve(node, rest[0])
 
     when 'dir'
       raise 'extraneous field after directory name' unless rest.empty?
