@@ -87,50 +87,74 @@ class DirNode
   end
 end
 
-def resolve(node, target)
-  case target
-  when '/'
-    node.find_root
-  when '..'
-    # "cd .." from the root would stay here, but that may be unintended.
-    raise 'ambiguous "cd .." from the root directory' unless node.parent
-
-    node.parent
-  else
-    node.get_dir(target)
+# Builder of trees of DirNode and FileNode nodes representing directory trees.
+class Builder
+  def self.build_from(lines)
+    builder = new
+    lines.each { |line| builder.execute(line) }
+    builder.build
   end
-end
 
-def build_tree(lines)
-  node = root = DirNode.new_root
+  def initialize
+    @node = @root = DirNode.new_root
+    @built = false
+  end
 
-  rows = lines.map(&:strip).reject(&:empty?).map(&:split)
+  def execute(line)
+    raise 'tree already built' if @built
 
-  rows.each do |lede, command_or_name, *rest|
+    execute_tokens(*line.split) unless line =~ /\A\s*\z/
+    nil
+  end
+
+  def build
+    @built = true
+    @root
+  end
+
+  private
+
+  def execute_tokens(lede, command_or_name, *rest)
     case lede
     when '$'
-      next if command_or_name == 'ls'
-      raise "unknown command #{command_or_name}" if command_or_name != 'cd'
-      raise "cd needs exactly 1 argument, got #{rest.size}" if rest.size != 1
-
-      node = resolve(node, rest[0])
+      execute_like_shell(command: command_or_name, args: rest)
 
     when 'dir'
       raise 'extraneous field after directory name' unless rest.empty?
 
-      node.make_dir(command_or_name)
+      @node.make_dir(command_or_name)
 
     when /\A\d+\z/
       raise 'extraneous field after file name' unless rest.empty?
 
-      node.make_file(name: command_or_name, size: lede.to_i)
+      @node.make_file(name: command_or_name, size: lede.to_i)
 
     else
       raise "unrecognized leading token: #{lede}"
     end
   end
 
-  root
+  def execute_like_shell(command:, args:)
+    return if command == 'ls'
+    raise "unknown command #{command}" if command != 'cd'
+    raise "cd needs exactly 1 argument, got #{args.size}" if args.size != 1
+
+    change_dir(args[0])
+  end
+
+  def change_dir(target)
+    case target
+    when '/'
+      @node = @node.find_root
+    when '..'
+      # "cd .." from the root would stay here, but that may be unintended.
+      raise 'ambiguous "cd .." from the root directory' unless @node.parent
+
+      @node = @node.parent
+    else
+      @node = @node.get_dir(target)
+    end
+  end
 end
 
 def parse_options
@@ -160,7 +184,7 @@ def run
   options = parse_options
   puts "Size cutoff is #{options[:cutoff]}.\n" if options[:verbose]
 
-  root = build_tree(ARGF)
+  root = Builder.build_from(ARGF)
   total = 0
 
   root.total_sizes do |dir, size|
