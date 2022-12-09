@@ -1,18 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Advent of Code, day 8, part A
+# Advent of Code, day 8, part B
 
 $VERBOSE = true
 
 require 'optparse'
-
-# Integer extensions for using min as a binary operation.
-class Integer
-  def min(other)
-    [self, other].min
-  end
-end
 
 # Array extensions for grids representing trees of various heights.
 class Array
@@ -22,38 +15,34 @@ class Array
     end
   end
 
-  def east_tallest
+  def east_scenic
     map do |row|
-      maximum = -1
+      rising_count = 0
+      previous = -1
 
-      row.map do |elem|
-        old_maximum = maximum
-        maximum = [maximum, elem].max
-        old_maximum
+      row.map do |current|
+        rising_count = (previous < current ? rising_count + 1 : 1)
+        previous = current
+        rising_count - 1
       end
     end
   end
 
-  def west_tallest
-    map(&:reverse).east_tallest.map(&:reverse)
+  def west_scenic
+    map(&:reverse).east_scenic.map(&:reverse)
   end
 
-  def north_tallest
-    transpose.reverse.east_tallest.reverse.transpose
+  def north_scenic
+    transpose.reverse.east_scenic.reverse.transpose
   end
 
-  def south_tallest
-    reverse.transpose.east_tallest.transpose.reverse
+  def south_scenic
+    reverse.transpose.east_scenic.transpose.reverse
   end
 
-  def visibility
-    tallest_grids = [east_tallest, west_tallest, north_tallest, south_tallest]
-
-    visible_heights = tallest_grids.reduce do |acc, grid|
-      acc.grid_op(:min, grid)
-    end
-
-    grid_op(:>, visible_heights)
+  def scenic_scoring
+    scenic_grids = [east_scenic, west_scenic, north_scenic, south_scenic]
+    scenic_grids.reduce { |acc, grid| acc.grid_op(:*, grid) }
   end
 end
 
@@ -91,9 +80,9 @@ end
 
 def run
   verbose = parse_options[:verbose]
-  visibility = parse_grid(ARGF).visibility
-  pp visibility if verbose
-  puts visibility.flatten.count(&:itself)
+  scenic_scoring = parse_grid(ARGF).scenic_scoring
+  pp scenic_scoring if verbose
+  puts scenic_scoring.flatten.max
 end
 
 run if $PROGRAM_NAME == __FILE__
