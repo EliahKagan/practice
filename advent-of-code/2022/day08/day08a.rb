@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+# Advent of Code, day 8, part A
+
 $VERBOSE = true
 
-# Advent of Code, day 8, part A
+require 'optparse'
 
 # Integer extensions for using min as a binary operation.
 class Integer
@@ -16,8 +18,13 @@ end
 class Array
   def east_tallest
     map do |row|
-      max = -1
-      row.map { |cur| max = [max, cur].max }
+      maximum = -1
+
+      row.map do |elem|
+        old_maximum = maximum
+        maximum = [maximum, elem].max
+        old_maximum
+      end
     end
   end
 
@@ -40,16 +47,23 @@ class Array
   end
 
   def visibility
-    tallests = [east_tallest, west_tallest, north_tallest, south_tallest]
-    visible_heights = tallests.reduce { |grid, acc| acc.grid_op(:min, grid) }
-    grid_op(:>=, visible_heights)
+    tallest_grids = [east_tallest, west_tallest, north_tallest, south_tallest]
+
+    visible_heights = tallest_grids.reduce do |grid, acc|
+      acc.grid_op(:min, grid)
+    end
+
+    grid_op(:>, visible_heights)
   end
 end
 
-def parse_grid(lines)
-  grid = lines.map(&:rstrip)
-              .map { |line| line.each_char.map { |ch| Integer(ch) }.freeze }
+def parse_grid_raw(lines)
+  lines.map(&:rstrip)
+       .map { |line| line.each_char.map { |ch| Integer(ch) }.freeze }
+end
 
+def parse_grid(lines)
+  grid = parse_grid_raw(lines)
   grid.pop while grid.last.empty?
   raise 'empty grid not allowed' if grid.empty?
 
@@ -59,8 +73,27 @@ def parse_grid(lines)
   grid.freeze
 end
 
+def parse_options
+  options = {verbose: false}
+
+  OptionParser.new do |parser|
+    parser.on('-v', '--verbose', 'Show the computed visibility grid') do
+      options[:verbose] = true
+    end
+    parser.on('-h', '--help', 'Print this help message') do
+      puts parser
+      exit
+    end
+  end.parse!
+
+  options
+end
+
 def run
-  grid = parse_grid(ARGF)
+  verbose = parse_options[:verbose]
+  visibility = parse_grid(ARGF).visibility
+  pp visibility if verbose
+  puts visibility.flatten.count(&:itself)
 end
 
 run if $PROGRAM_NAME == __FILE__
