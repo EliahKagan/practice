@@ -7,8 +7,8 @@ $VERBOSE = true
 
 require 'optparse'
 
-# Integer extensions for using min as a binary operation.
-class Integer
+# Numeric extensions for using min as a binary operation.
+class Numeric
   def min(other)
     [self, other].min
   end
@@ -24,7 +24,7 @@ class Array
 
   def east_tallest
     map do |row|
-      maximum = -1
+      maximum = -Float::INFINITY
 
       row.map do |elem|
         old_maximum = maximum

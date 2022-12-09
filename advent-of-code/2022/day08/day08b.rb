@@ -17,13 +17,14 @@ class Array
 
   def east_scenic
     map do |row|
-      rising_count = 0
-      previous = -1
-
-      row.map do |current|
-        rising_count = (previous < current ? rising_count + 1 : 1)
-        previous = current
-        rising_count - 1
+      # Let's see if the naive algorithm finishes quickly enough.
+      row.each_with_index.map do |value, right|
+        left = right
+        while left.positive?
+          left -= 1
+          break if row[left] >= value
+        end
+        right - left
       end
     end
   end
@@ -42,6 +43,7 @@ class Array
 
   def scenic_scoring
     scenic_grids = [east_scenic, west_scenic, north_scenic, south_scenic]
+    pp scenic_grids
     scenic_grids.reduce { |acc, grid| acc.grid_op(:*, grid) }
   end
 end
