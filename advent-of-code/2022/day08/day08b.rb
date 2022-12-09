@@ -43,7 +43,6 @@ class Array
 
   def scenic_scoring
     scenic_grids = [east_scenic, west_scenic, north_scenic, south_scenic]
-    pp scenic_grids
     scenic_grids.reduce { |acc, grid| acc.grid_op(:*, grid) }
   end
 end
