@@ -16,6 +16,12 @@ end
 
 # Array extensions for grids representing trees of various heights.
 class Array
+  def grid_op(operation, other)
+    zip(other).map do |row1, row2|
+      row1.zip(row2).map { |elem1, elem2| elem1.send(operation, elem2) }
+    end
+  end
+
   def east_tallest
     map do |row|
       maximum = -1
@@ -38,12 +44,6 @@ class Array
 
   def south_tallest
     reverse.transpose.east_tallest.transpose.reverse
-  end
-
-  def grid_op(operation, other)
-    zip(other).map do |row1, row2|
-      row1.zip(row2).map { |elem1, elem2| elem1.send(operation, elem2) }
-    end
   end
 
   def visibility
