@@ -26,7 +26,7 @@ def run
       head_col += head_col_delta
       row_sep = head_row - tail_row
       col_sep = head_col - tail_col
-      raise "Bug: excessive row separation of #{row_sep} " if row_sep.abs > 2
+      raise "Bug: excessive row separation of #{row_sep}" if row_sep.abs > 2
       raise "Bug: excessive column separation of #{col_sep}" if col_sep.abs > 2
 
       next if row_sep.abs < 2 && col_sep.abs < 2
