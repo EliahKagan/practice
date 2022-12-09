@@ -29,9 +29,10 @@ def run
       raise "Bug: excessive row separation of #{row_sep} " if row_sep.abs > 2
       raise "Bug: excessive column separation of #{col_sep}" if col_sep.abs > 2
 
-      # FIXME: This performs too few diagonal moves.
-      tail_row += row_sep / row_sep.abs if row_sep.abs > 1
-      tail_col += col_sep / col_sep.abs if col_sep.abs > 1
+      next if row_sep.abs < 2 && col_sep.abs < 2
+
+      tail_row += row_sep / row_sep.abs unless row_sep.zero?
+      tail_col += col_sep / col_sep.abs unless col_sep.zero?
       tail_history.add([tail_row, tail_col].freeze)
     end
   end
