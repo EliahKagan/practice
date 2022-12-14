@@ -108,7 +108,7 @@ def run
             .map { |expression| Parser.new(expression).parse }
             .each_slice(2) # Chunk into pairs.
             .with_index(1) # Give each pair an index, starting at 1.
-            .select { |(lhs, rhs), _| p(compare(p(lhs), p(rhs))) <= 0 }
+            .select { |(lhs, rhs), _| compare(lhs, rhs) <= 0 }
             .sum { |(_, _), index| index }
 
   puts sum
