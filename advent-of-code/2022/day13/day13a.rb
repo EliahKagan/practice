@@ -22,7 +22,7 @@ $VERBOSE = true
 class Parser
   def initialize(expression)
     @parsed = false
-    @tokens = lex(expression)
+    @tokens = tokenize(expression)
     raise 'no tokens in expression' if @tokens.empty?
   end
 
@@ -38,7 +38,7 @@ class Parser
 
   private
 
-  def lex(expression)
+  def tokenize(expression)
     expression.scan(/[\[\]]|\d+/).map do |lexeme|
       case lexeme
       when '['
