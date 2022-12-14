@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Advent of Code 2022, day 23, part A
+# Advent of Code 2022, day 13, part A
 #
 # This problem consists of two things Ruby almost provides directly: parsing
 # the lists/arrays, and comparing them lexicographically. However:
