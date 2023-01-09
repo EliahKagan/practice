@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""rectangle.py - Axis-aligned rectangles."""
+
+"""Axis-aligned rectangles."""
 
 import math
 

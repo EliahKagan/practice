@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""monkeys.py - "monkeys" exercise from pythonds - much faster way"""
+
+""""monkeys" exercise from pythonds - much faster way."""
 
 import itertools
 import random
@@ -12,20 +13,20 @@ GOAL = 'methinks it is like a weasel'
 
 
 def check_length(guess):
-    """Ensures the guess has the same length as the goal."""
+    """Ensure the guess has the same length as the goal."""
     if len(guess) != len(GOAL):
         raise ValueError('wrong length guess')
 
 
 def generate(guess):
-    """Randomly changes the guess at one character position."""
+    """Randomly change the guess at one character position."""
     check_length(guess)
     index = random.randrange(len(GOAL))
     return guess[:index] + random.choice(CHARS) + guess[(index + 1):]
 
 
 def score(guess):
-    """Counts how many positions the guess is correct at."""
+    """Count how many positions the guess is correct at."""
     check_length(guess)
     return sum(lhs == rhs for lhs, rhs in zip(guess, GOAL))
 

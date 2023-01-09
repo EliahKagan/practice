@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""monkeys.py - "monkeys" exercise from pythonds"""
+
+""""monkeys" exercise from pythonds."""
 
 import itertools
 import random
@@ -12,12 +13,12 @@ GOAL = 'methinks it is like a weasel'
 
 
 def generate():
-    """Generates the guess."""
+    """Generate the guess."""
     return ''.join(random.choice(CHARS) for _ in GOAL)
 
 
 def score(guess):
-    """Counts how many positions the guess is correct at."""
+    """Count how many positions the guess is correct at."""
     if len(guess) != len(GOAL):
         raise ValueError('wrong length guess')
 

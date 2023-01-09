@@ -1,6 +1,4 @@
-"""
-fraction.py - Fractional calculations. Even though fractions.Fraction exists.
-"""
+"""Fractional calculations. Even though fractions.Fraction exists."""
 
 import functools
 
@@ -29,7 +27,7 @@ class Fraction:
     __slots__ = ('_numerator', '_denominator')
 
     def __init__(self, numerator, denominator=1):
-        """Creates a fraction with the specified numerator and denominator."""
+        """Create a fraction with the specified numerator and denominator."""
         if denominator == 0:
             raise ZeroDivisionError('denominator cannot be zero')
 
@@ -42,7 +40,7 @@ class Fraction:
             self._denominator = -self._denominator
 
     def __eq__(self, other):
-        """Checks if two fractions are equal."""
+        """Check if two fractions are equal."""
         if not isinstance(other, Fraction):
             return NotImplemented
 
@@ -50,7 +48,7 @@ class Fraction:
                 and self._denominator == other.denominator)
 
     def __lt__(self, other):
-        """Checks if this fraction is smaller than another."""
+        """Check if this fraction is smaller than another."""
         if not isinstance(other, Fraction):
             return NotImplemented
 
@@ -59,7 +57,7 @@ class Fraction:
         return lhs < rhs
 
     def __hash__(self):
-        """Computes a prehash to store this fraction in a dict or set."""
+        """Compute a prehash to store this fraction in a dict or set."""
         return hash((self._numerator, self._denominator))
 
     def __repr__(self):
@@ -71,41 +69,41 @@ class Fraction:
         return f'{self._numerator}/{self._denominator}'
 
     def __neg__(self):
-        """Computes the additive inverse (unary minus)."""
+        """Compute the additive inverse (unary minus)."""
         return Fraction(-self._numerator, self._denominator)
 
     def __pos__(self):
-        """Returns the same value (unary plus)."""
+        """Return the same value (unary plus)."""
         return self
 
     def __abs__(self):
-        """Returns the absolute value."""
+        """Return the absolute value."""
         return Fraction(abs(self._numerator), self._denominator)
 
     def __add__(self, other):
-        """Computes the sum of this and another fraction."""
+        """Compute the sum of this and another fraction."""
         return Fraction(self._numerator * other.denominator
                             + other.numerator * self._denominator,
                         self._denominator * other.denominator)
 
     def __sub__(self, other):
-        """Computes the difference of this and another fraction."""
+        """Compute the difference of this and another fraction."""
         return self + -other
 
     def __mul__(self, other):
-        """Computes the the product of this and another fraction."""
+        """Compute the the product of this and another fraction."""
         return Fraction(self._numerator * other.numerator,
                         self._denominator * other.denominator)
 
     def __truediv__(self, other):
-        """Computes the quotient of this and another fraction."""
+        """Compute the quotient of this and another fraction."""
         if other.numerator == 0:
             raise ZeroDivisionError('cannot divide by the zero fraction')
 
         return self * other.reciprocal
 
     def __pow__(self, exponent):
-        """Raises this fraction to a particular integer exponent."""
+        """Raise this fraction to a particular integer exponent."""
         if exponent >= 0:
             return self._do_pow(exponent)
 

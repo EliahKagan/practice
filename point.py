@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""point.py - a simple Point class"""
+
+"""A simple Point class."""
 
 import math
 

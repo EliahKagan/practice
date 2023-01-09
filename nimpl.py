@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 The common claim that magic dunder methods are mere "syntactic sugar" is not
 accurate.
@@ -11,7 +12,7 @@ class Box:
     __slot__ = ('_value',)
 
     def __init__(self, value):
-        """Makes a Widget with the specified value."""
+        """Make a Widget with the specified value."""
         self._value = value
 
     def __repr__(self):
@@ -19,14 +20,14 @@ class Box:
         return f'Widget({self._value})'
 
     def __add__(self, other):
-        """Takes the sum of this Widget with a Widget or bare value."""
+        """Take the sum of this Widget with a Widget or bare value."""
         if isinstance(other, Box):
             return Box(self._value + other._value)
 
         return Box(self._value + other)
 
     def __radd__(self, other):
-        """Takes the sum of this Widget with a bare value on the left."""
+        """Take the sum of this Widget with a bare value on the left."""
         return Box(other + self._value)
 
 
