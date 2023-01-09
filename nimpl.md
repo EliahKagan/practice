@@ -1,11 +1,17 @@
 # `NotImplemented` in binary dunders: why it's important
 
+*Note that this only applies to binary dunders, which are called indirectly by
+the interpreter to resolve binary operations like `==` and `+`. In particular,
+the material here is completely inapplicable to ordinary (i.e., non-dunder)
+methods: do not return `NotImplemented` when what you mean to do is directly
+raise `TypeError`.*
+
 In nearly all cases, *including* in all the code in this directory, it is a
-design bug to fail to return NotImplemented when the other operand of a binary
-dunder method does not support the operation.
+design bug to fail to return `NotImplemented` when the other operand of a
+binary dunder method does not support the operation.
 
 This is important even when runtime type checking is not (otherwise) being
-done. Returning NotImplemented allows other classes' implementations of the
+done. Returning `NotImplemented` allows other classes' implementations of the
 operation to be attempted.
 
 That is, dunder methods used to implement the logic for binary operators do not

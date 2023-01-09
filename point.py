@@ -37,7 +37,7 @@ class Point:
         """
         Computes the Euclidean distance from another point.
 
-        NOTE: This is not a dunder. The problems detailed in nimpl.md do not
+        NOTE: This is not a dunder. The issues detailed in nimpl.md do not
         apply here. It is possible that it would be an improvement to add type
         checking to this method, but the considerations differ. Furthermore, if
         this were done, this method must still NEVER return NotImplemented.

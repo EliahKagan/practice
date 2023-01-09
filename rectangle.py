@@ -112,6 +112,9 @@ class Rectangle:
 
         Edges not adjacent to the vertex given to construct the rectangle
         are considered not to be in the rectangle.
+
+        NOTE: This is not a dunder. The issues detailed in nimpl.md do not
+        apply here. See point.Point.distance for details on this.
         """
         return (self._x <= point.x < self._x + self._width
                 and self._y <= point.y < self._y + self._height)
@@ -131,6 +134,9 @@ class Rectangle:
         only when their overlapping area is greater than zero but less than the
         area of either rectangle, but also when one rectangle is completely
         contained inside another.
+
+        NOTE: This is not a dunder. The issues detailed in nimpl.md do not
+        apply here. See point.Point.distance for details on this.
         """
         if self.x + self.width <= other.x or other.x + other.width <= self.x:
             return False  # The rectangles are too far apart horizontally.
