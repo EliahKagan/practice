@@ -14,6 +14,14 @@ included some small input test cases. I&rsquo;ve only included any material not
 written by me when I believe it is clearly fair use. See
 [`FAIR-USE.md`](FAIR-USE.md) for details.
 
+## Major directories
+
+A few of the directories here have substantial code, corresponding to numerous
+practice exercise solutions, while others have just a few.
+
+The directories of greatest interest are currently `leetcode`, `hackerrank`,
+and `advent-of-code`.
+
 ## Older Practice Solutions
 
 My solutions from before then are not as well organized, but they are available
@@ -21,3 +29,6 @@ in
 [old-practice-snapshot](https://github.com/EliahKagan/old-practice-snapshot).
 See the README in that repository for more information (including on how I plan
 to improve the organization of that file tree in the future).
+
+That repository has way more of my GeeksforGeeks and HackerRank solutions than
+here.
