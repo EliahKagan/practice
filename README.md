@@ -22,7 +22,7 @@ practice exercise solutions, while others have just a few.
 The directories of greatest interest are currently `leetcode`, `hackerrank`,
 and `advent-of-code`.
 
-## Older Practice Solutions
+## Older practice solutions
 
 My solutions from before then are not as well organized, but they are available
 in
