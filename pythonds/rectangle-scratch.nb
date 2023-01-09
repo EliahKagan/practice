@@ -1,0 +1,13 @@
+Notebook[{Cell[
+CellGroupData[{Cell[
+BoxData[RowBox[{"Graphics","[",RowBox[{"{",RowBox[
+{"Red",","," ",RowBox[{"Rectangle","[",RowBox[{RowBox[{"{",RowBox[{"4",","," ","5"}],"}"}],","," ",RowBox[
+{"{",RowBox[{"10",","," ","10"}],"}"}]}],"]"}],","," ","Blue",","," ",RowBox[{"Rectangle","[",RowBox[
+{RowBox[{"{",RowBox[{"0",","," ","0"}],"}"}],","," ",RowBox[{"{",RowBox[{"10",","," ","5"}],"}"}]}],"]"}]}],"}"}],"]"}]],
+"Input",CellLabel -> "In[3]:= ",ExpressionUUID -> "bc9fb8ef-a1fb-4858-aec5-9f16d858796e"],Cell[
+BoxData[
+GraphicsBox[{RGBColor[1,0,0],RectangleBox[{4,5},{10,10}],RGBColor[0,0,1],RectangleBox[
+{0,0},{10,5}]},ExpressionUUID -> "9f0b8181-06f4-403d-a3f6-cabdf1388860"],StandardForm],
+"Output",CellLabel -> "Out[3]= ",ExpressionUUID -> "17562f54-4507-43b1-bd68-97442387da4c"]},
+Open],ExpressionUUID -> "78f7bc22-0635-4e6c-8a21-0cbff2243d61"]},StyleDefinitions -> "Default.nb",
+FrontEndVersion -> "12.3 for Wolfram Cloud 1.59.0.1 (July 26, 2021)"]
