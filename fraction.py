@@ -16,7 +16,15 @@ def _gcd(a, b):
 
 @functools.total_ordering
 class Fraction:
-    """A fraction type, even though fractions.Fraction exists and is good."""
+    """
+    A fraction type, even though fractions.Fraction exists and is good.
+
+    NOTE: This class does NOT make use of NotImplemented for arithmetic
+    operations. It assumes the second operand of an arithmetic operation is
+    always of a compatible type. This behavior is wrong. See nimpl.md for why
+    it is wrong, even here, and why I've nonetheless done it in this code. Note
+    that it's not *justified* here. This code should not be used in production.
+    """
 
     __slots__ = ('_numerator', '_denominator')
 
@@ -56,7 +64,7 @@ class Fraction:
 
     def __repr__(self):
         """Representation of a fraction that can be passed to eval()."""
-        return f'Fraction({self._numerator}, {self._denominator})'
+        return f'Fraction({self._numerator!r}, {self._denominator!r})'
 
     def __str__(self):
         """Representation of a fraction suitable for user interfaces."""

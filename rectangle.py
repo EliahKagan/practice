@@ -15,7 +15,7 @@ class Point:
 
     def __repr__(self):
         """String representation. Can be passed to eval()."""
-        return f'Point(x={self._x}, y={self._y})'
+        return f'Point(x={self._x!r}, y={self._y!r})'
 
     def __str__(self):
         """String representation. Suitable for user interfaces."""
@@ -23,9 +23,9 @@ class Point:
 
     def __eq__(self, other):
         """Checks if two points are equal."""
-        return (isinstance(other, Point)
-                and self._x == other._x
-                and self._y == other._y)
+        if isinstance(other, Point):
+            return self._x == other._x and self._y == other._y
+        return NotImplemented
 
     def __hash__(self):
         return hash((self._x, self._y))
@@ -132,10 +132,10 @@ class Rectangle:
         contained inside another.
         """
         if self.x + self.width <= other.x or other.x + other.width <= self.x:
-            return False # The rectangles are too far apart horizontally.
+            return False  # The rectangles are too far apart horizontally.
 
         if self.y + self.height <= other.y or other.y + other.height <= self.y:
-            return False # The rectangles are too far apart vertically.
+            return False  # The rectangles are too far apart vertically.
 
         return True
 
@@ -163,7 +163,7 @@ def run():
     print()
 
     t = Rectangle(Point(0, 0), 10, 20)
-    print(r.overlaps(s)) # r is just above s on the right side, no overlap.
+    print(r.overlaps(s))  # r is just above s on the right side, no overlap.
     print(r.overlaps(t))
     print(s.overlaps(t))
 

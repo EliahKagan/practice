@@ -19,7 +19,15 @@ def _gcd(a, b):
 
 
 class Fraction:
-    """A fraction type, even though fractions.Fraction exists and is good."""
+    """
+    A fraction type, even though fractions.Fraction exists and is good.
+
+    NOTE: This class does NOT make use of NotImplemented for arithmetic
+    operations. It assumes the second operand of an arithmetic operation is
+    always of a compatible type. This behavior is wrong. See nimpl.md for why
+    it is wrong, even here, and why I've nonetheless done it in this code. Note
+    that it's not *justified* here. This code should not be used in production.
+    """
 
     __slots__ = ('_numerator', '_denominator')
 
@@ -57,15 +65,19 @@ class Fraction:
         """Checks if this fraction is larger than another."""
         return other.__lt__(self)
 
-    # FIXME: I should probably not be using "or" like this with NotImplemented.
-
     def __le__(self, other):
         """Checks if this fraction is no larger than another."""
-        return self.__lt__(other) or self.__eq__(other)
+        lt_result = self.__lt__(other)
+        if lt_result is NotImplemented or lt_result:
+            return lt_result
+        return self.__eq__(other)
 
     def __ge__(self, other):
         """Checks if this fraction is no smaller than another."""
-        return self.__gt__(other) or self.__eq__(other)
+        gt_result = self.__gt__(other)
+        if gt_result is NotImplemented or gt_result:
+            return gt_result
+        return self.__eq__(other)
 
     def __hash__(self):
         """Computes a prehash to store this fraction in a dict or set."""
@@ -73,7 +85,7 @@ class Fraction:
 
     def __repr__(self):
         """Representation of a fraction that can be passed to eval()."""
-        return f'Fraction({self._numerator}, {self._denominator})'
+        return f'Fraction({self._numerator!r}, {self._denominator!r})'
 
     def __str__(self):
         """Representation of a fraction suitable for user interfaces."""

@@ -33,7 +33,19 @@ class Point:
         return self._y
 
     def distance(self, other):
-        """Computes the Euclidean distance from another point."""
+        """
+        Computes the Euclidean distance from another point.
+
+        NOTE: This is not a dunder. The problems detailed in nimpl.md do not
+        apply here. It is possible that it would be an improvement to add type
+        checking to this method, but the considerations differ. Furthermore, if
+        this were done, this method must still NEVER return NotImplemented.
+        This method is not a binary dunder supplying logic for an operator in
+        the language. It is called directly (or through a bound method object)
+        and NotImplemented would never be converted into an appropriate
+        exception! Instead, if type checking were added to this method,
+        TypeError should be raised explicitly.
+        """
         return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
 
 
