@@ -16,14 +16,17 @@ class Solution {
     }
 
     private static long solve(DivEdge[] edges, int maxCost, int vertexCount) {
-        var pathTree = buildGraph(edges, vertexCount).dijkstra(START, maxCost);
-        long reach = Stream.of(pathTree).filter(Objects::nonNull).count();
+        var costs = buildGraph(edges, vertexCount).dijkstra(START, maxCost);
+
+        long reach = IntStream.of(costs)
+            .filter(cost -> cost != Graph.NOT_REACHED)
+            .count();
 
         for (var edge : edges) {
             var subReach = IntStream.of(edge.u(), edge.v())
-                .mapToObj(endpoint -> pathTree[endpoint])
-                .filter(Objects::nonNull)
-                .mapToInt(pair -> maxCost - pair.cost())
+                .map(endpoint -> costs[endpoint])
+                .filter(cost -> cost != Graph.NOT_REACHED)
+                .map(cost -> maxCost - cost)
                 .sum();
 
             reach += Math.min(subReach, edge.count());
@@ -51,11 +54,10 @@ record OutEdge(int dest, int weight) { }
 /** A vertex and the best cost, so far, of reaching it. */
 record VertexCostPair(int vertex, int cost) { }
 
-/** The parent (predecessor) and cost to reach a vertex by a shortest path. */
-record ParentCostPair(int parent, int cost) { }
-
 /** A weighted undirected graph. Edge weights are assumed nonnegative. */
 final class Graph {
+    static int NOT_REACHED = -1;
+
     Graph(int vertexCount) {
         _vertexCount = vertexCount;
 
@@ -69,12 +71,9 @@ final class Graph {
         _adj.get(v).add(new OutEdge(u, weight));
     }
 
-    // TODO: The problem being solved doesn't need parents, just costs.
-    //       Simplify this by not tracking parents. Remove ParentCostPair.
-    ParentCostPair[] dijkstra(int start, int maxCost) {
+    int[] dijkstra(int start, int maxCost) {
         var finished = new boolean[_vertexCount];
-        var parents = makeArrayOfUndefined(_vertexCount);
-        var costs = makeArrayOfUndefined(_vertexCount);
+        var costs = makeNotReachedCosts();
         var heap = makeHeap();
 
         costs[start] = 0;
@@ -95,40 +94,24 @@ final class Graph {
                 if (newCost > maxCost) continue;
 
                 var oldCost = costs[edge.dest()];
-                if (oldCost != UNDEFINED && oldCost <= newCost) continue;
+                if (oldCost != NOT_REACHED && oldCost <= newCost) continue;
 
-                parents[edge.dest()] = src.vertex();
                 costs[edge.dest()] = newCost;
                 heap.add(new VertexCostPair(edge.dest(), newCost));
             }
         }
 
-        return zipPathTree(parents, costs);
-    }
-
-    private static int UNDEFINED = -1;
-
-    private static int[] makeArrayOfUndefined(int length) {
-        var undefineds = new int[length];
-        Arrays.fill(undefineds, UNDEFINED);
-        return undefineds;
+        return costs;
     }
 
     private static Queue<VertexCostPair> makeHeap() {
         return new PriorityQueue<>(Comparator.comparing(VertexCostPair::cost));
     }
 
-    private ParentCostPair[] zipPathTree(int[] parents, int[] costs) {
-        var pathTree = new ParentCostPair[_vertexCount];
-
-        for (var vertex = 0; vertex < _vertexCount; ++vertex) {
-            if (costs[vertex] != UNDEFINED) {
-                pathTree[vertex] =
-                    new ParentCostPair(parents[vertex], costs[vertex]);
-            }
-        }
-
-        return pathTree;
+    private int[] makeNotReachedCosts() {
+        var costs = new int[_vertexCount];
+        Arrays.fill(costs, NOT_REACHED);
+        return costs;
     }
 
     private final int _vertexCount;
