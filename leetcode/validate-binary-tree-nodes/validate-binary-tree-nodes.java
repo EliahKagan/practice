@@ -1,5 +1,6 @@
 // LeetCode #1361 - Validate Binary Tree Nodes
 // https://leetcode.com/problems/validate-binary-tree-nodes/
+// By checking for a unique root and doing recursive DFS from it.
 
 class Solution {
     public boolean
