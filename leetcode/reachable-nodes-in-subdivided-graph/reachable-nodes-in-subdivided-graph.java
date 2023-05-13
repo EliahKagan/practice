@@ -109,9 +109,9 @@ final class Graph {
     private static int UNDEFINED = -1;
 
     private static int[] makeArrayOfUndefined(int length) {
-        var nones = new int[length];
-        Arrays.fill(nones, UNDEFINED);
-        return nones;
+        var undefineds = new int[length];
+        Arrays.fill(undefineds, UNDEFINED);
+        return undefineds;
     }
 
     private static Queue<VertexCostPair> makeHeap() {
