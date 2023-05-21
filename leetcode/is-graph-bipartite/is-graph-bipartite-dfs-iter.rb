@@ -1,6 +1,6 @@
 # LeetCode #785 - Is Graph Bipartite?
 # https://leetcode.com/problems/is-graph-bipartite/
-# By iterative DFS.
+# By stack-based search.
 
 # @param {Integer[][]} graph
 # @return {Boolean}
