@@ -10,7 +10,7 @@ def gcd_sort(nums)
   nodes = Hash.new { |hash, key| hash[key] = Node.new }
 
   # Represent transitive swappability as connectivity.
-  nums.each do |num|
+  nums.uniq.each do |num|
     Prime.prime_division(num).each do |prime, _power|
       nodes[num].union(nodes[prime])
     end
