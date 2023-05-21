@@ -45,6 +45,8 @@ class Node
       elem1.rank += 1 if elem1.rank == elem2.rank
       elem2.parent = elem1
     end
+
+    nil
   end
 
   protected
