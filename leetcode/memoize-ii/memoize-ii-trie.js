@@ -1,11 +1,12 @@
 // LeetCode #2630 - Memoize II
 // https://leetcode.com/problems/memoize-ii/
+// Using a trie.
 
 /**
  * @param {Function} fn
  */
 function memoize(fn) {
-    const end = Object.freeze({});
+    const end = Symbol();
     const trie = new Map();
 
     return (...args) => {
