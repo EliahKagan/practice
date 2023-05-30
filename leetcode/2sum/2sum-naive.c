@@ -15,14 +15,14 @@ static void *xcalloc(size_t num, size_t size)
 int* twoSum(const int *restrict const nums, const int numsSize,
             const int target, int *restrict const returnSize)
 {
-    int *const indices = xcalloc(*returnSize = 2, sizeof(*indices));
+    int *const pair = xcalloc(*returnSize = 2, sizeof(*pair));
 
     for (int left = 0; left < numsSize - 1; ++left) {
         for (int right = left + 1; right < numsSize; ++right) {
             if (nums[left] + nums[right] == target) {
-                indices[0] = left;
-                indices[1] = right;
-                return indices;
+                pair[0] = left;
+                pair[1] = right;
+                return pair;
             }
         }
     }
