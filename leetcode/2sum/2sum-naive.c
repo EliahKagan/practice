@@ -2,11 +2,11 @@
 // https://leetcode.com/problems/two-sum/
 // Naive solution, O(n**2) time.
 
-static void *xcalloc(size_t num, size_t size)
+static void *xcalloc(const size_t num, const size_t size)
 {
-    void *const p = calloc(num, size);
-    if (!p) abort();
-    return p;
+    void *const ptr = calloc(num, size);
+    if (!ptr) abort();
+    return ptr;
 }
 
 /**
