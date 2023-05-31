@@ -56,7 +56,7 @@ int* twoSum(int *restrict const nums, const int numsSize,
 
     if (left >= right) abort(); // Not found (violates problem constraints).
 
-    int *const pair = xcalloc(*returnSize = 2, sizeof(*indices));
+    int *const pair = xcalloc(*returnSize = 2, sizeof(*pair));
     pair[0] = indices[left];
     pair[1] = indices[right];
     DESTROY(indices);
