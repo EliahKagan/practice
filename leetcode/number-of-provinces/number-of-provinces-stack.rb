@@ -1,6 +1,6 @@
 # LeetCode #547 - Number of Provinces
 # https://leetcode.com/problems/number-of-provinces/
-# By iterative DFS.
+# By iterative stack-based search.
 
 # @param {Integer[][]} is_connected
 # @return {Integer}
