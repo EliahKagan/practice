@@ -81,11 +81,11 @@ static void dfs(const int *restrict const *restrict const matrix,
     stack_free(&fringe);
 }
 
-static int count_components(const int *restrict const *restrict const matrix,
-                            bool *restrict const vis,
+static int count_components(const int *const *const matrix,
                             const int vertex_count)
 {
     int component_count = 0;
+    bool *const vis = xcalloc(vertex_count, sizeof(*vis));
 
     for (int start = 0; start < vertex_count; ++start) {
         if (vis[start]) continue;
@@ -93,6 +93,7 @@ static int count_components(const int *restrict const *restrict const matrix,
         ++component_count;
     }
 
+    free(vis);
     return component_count;
 }
 
@@ -101,9 +102,5 @@ int findCircleNum(const int *restrict const *restrict const isConnected,
                   const int *restrict const isConnectedColSize)
 {
     (void)isConnectedColSize; // Unused, as all must equal isConnectedSize.
-
-    bool *const vis = xcalloc(isConnectedSize, sizeof(*vis));
-    const int count = count_components(isConnected, vis, isConnectedSize);
-    free(vis);
-    return count;
+    return count_components(isConnected, isConnectedSize);
 }
