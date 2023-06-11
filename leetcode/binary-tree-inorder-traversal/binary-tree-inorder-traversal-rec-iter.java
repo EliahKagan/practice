@@ -24,10 +24,6 @@ class Solution {
         return values;
     }
 
-    private static void noop(int _value) {
-        // Do nothing.
-    }
-
     private static enum State {
         GO_LEFT,
         GO_RIGHT,
