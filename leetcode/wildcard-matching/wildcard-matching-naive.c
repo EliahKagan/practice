@@ -1,6 +1,6 @@
 // LeetCode #44 - Wildcard Matching
 // https://leetcode.com/problems/wildcard-matching/
-// By pure backtracking (and collapsing consecutive stars for performance).
+// By pure backtracking (and collapsing consecutive stars, but still too slow).
 
 bool isMatch(const char *s, const char* p)
 {
