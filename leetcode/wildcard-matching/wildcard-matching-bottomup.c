@@ -1,6 +1,6 @@
 // LeetCode #44 - Wildcard Matching
 // https://leetcode.com/problems/wildcard-matching/
-// By memoization (top-down dynamic programming) and collapsing runs of stars.
+// By tabulation (bottom-up dynamic programming) and collapsing runs of stars.
 
 bool isMatch(const char *const s, const char *const p)
 {
