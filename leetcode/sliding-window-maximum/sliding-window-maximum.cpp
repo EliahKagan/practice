@@ -1,6 +1,7 @@
 // LeetCode #239: Sliding Window Maximum
 // https://leetcode.com/problems/sliding-window-maximum/
 // Using a self-balancing binary search tree holding the window's contents.
+// Takes O(n log k) time.
 
 class Solution {
 public:

@@ -1,6 +1,7 @@
 // LeetCode #239: Sliding Window Maximum
 // https://leetcode.com/problems/sliding-window-maximum/
 // Discarding smaller elements that precede larger ones.
+// This is also called a "monontonic queue." Takes O(n) time.
 
 class Solution {
 public:
