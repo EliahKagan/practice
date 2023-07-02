@@ -13,22 +13,17 @@ Solution::maxSlidingWindow(const vector<int>& nums, const int k) noexcept
 {
     auto left = cbegin(nums);
     auto right = left + k;
-
     auto window = multiset(left, right);
-    auto best_max = *crbegin(window);
-    auto best_left = left;
+
+    auto maxima = vector<int>{};
+    maxima.reserve(size(nums) - k + 1);
+    maxima.push_back(*crbegin(window));
 
     for (const auto stop = cend(nums); right != stop; ++left, ++right) {
         window.erase(window.find(*left));
         window.insert(*right);
-
-        const auto current_max = *crbegin(window);
-
-        if (best_max < current_max) {
-            best_max = current_max;
-            best_left = left + 1;
-        }
+        maxima.push_back(*crbegin(window));
     }
 
-    return vector(best_left, best_left + k);
+    return maxima;
 }
