@@ -86,6 +86,8 @@ namespace {
             total_weight += src_cost;
 
             for (const auto [dest, weight] : adj_[src]) {
+                if (vis[dest] == Vis::done) continue;
+
                 if (costs[dest] == unseen || costs[dest] > weight) {
                     costs[dest] = weight;
                     pq.push({dest, weight});
