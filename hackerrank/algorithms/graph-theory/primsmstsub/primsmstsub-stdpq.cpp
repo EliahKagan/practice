@@ -74,7 +74,7 @@ namespace {
         pq.push({start, 0});
         auto costs = std::vector<int>(size(adj_), unseen);
         costs[start] = 0;
-        auto vis = std::vector<Vis>(size(adj_), Vis::not_done);
+        auto vis = std::vector(size(adj_), Vis::not_done);
         auto total_weight = 0;
 
         while (!empty(pq)) {
