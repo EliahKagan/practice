@@ -12,7 +12,7 @@ namespace {
     class DisjointSets {
     public:
         // Creates with singleton sets for elements 0, ..., element_count - 1.
-        DisjointSets(int element_count) noexcept;
+        explicit DisjointSets(int element_count) noexcept;
 
         // Joins the sets of elem1 and elem2.
         // Returns true if joined, or false if they were already the same set.
@@ -80,7 +80,7 @@ namespace {
         while (edge_count-- > 0) {
             auto u = 0, v = 0, weight = 0;
             std::cin >> u >> v >> weight;
-            edges.push_back(Edge{u, v, weight});
+            edges.push_back({u, v, weight});
         }
 
         return edges;

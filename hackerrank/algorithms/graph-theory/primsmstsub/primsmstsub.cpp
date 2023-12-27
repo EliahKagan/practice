@@ -42,7 +42,7 @@ namespace {
     class Graph {
     public:
         // Make a graph with vertices 0, ..., vertex_count - 1, no edges yet.
-        Graph(int vertex_count) noexcept;
+        explicit Graph(int vertex_count) noexcept;
 
         // Add an edge to the graph.
         void add_edge(int u, int v, int weight) noexcept;
